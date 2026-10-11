@@ -22,6 +22,7 @@ export async function fetchApprovedProjectMarkers(filters: MarkerFilters = {}): 
     .from("projects")
     .select("id, slug, name, description, place_name, lat, lng")
     .eq("status", "approved")
+    .eq("visibility", "public")
     .not("lat", "is", null)
     .not("lng", "is", null);
 
