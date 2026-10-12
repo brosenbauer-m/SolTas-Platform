@@ -2159,6 +2159,7 @@ export type Database = {
           role: string
           social_links: Json | null
           surname: string | null
+          updated_at: string
         }
         Insert: {
           avatar_url?: string | null
@@ -2181,6 +2182,7 @@ export type Database = {
           role?: string
           social_links?: Json | null
           surname?: string | null
+          updated_at?: string
         }
         Update: {
           avatar_url?: string | null
@@ -2203,6 +2205,7 @@ export type Database = {
           role?: string
           social_links?: Json | null
           surname?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
