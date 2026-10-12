@@ -24,6 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/lib/supabase";
+import { URGENCY_LEVELS } from "@/lib/watchdog/urgency";
 
 const linkSchema = z.object({
   url: z.string().trim().min(1, "Link is required").url("Enter a valid URL"),
@@ -119,13 +120,7 @@ const createDefaultValues = (): FormValues => ({
   feed_message: "",
 });
 
-const URGENCY_OPTIONS = [
-  { value: 1, label: "1 — Low" },
-  { value: 2, label: "2 — Guarded" },
-  { value: 3, label: "3 — Elevated" },
-  { value: 4, label: "4 — High" },
-  { value: 5, label: "5 — Critical" },
-];
+const URGENCY_OPTIONS = URGENCY_LEVELS.map(level => ({ value: level.value, label: `${level.value} — ${level.label}` }));
 
 export default function WatchdogIssueForm() {
   const router = useRouter();

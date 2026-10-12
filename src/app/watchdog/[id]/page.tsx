@@ -1,7 +1,19 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ExternalLink } from "lucide-react";
 
 import UpdatesSection, { type UpdateSummary } from "@/components/updates/UpdatesSection";
+import { Badge } from "@/components/ui/badge";
 import { getServerSupabase } from "@/lib/supabaseServer";
+import { urgencyLabel, urgencyTone } from "@/lib/watchdog/urgency";
+
+function linkHost(url: string) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
+}
 
 function formatDate(value: string | null) {
   if (!value) return "—";
@@ -75,115 +87,114 @@ export default async function WatchdogIssuePage({
     }),
   );
 
+  const urgency = urgencyLabel(issue.urgency);
+  const evidenceLinks = (Array.isArray(issue.evidence_links) ? issue.evidence_links : []).filter(Boolean) as string[];
+  const demographics = (Array.isArray(issue.affected_demographics) ? issue.affected_demographics : []) as string[];
+  const challenges = (Array.isArray(issue.global_challenges) ? issue.global_challenges : []) as string[];
+  const sdgs = (Array.isArray(issue.sdgs) ? issue.sdgs : []) as number[];
+  const affected = [...demographics, issue.affected_groups_text].filter(Boolean).join(", ");
+
   return (
     <main className="mx-auto w-full max-w-5xl space-y-6 px-4 py-6 sm:space-y-8 sm:py-10">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="truncate text-2xl font-semibold tracking-tight text-soltas-text">
-              {issue.title}
-            </h1>
-            {issue.urgency != null ? (
-              <span className="rounded-full border border-soltas-line bg-white px-2 py-0.5 text-xs font-medium text-soltas-muted">
-                Urgency: {issue.urgency}/10
-              </span>
-            ) : null}
-          </div>
+      <nav aria-label="Breadcrumb" className="text-sm text-soltas-muted">
+        <Link href="/watchdog" className="text-soltas-ocean hover:underline">
+          Watchdog
+        </Link>
+        <span aria-hidden="true"> / </span>
+        <span>Issue</span>
+      </nav>
 
-          {locationLabel ? <p className="mt-1 text-sm text-soltas-muted">{locationLabel}</p> : null}
-          <p className="mt-1 text-sm text-soltas-muted">
-            Reported on {formatDate(issue.created_at)}
-          </p>
+      <header className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          {urgency ? <Badge variant={urgencyTone(issue.urgency)}>{urgency} urgency</Badge> : null}
+          {issue.status !== "approved" ? (
+            <Badge variant={issue.status === "rejected" ? "rose" : "amber"}>
+              {issue.status === "pending" ? "Waiting for review" : issue.status === "rejected" ? "Not published" : issue.status}
+            </Badge>
+          ) : null}
         </div>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-soltas-text sm:text-4xl">{issue.title}</h1>
+        <p className="mt-2 text-[15px] text-soltas-muted">
+          {locationLabel ? <>{locationLabel} · </> : null}
+          Reported {formatDate(issue.created_at)}
+          {issue.date_observed ? <> · Observed {formatDate(issue.date_observed)}</> : null}
+        </p>
       </header>
 
       {issue.description ? (
         <section className="card p-6">
-          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">
-            Description
-          </h2>
-          <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-soltas-text">
-            {issue.description}
-          </p>
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">What’s happening</h2>
+          <p className="mt-3 whitespace-pre-wrap text-[15px] leading-7 text-soltas-text">{issue.description}</p>
         </section>
       ) : null}
 
-      <UpdatesSection
-        updates={updates}
-        isAuthenticated={Boolean(user)}
-        canPost={canEdit}
-      />
+      {issue.desired_outcome ? (
+        <section className="card p-6">
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Help needed</h2>
+          <p className="mt-3 whitespace-pre-wrap text-[15px] leading-7 text-soltas-text">{issue.desired_outcome}</p>
+        </section>
+      ) : null}
 
-      <section className="card p-6">
-        <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Details</h2>
+      {evidenceLinks.length > 0 ? (
+        <section className="card p-6">
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Evidence</h2>
+          <ul className="mt-3 divide-y divide-soltas-line">
+            {evidenceLinks.map((url) => (
+              <li key={url}>
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  className="flex min-h-11 items-center justify-between gap-3 py-2 text-[15px] text-soltas-ocean hover:underline"
+                >
+                  <span className="truncate">{linkHost(url)}</span>
+                  <ExternalLink aria-hidden className="h-4 w-4 shrink-0 text-soltas-muted" />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
-        <dl className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {issue.date_observed ? (
-            <div>
-              <dt className="text-xs font-medium text-soltas-muted">
-                Date observed
-              </dt>
-              <dd className="text-sm text-soltas-text">{formatDate(issue.date_observed)}</dd>
-            </div>
-          ) : null}
+      <UpdatesSection updates={updates} isAuthenticated={Boolean(user)} canPost={canEdit} />
 
-          {issue.urgency != null ? (
-            <div>
-              <dt className="text-xs font-medium text-soltas-muted">
-                Urgency
-              </dt>
-              <dd className="text-sm text-soltas-text">{issue.urgency} / 10</dd>
-            </div>
-          ) : null}
-
-          {Array.isArray(issue.affected_demographics) && issue.affected_demographics.length > 0 ? (
-            <div>
-              <dt className="text-xs font-medium text-soltas-muted">
-                Affected demographics
-              </dt>
-              <dd className="text-sm text-soltas-text">
-                {(issue.affected_demographics as string[]).join(", ")}
-              </dd>
-            </div>
-          ) : null}
-
-          {Array.isArray(issue.global_challenges) && issue.global_challenges.length > 0 ? (
-            <div className="sm:col-span-2 lg:col-span-3">
-              <dt className="text-xs font-medium text-soltas-muted">
-                Global challenges
-              </dt>
-              <dd className="mt-1 flex flex-wrap gap-2">
-                {(issue.global_challenges as string[]).map((challenge: string) => (
-                  <span
-                    key={challenge}
-                    className="rounded-full border border-soltas-line bg-white px-2 py-0.5 text-xs font-medium text-soltas-text"
-                  >
-                    {challenge}
-                  </span>
-                ))}
-              </dd>
-            </div>
-          ) : null}
-
-          {Array.isArray(issue.sdgs) && issue.sdgs.length > 0 ? (
-            <div className="sm:col-span-2 lg:col-span-3">
-              <dt className="text-xs font-medium text-soltas-muted">
-                SDGs
-              </dt>
-              <dd className="mt-1 flex flex-wrap gap-2">
-                {(issue.sdgs as number[]).map((sdg: number) => (
-                  <span
-                    key={sdg}
-                    className="rounded-full border border-soltas-line bg-white px-2 py-0.5 text-xs font-medium text-soltas-text"
-                  >
-                    SDG {sdg}
-                  </span>
-                ))}
-              </dd>
-            </div>
-          ) : null}
-        </dl>
-      </section>
+      {affected || challenges.length > 0 || sdgs.length > 0 ? (
+        <section className="card p-6">
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Details</h2>
+          <dl className="mt-4 space-y-5">
+            {affected ? (
+              <div>
+                <dt className="text-xs font-medium text-soltas-muted">Who is affected</dt>
+                <dd className="mt-1 text-[15px] text-soltas-text">{affected}</dd>
+              </div>
+            ) : null}
+            {challenges.length > 0 ? (
+              <div>
+                <dt className="text-xs font-medium text-soltas-muted">Global challenges</dt>
+                <dd className="mt-2 flex flex-wrap gap-2">
+                  {challenges.map((challenge) => (
+                    <Badge key={challenge} variant="outline">
+                      {challenge}
+                    </Badge>
+                  ))}
+                </dd>
+              </div>
+            ) : null}
+            {sdgs.length > 0 ? (
+              <div>
+                <dt className="text-xs font-medium text-soltas-muted">Sustainable Development Goals</dt>
+                <dd className="mt-2 flex flex-wrap gap-2">
+                  {sdgs.map((sdg) => (
+                    <Badge key={sdg} variant="outline">
+                      SDG {sdg}
+                    </Badge>
+                  ))}
+                </dd>
+              </div>
+            ) : null}
+          </dl>
+        </section>
+      ) : null}
     </main>
   );
 }

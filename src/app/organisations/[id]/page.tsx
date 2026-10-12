@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import FollowButton from "@/components/FollowButton";
+import { buttonClasses } from "@/components/ui/button";
 import { SocialLinks } from "@/components/profiles/SocialLinks";
 import UpdatesSection, { type UpdateSummary } from "@/components/updates/UpdatesSection";
 import { getServerSupabase } from "@/lib/supabaseServer";
@@ -87,10 +88,16 @@ export default async function OrganisationPage({
     .select("user_id", { count: "exact", head: true })
     .eq("organisation_id", organisation.id);
 
-  const { count: projectCount, error: projectError } = await supabase
+  // Public, approved projects this organisation leads or owns.
+  const { data: orgProjects, error: projectError } = await supabase
     .from("projects")
-    .select("id", { count: "exact", head: true })
-    .eq("lead_org_id", organisation.id);
+    .select("id,slug,name,category,place_name,country,description")
+    .or(`lead_org_id.eq.${organisation.id},and(owner_type.eq.organisation,owner_id.eq.${organisation.id})`)
+    .eq("status", "approved")
+    .eq("visibility", "public")
+    .order("created_at", { ascending: false })
+    .limit(12);
+  const projectCount = orgProjects?.length ?? 0;
 
   const resolvedMemberCount = memberError ? null : memberCount ?? 0;
   const resolvedProjectCount = projectError ? null : projectCount ?? 0;
@@ -206,14 +213,14 @@ export default async function OrganisationPage({
             <>
               <Link
                 href={`/organisations/${organisation.id}/edit`}
-                className="inline-flex items-center justify-center rounded-xl bg-soltas-ocean px-4 py-2 text-sm font-semibold text-white hover:bg-soltas-abyssal transition-all duration-200 shadow-sm"
+                className={buttonClasses({ size: "sm" })}
               >
                 Edit
               </Link>
               {isOrgAdmin ? (
                 <Link
                   href={`/organisations/${organisation.id}/members`}
-                  className="inline-flex items-center justify-center rounded-xl border border-soltas-line bg-white px-4 py-2 text-sm font-semibold text-soltas-text hover:bg-soltas-off-white transition-all duration-200"
+                  className={buttonClasses({ variant: "outline", size: "sm" })}
                 >
                   Members
                 </Link>
@@ -290,41 +297,54 @@ export default async function OrganisationPage({
         </dl>
       </section>
 
+      <section className="card p-6">
+        <div className="flex items-baseline justify-between gap-3">
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Projects</h2>
+          <p className="text-sm text-soltas-muted">
+            {[
+              resolvedProjectCount ? `${resolvedProjectCount} ${resolvedProjectCount === 1 ? "project" : "projects"}` : null,
+              resolvedMemberCount ? `${resolvedMemberCount} ${resolvedMemberCount === 1 ? "member" : "members"}` : null,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
+        </div>
+        {orgProjects && orgProjects.length > 0 ? (
+          <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+            {orgProjects.map((project) => (
+              <li key={project.id}>
+                <Link
+                  href={`/projects/${project.slug ?? project.id}`}
+                  className="flex h-full flex-col rounded-2xl border border-soltas-line p-4 transition-colors hover:bg-soltas-off-white"
+                >
+                  <span className="flex items-center gap-2">
+                    {project.category ? (
+                      <Badge variant={project.category === "humanitarian" ? "ocean" : "green"} className="capitalize">
+                        {project.category}
+                      </Badge>
+                    ) : null}
+                    {project.place_name || project.country ? (
+                      <span className="truncate text-xs text-soltas-muted">{project.place_name || project.country}</span>
+                    ) : null}
+                  </span>
+                  <span className="mt-2 font-medium text-soltas-text">{project.name}</span>
+                  {project.description ? (
+                    <span className="mt-1 line-clamp-2 text-sm text-soltas-muted">{project.description}</span>
+                  ) : null}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-3 text-sm text-soltas-muted">No public projects yet.</p>
+        )}
+      </section>
+
       <UpdatesSection
         updates={updates}
         isAuthenticated={Boolean(user)}
         canPost={canEdit}
       />
-
-      <section className="card p-6">
-        <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Stats</h2>
-        <dl className="mt-4 grid gap-4 sm:grid-cols-3">
-          <div>
-            <dt className="text-xs font-medium text-soltas-muted">
-              Members
-            </dt>
-            <dd className="mt-1 text-2xl font-semibold text-soltas-text">
-              {resolvedMemberCount === null ? "—" : resolvedMemberCount}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-xs font-medium text-soltas-muted">
-              Projects
-            </dt>
-            <dd className="mt-1 text-2xl font-semibold text-soltas-text">
-              {resolvedProjectCount === null ? "—" : resolvedProjectCount}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-xs font-medium text-soltas-muted">
-              Followers
-            </dt>
-            <dd className="mt-1 text-2xl font-semibold text-soltas-text">
-              {resolvedFollowerCount === null ? "—" : resolvedFollowerCount}
-            </dd>
-          </div>
-        </dl>
-      </section>
     </main>
   );
 }
