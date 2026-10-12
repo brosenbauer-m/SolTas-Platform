@@ -52,7 +52,18 @@ export function SocialLinks({ links }: { links: unknown }) {
   return (
     <ul className="space-y-2">
       {normalized.map((link) => {
-        const label = link.type ?? link.url;
+        const NAMES: Record<string, string> = {
+          linkedin: "LinkedIn",
+          instagram: "Instagram",
+          twitter: "X (Twitter)",
+          x: "X",
+          facebook: "Facebook",
+          youtube: "YouTube",
+          tiktok: "TikTok",
+          github: "GitHub",
+          website: "Website",
+        };
+        const label = link.type ? (NAMES[link.type.toLowerCase()] ?? link.type) : link.url;
         return (
           <li key={`${label}-${link.url}`}>
             <Link

@@ -36,7 +36,7 @@ export const buttonClasses = ({
   className?: string;
 } = {}) =>
   cn(
-    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-soltas-ocean focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+    "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-soltas-ocean focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
     sizeClasses[size],
     variantClasses[variant],
     className,

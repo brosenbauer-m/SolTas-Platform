@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { EmptyState } from "@/components/ui/empty-state";
 import { buttonClasses } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
@@ -339,7 +340,7 @@ export default async function FeedPage({
             key={tab.key}
             href={`/feed?tab=${tab.key}`}
             aria-current={activeTab === tab.key ? "page" : undefined}
-            className={`${segmentClass(activeTab === tab.key)} flex-1 sm:flex-none`}
+            className={cn(segmentClass(activeTab === tab.key), "min-w-0 flex-1 px-2 sm:flex-none sm:px-4")}
           >
             {tab.label}
           </Link>

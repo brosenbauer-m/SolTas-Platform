@@ -404,15 +404,20 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
   useEffect(() => {
     let isMounted = true;
     async function loadOptions() {
-      const [orgRes, sdgRes, ifrcRes, userRes, creatableOrgsRes] = await Promise.all([
+      const userRes = await supabase.auth.getUser();
+      const userId = userRes.data.user?.id ?? null;
+      const [orgRes, sdgRes, ifrcRes, creatableOrgsRes] = await Promise.all([
         supabase.from("organisations").select("id, name").order("name"),
         supabase.from("sdgs").select("id, name").order("id"),
         supabase.from("ifrc_challenges").select("id, name").order("name"),
-        supabase.auth.getUser(),
-        supabase
-          .from("organisation_members")
-          .select("organisation_id, organisations(id, name)")
-          .eq("can_create_projects", true),
+        // Only the current user's own memberships that allow creating projects
+        userId
+          ? supabase
+              .from("organisation_members")
+              .select("organisation_id, organisations(id, name)")
+              .eq("user_id", userId)
+              .eq("can_create_projects", true)
+          : Promise.resolve({ data: [], error: null }),
       ]);
       if (!isMounted) return;
       if (!orgRes.error && orgRes.data) {
@@ -428,8 +433,10 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
         setCurrentUserId(userRes.data.user.id);
       }
       if (!creatableOrgsRes.error && creatableOrgsRes.data) {
+        const seen = new Set<string>();
         const orgs = (creatableOrgsRes.data ?? [])
           .flatMap(om => om.organisations ?? [])
+          .filter(org => (seen.has(org.id) ? false : (seen.add(org.id), true)))
           .map(org => ({ value: org.id, label: org.name }));
         setCreatableOrgOptions(orgs);
       }
@@ -699,10 +706,10 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
                         <Button
                           key={option.value}
                           type="button"
-                          variant={isSelected ? "default" : "outline"}
+                          variant="outline"
                           className={cn(
-                            "flex h-full flex-col items-start gap-1 rounded-2xl border px-4 py-3 text-left transition",
-                            isSelected ? "border-soltas-ocean bg-soltas-glacial/15 text-soltas-ocean" : "bg-white",
+                            "flex h-full flex-col items-start gap-1 rounded-2xl px-4 py-3 text-left font-normal transition",
+                            isSelected ? "border-soltas-ocean bg-soltas-ocean/5 text-soltas-text ring-1 ring-soltas-ocean" : "bg-white",
                           )}
                           onClick={() => field.onChange(option.value)}
                         >

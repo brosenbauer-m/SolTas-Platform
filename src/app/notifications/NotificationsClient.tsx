@@ -1,5 +1,10 @@
 "use client";
 
+import { Bell } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useTransition } from "react";
@@ -83,82 +88,80 @@ export default function NotificationsClient({
   };
 
   return (
-    <section className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-soltas-text">Notifications</h1>
-          <p className="text-sm text-soltas-muted">
-            Updates about your projects, follows, and collaborations.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={handleMarkAll}
-          disabled={!hasUnread || isPending}
-          className="inline-flex items-center justify-center rounded-lg border border-soltas-line bg-white px-3 py-2 text-sm font-medium text-soltas-text transition disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          Mark all as read
-        </button>
-      </div>
+    <section className="space-y-6">
+      <PageHeader
+        title="Notifications"
+        description="Updates about your projects, follows and collaborations."
+        actions={
+          <Button variant="outline" size="sm" onClick={handleMarkAll} disabled={!hasUnread || isPending}>
+            Mark all as read
+          </Button>
+        }
+      />
 
       {notifications.length ? (
-        <ul className="space-y-3">
+        <ul className="divide-y divide-soltas-line overflow-hidden rounded-2xl border border-soltas-line bg-white">
           {notifications.map((notification) => {
             const isUnread = !notification.read_at;
             const fallbackBody = getFallbackBody(notification.type);
             const body = notification.body ?? fallbackBody;
             const content = (
-              <div className="min-w-0 space-y-1">
-                <div className="truncate text-sm font-semibold text-soltas-text">{notification.title}</div>
-                {body ? (
-                  <div className="truncate text-xs text-soltas-muted">{body}</div>
-                ) : null}
-                <div className="text-xs text-soltas-muted">{formatDateTime(notification.created_at)}</div>
+              <div className="flex min-w-0 items-start gap-3">
+                <span
+                  aria-hidden="true"
+                  className={`mt-2 h-2 w-2 shrink-0 rounded-full ${isUnread ? "bg-soltas-ocean" : "bg-transparent"}`}
+                />
+                <div className="min-w-0 space-y-0.5">
+                  <p className={`text-[15px] text-soltas-text ${isUnread ? "font-semibold" : "font-medium"}`}>
+                    {notification.title}
+                    {isUnread ? <span className="sr-only"> (unread)</span> : null}
+                  </p>
+                  {body ? <p className="line-clamp-2 text-sm text-soltas-muted">{body}</p> : null}
+                  <p className="text-xs text-soltas-muted">{formatDateTime(notification.created_at)}</p>
+                </div>
               </div>
             );
 
             return (
-              <li
-                key={notification.id}
-                className={`flex flex-col gap-3 rounded-2xl border px-4 py-3 sm:flex-row sm:items-center sm:justify-between ${
-                  isUnread
-                    ? "border-soltas-glacial/30 bg-soltas-glacial/15"
-                    : "border-soltas-line bg-white"
-                }`}
-              >
+              <li key={notification.id} className="flex items-start justify-between gap-3 px-4 py-4 transition-colors hover:bg-soltas-off-white sm:px-5">
                 {notification.href ? (
-                  <Link href={notification.href} className="flex-1" prefetch={false}>
+                  <Link
+                    href={notification.href}
+                    className="min-w-0 flex-1"
+                    prefetch={false}
+                    onClick={() => {
+                      if (isUnread) handleMarkRead(notification.id);
+                    }}
+                  >
                     {content}
                   </Link>
                 ) : (
-                  <div className="flex-1">{content}</div>
+                  <div className="min-w-0 flex-1">{content}</div>
                 )}
-                <div className="flex items-center gap-2">
-                  {isUnread ? (
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        handleMarkRead(notification.id);
-                      }}
-                      disabled={isPending}
-                      className="rounded-lg border border-soltas-line bg-white px-3 py-1 text-xs font-medium text-soltas-text transition hover:bg-soltas-off-white disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      Mark read
-                    </button>
-                  ) : (
-                    <span className="text-xs font-medium text-soltas-muted">Read</span>
-                  )}
-                </div>
+                {isUnread ? (
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      handleMarkRead(notification.id);
+                    }}
+                    disabled={isPending}
+                    className="shrink-0 rounded-full px-2.5 py-1 text-xs font-medium text-soltas-ocean transition hover:bg-soltas-light disabled:opacity-60"
+                  >
+                    Mark read
+                  </button>
+                ) : null}
               </li>
             );
           })}
         </ul>
       ) : (
-        <div className="rounded-2xl border border-soltas-line bg-white p-6 text-sm text-soltas-muted">
-          You have no notifications yet.
-        </div>
+        <EmptyState
+          icon={<Bell />}
+          title="You're all caught up"
+          description="Follow projects, organisations and people to get notified about their updates."
+        />
       )}
     </section>
   );
