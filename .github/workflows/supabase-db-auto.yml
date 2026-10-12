@@ -1,5 +1,7 @@
 name: supabase-db-auto
 
+# Applies repo migrations to the production database (forward-only) and
+# commits regenerated TypeScript types back to main.
 on:
   workflow_dispatch:
   push:
@@ -7,31 +9,26 @@ on:
     paths:
       - "supabase/**"
       - ".github/workflows/supabase-db-auto.yml"
-      - "package.json"
-      - "pnpm-lock.yaml"
 
 permissions:
   contents: write
 
+# Never run two database pushes at the same time; queue them instead.
+concurrency:
+  group: supabase-db
+  cancel-in-progress: false
+
 env:
-  SUPABASE_DB_URL:       ${{ secrets.SUPABASE_DB_URL }}
-  SUPABASE_PROJECT_REF:  ${{ secrets.SUPABASE_PROJECT_REF }}
+  SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
   SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
 jobs:
-  # ------------------ Sync migrations + types on push ------------------
-  sync_on_push:
-    if: github.event_name == 'push'
+  apply-migrations:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Bail if last commit from Actions bot
-        run: |
-          if git log -1 --pretty=%an | grep -qi "github-actions"; then
-            echo "Last commit from GitHub Actions; exiting."
-            exit 0
-          fi
+        with:
+          fetch-depth: 0  # full history so the types commit can rebase onto main
 
       - name: Validate secrets
         run: |
@@ -39,27 +36,27 @@ jobs:
           test -n "${SUPABASE_DB_URL}" || { echo "ERR: SUPABASE_DB_URL missing"; exit 1; }
           test -n "${SUPABASE_ACCESS_TOKEN}" || { echo "ERR: SUPABASE_ACCESS_TOKEN missing"; exit 1; }
 
-      - name: Supabase CLI (npx) – version
-        run: npx supabase@latest --version
+      - name: Read Supabase CLI version from package.json
+        id: cli
+        run: echo "version=$(node -p "require('./package.json').devDependencies.supabase.replace(/^[^0-9]*/, '')")" >> "$GITHUB_OUTPUT"
 
-      - name: Login to Supabase
-        run: npx supabase@latest login --token "${SUPABASE_ACCESS_TOKEN}"
+      - uses: supabase/setup-cli@v1
+        with:
+          version: ${{ steps.cli.outputs.version }}
 
-      # Apply repo migrations forward-only (NO --include-all)
-      - name: Apply repo migrations (safe forward-only)
-        run: |
-          set -euo pipefail
-          npx supabase@latest db push --db-url "${SUPABASE_DB_URL}" --yes
+      # Forward-only: never use --include-all on production.
+      - name: Apply repo migrations
+        run: supabase db push --db-url "${SUPABASE_DB_URL}" --yes
 
-      - name: Generate TypeScript types (DB URL)
+      - name: Generate TypeScript types
         run: |
           set -euo pipefail
           mkdir -p src/lib
-          npx supabase@latest gen types typescript \
+          supabase gen types typescript \
             --db-url "${SUPABASE_DB_URL}" \
             -s public -s auth -s storage > src/lib/database.types.ts
-          head -n 3 src/lib/database.types.ts || true
 
+      # [skip ci] on the commit prevents this workflow from re-triggering itself.
       - name: Commit & push types (if changed)
         run: |
           set -euo pipefail
@@ -68,50 +65,5 @@ jobs:
           git add src/lib/database.types.ts
           git diff --cached --quiet && { echo "No type changes"; exit 0; }
           git commit -m "chore(types): regenerate DB types [skip ci]"
-          git push origin main
-
-  # ------------------ Full DB ops (manual only) ------------------
-  # This is an emergency/maintenance job:
-  # - It applies repo migrations (forward-only)
-  # - It regenerates types
-  # - It DOES NOT generate auto migrations from the DB
-  db_ops:
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Validate secrets
-        run: |
-          set -euo pipefail
-          test -n "${SUPABASE_DB_URL}" || { echo "ERR: SUPABASE_DB_URL missing"; exit 1; }
-          test -n "${SUPABASE_ACCESS_TOKEN}" || { echo "ERR: SUPABASE_ACCESS_TOKEN missing"; exit 1; }
-
-      - name: Supabase CLI (npx) – version
-        run: npx supabase@latest --version
-
-      - name: Login to Supabase
-        run: npx supabase@latest login --token "${SUPABASE_ACCESS_TOKEN}"
-
-      - name: Apply repo migrations (safe forward-only)
-        run: |
-          set -euo pipefail
-          npx supabase@latest db push --db-url "${SUPABASE_DB_URL}" --yes
-
-      - name: Regenerate TypeScript types
-        run: |
-          set -euo pipefail
-          mkdir -p src/lib
-          npx supabase@latest gen types typescript \
-            --db-url "${SUPABASE_DB_URL}" \
-            -s public -s auth -s storage > src/lib/database.types.ts
-
-      - name: Commit & push types (if changed)
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add src/lib/database.types.ts
-          git diff --cached --quiet && { echo "No changes"; exit 0; }
-          git commit -m "chore(types): regenerate DB types [skip ci]"
-          git push origin main
+          git pull --rebase origin main
+          git push origin HEAD:main

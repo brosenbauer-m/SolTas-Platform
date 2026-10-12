@@ -143,35 +143,38 @@ This ensures your Supabase schema and types stay synchronized.
 
 ---
 
-## 9. GitHub Actions — Supabase DB Automation
+## 9. GitHub Actions
 
-Workflow file: `.github/workflows/supabase-db-auto.yml`
+### CI (`.github/workflows/ci.yml`)
 
-This runs automatically when:
-- Code is pushed to `main`
-- Or triggered manually from the **Actions** tab
+Runs on every pull request to `main`. Four parallel jobs:
 
-### Steps Performed
+| Job | Command |
+|-----|---------|
+| `check-migrations` | `pnpm check:migrations` (migration files strictly ordered) |
+| `typecheck` | `pnpm typecheck` |
+| `lint` | `pnpm lint` |
+| `build` | `pnpm build` (with dummy `NEXT_PUBLIC_SUPABASE_*` values) |
 
-1. Logs into Supabase using repository secrets:
-   - `SUPABASE_ACCESS_TOKEN`
-   - `SUPABASE_DB_URL`
-   - `SUPABASE_PROJECT_REF`
-2. Creates migration diffs:
+### Supabase DB automation (`.github/workflows/supabase-db-auto.yml`)
+
+Runs when a push to `main` changes `supabase/**` (or this workflow file), and can be started manually from the **Actions** tab. Only one run at a time; later runs wait in a queue (`concurrency: supabase-db`).
+
+Steps:
+
+1. Checks that the `SUPABASE_DB_URL` and `SUPABASE_ACCESS_TOKEN` repository secrets are set.
+2. Installs the Supabase CLI at the version pinned in `package.json` (`devDependencies.supabase`).
+3. Applies new repo migrations to production, forward-only (never `--include-all`):
    ```bash
-   supabase db diff --db-url $SUPABASE_DB_URL
-   ```
-3. Applies migrations:
-   ```bash
-   supabase db push
+   supabase db push --db-url $SUPABASE_DB_URL --yes
    ```
 4. Regenerates TypeScript types:
    ```bash
    supabase gen types typescript --db-url $SUPABASE_DB_URL -s public -s auth -s storage > src/lib/database.types.ts
    ```
-5. Commits and pushes updates back to `main`.
+5. If the types changed, commits them as `chore(types): regenerate DB types [skip ci]`, rebases onto the latest `main` and pushes. `[skip ci]` stops the commit from triggering the workflow again.
 
-This keeps your live Supabase DB and schema definitions consistent with code.
+It never generates migrations from the database: the repo is the source of truth for the schema.
 
 ---
 
