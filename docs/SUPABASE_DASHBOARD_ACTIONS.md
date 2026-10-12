@@ -1,5 +1,7 @@
 # Supabase Dashboard Actions Required
 
+> **Historical document.** Dashboard settings (Auth, email) are still changed in the Supabase dashboard, but schema changes always go through migrations (see `AGENT_RULES.md`).
+
 This document describes manual actions that must be taken in the Supabase Dashboard to complete the security hardening process. These items cannot be automated via migrations.
 
 ## 1. Enable Leaked Password Protection

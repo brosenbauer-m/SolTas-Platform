@@ -1,4 +1,5 @@
 -- Manual tests for 20260324120004_fix_projects_rls_recursion.sql
+-- runnable: pnpm db:test
 --
 -- Run in the Supabase SQL editor (or psql as postgres). Everything runs inside a
 -- transaction that is rolled back, so nothing is left behind.

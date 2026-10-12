@@ -1,4 +1,5 @@
 -- Manual tests for 20260324120007_lock_down_org_membership_and_creation.sql
+-- runnable: pnpm db:test
 -- Run in the Supabase SQL editor. Everything is rolled back.
 
 begin;

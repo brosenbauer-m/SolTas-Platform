@@ -1,4 +1,5 @@
 -- Manual tests for 20260324120006_fix_profiles_updates_and_protect_roles.sql
+-- runnable: pnpm db:test
 -- Run in the Supabase SQL editor. Everything is rolled back.
 -- Uses two throwaway users; picks any existing superadmin from user_roles for test 4.
 

@@ -8,7 +8,7 @@ how setup works, how Supabase integrates, and what to do for syncing, deployment
 ## Latest Updates (Humans + Agent AIs)
 
 - UI palette rebrand is complete — see `docs/REBRAND_COMPLETE.md` for the blue/brown theme coverage across components.
-- Supabase migration/RLS guardrails for agents are in `AGENT_RULES.md`; review before touching database code or policies.
+- **Agents and contributors: read `AGENT_RULES.md` first** (shipping, migrations, RLS checklist). `CLAUDE.md` has a code map; `docs/ROADMAP.md` is the plan, `docs/DESIGN.md` the UI rules.
 - Implementation notes and test playbooks now live under `docs/` (e.g., `docs/IMPLEMENTATION.md`, `docs/manual-tests/`); add any new Markdown docs under `docs/` — only `README.md` stays at the repo root.
 - Security hardening guidance is captured in `docs/SECURITY_HARDENING_QUICKSTART.md` and `docs/SECURITY_HARDENING_SUMMARY.md`; follow alongside the Supabase rules above.
 
@@ -117,6 +117,7 @@ Available via `package.json`:
 | `pnpm check:migrations` | Verify migration files are strictly ordered |
 | `pnpm sb:migration "name"` | Create a new, correctly ordered migration file |
 | `pnpm test:rls` | RLS smoke test against a Supabase project (see below) |
+| `pnpm db:test` | Build a throwaway local DB from all migrations and sweep RLS (needs local Postgres binaries) |
 | `pnpm sb:sync` | Run Supabase sync script |
 | `pnpm sb:diff` | Show schema differences |
 | `pnpm sb:login` | Authenticate Supabase |
