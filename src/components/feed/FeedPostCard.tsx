@@ -193,7 +193,7 @@ export function FeedPostCard({
   };
 
   return (
-    <article className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+    <article className="card p-6">
       <div className="flex gap-3">
         {authorAvatarUrl ? (
           <Image

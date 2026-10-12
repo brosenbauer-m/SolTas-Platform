@@ -447,7 +447,7 @@ export default async function ProjectEditPage({
       <ProjectForm mode="edit" projectId={project.id} initialValues={initialValues} />
 
       {/* Sharing */}
-      <section id="sharing" className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+      <section id="sharing" className="card p-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Sharing</h2>
@@ -565,7 +565,7 @@ export default async function ProjectEditPage({
         </div>
       </section>
 
-      <section id="updates" className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+      <section id="updates" className="card p-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-semibold tracking-tight text-soltas-text">

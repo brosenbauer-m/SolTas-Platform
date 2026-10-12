@@ -245,7 +245,7 @@ export default function HomeGlobeSection({
       </div>
 
       <div className="pointer-events-none relative z-10 flex h-full w-full flex-col">
-        <div className="px-6 pt-8 sm:px-8 lg:px-12">
+        <div className="mx-auto w-full max-w-7xl px-4 pt-10 sm:px-6">
           <div className="max-w-2xl space-y-3">
             <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
               Impact, mapped.
@@ -324,7 +324,7 @@ export default function HomeGlobeSection({
           </div>
         </div>
 
-        <div className="pointer-events-auto absolute inset-x-0 bottom-20 px-4 sm:px-8 lg:px-12">
+        <div className="pointer-events-auto absolute inset-x-0 bottom-20 px-4 sm:px-6">
           <StatsBar items={[...activeStats.left, ...activeStats.right]} />
         </div>
 
@@ -348,8 +348,8 @@ function StatsBar({ items }: { items: StatItem[] }) {
   if (!items.length) return null;
   return (
     <dl
-      className="mx-auto grid w-full max-w-3xl gap-px overflow-hidden rounded-2xl border border-white/15 bg-white/10 shadow-[0_20px_60px_-30px_rgba(15,23,42,0.6)] backdrop-blur-xl"
-      style={{ gridTemplateColumns: `repeat(${Math.min(items.length, 4)}, minmax(0, 1fr))` }}
+      className="mx-auto grid w-full max-w-3xl grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/15 bg-white/10 shadow-[0_20px_60px_-30px_rgba(15,23,42,0.6)] backdrop-blur-xl sm:[grid-template-columns:repeat(var(--cols),minmax(0,1fr))]"
+      style={{ "--cols": Math.min(items.length, 4) } as React.CSSProperties}
     >
       {items.map((item) => (
         <div key={item.label} className="bg-black/10 px-4 py-3 sm:px-5 sm:py-4">

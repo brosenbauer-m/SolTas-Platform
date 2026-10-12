@@ -232,7 +232,7 @@ export default function ProjectsGlobeSplitView({ markers, totalCount, focusSlug 
 
   if (isMobile) {
     return (
-      <section className="relative h-full w-full min-h-0 overflow-hidden rounded-2xl border border-soltas-line bg-white shadow-sm">
+      <section className="relative h-full w-full min-h-0 overflow-hidden rounded-2xl border border-soltas-line bg-white">
         <div className="h-full w-full">
           <Map
             markers={mapMarkers}
@@ -279,7 +279,7 @@ export default function ProjectsGlobeSplitView({ markers, totalCount, focusSlug 
   return (
     <section
       ref={containerRef}
-      className="h-full w-full min-h-0 overflow-hidden rounded-2xl border border-soltas-line bg-white shadow-sm"
+      className="h-full w-full min-h-0 overflow-hidden rounded-2xl border border-soltas-line bg-white"
     >
       <div
         className="grid h-full w-full"

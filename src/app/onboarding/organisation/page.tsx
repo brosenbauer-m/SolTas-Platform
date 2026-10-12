@@ -126,7 +126,7 @@ export default function OrganisationOnboardingPage() {
   if (loading || creating) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-soltas-light">
-        <div className="rounded-2xl border border-soltas-line bg-white p-8 text-center shadow-sm">
+        <div className="rounded-2xl border border-soltas-line bg-white p-8 text-center">
           <div className="mb-4 text-lg font-medium text-soltas-ocean">
             {creating ? "Creating your organisation..." : "Setting up..."}
           </div>
@@ -156,7 +156,7 @@ export default function OrganisationOnboardingPage() {
   if (message) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-soltas-light">
-        <div className="rounded-2xl border border-soltas-line bg-white p-8 text-center shadow-sm">
+        <div className="rounded-2xl border border-soltas-line bg-white p-8 text-center">
           <div className="text-lg font-medium text-soltas-ocean">{message}</div>
         </div>
       </div>

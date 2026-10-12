@@ -63,7 +63,7 @@ export default async function GrantDetailPage({
         {grant.summary ? <p className="text-base text-soltas-muted">{grant.summary}</p> : null}
       </header>
 
-      <section className="grid gap-6 rounded-3xl border border-soltas-line bg-white p-6 shadow-sm sm:grid-cols-2">
+      <section className="grid gap-6 rounded-2xl border border-soltas-line bg-white p-6 sm:grid-cols-2">
         <div className="space-y-2">
           <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Funder</h2>
           <p className="text-base text-soltas-text">{grant.funder_name ?? "Not listed"}</p>
@@ -95,7 +95,7 @@ export default async function GrantDetailPage({
         </div>
       </section>
 
-      <section className="grid gap-6 rounded-3xl border border-soltas-line bg-white p-6 shadow-sm sm:grid-cols-2">
+      <section className="grid gap-6 rounded-2xl border border-soltas-line bg-white p-6 sm:grid-cols-2">
         <div className="space-y-2">
           <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Key dates</h2>
           <ul className="space-y-1 text-sm text-soltas-muted">
@@ -116,7 +116,7 @@ export default async function GrantDetailPage({
       </section>
 
       {grant.description ? (
-        <section className="rounded-3xl border border-soltas-line bg-white p-6 shadow-sm">
+        <section className="rounded-2xl border border-soltas-line bg-white p-6">
           <h2 className="text-lg font-semibold text-soltas-text">Details</h2>
           <p className="mt-3 whitespace-pre-wrap text-sm text-soltas-muted">{grant.description}</p>
         </section>

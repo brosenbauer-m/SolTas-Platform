@@ -156,7 +156,7 @@ export default async function OrganisationEditPage({
       <form action={updateOrganisation} className="space-y-6">
         <input type="hidden" name="id" value={organisation.id} />
 
-        <section className="rounded-2xl border border-soltas-line bg-white p-7 shadow-sm">
+        <section className="rounded-2xl border border-soltas-line bg-white p-7">
           <h2 className="text-xs font-medium text-soltas-muted">
             Basic information
           </h2>
@@ -218,7 +218,7 @@ export default async function OrganisationEditPage({
           </div>
         </section>
 
-        <section className="rounded-2xl border border-soltas-line bg-white p-7 shadow-sm">
+        <section className="rounded-2xl border border-soltas-line bg-white p-7">
           <h2 className="text-xs font-medium text-soltas-muted">
             What we do
           </h2>
@@ -230,7 +230,7 @@ export default async function OrganisationEditPage({
           />
         </section>
 
-        <section className="rounded-2xl border border-soltas-line bg-white p-7 shadow-sm">
+        <section className="rounded-2xl border border-soltas-line bg-white p-7">
           <h2 className="text-xs font-medium text-soltas-muted">
             Social links
           </h2>

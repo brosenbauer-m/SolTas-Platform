@@ -620,7 +620,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        <section className="rounded-3xl border border-soltas-line bg-white p-6 shadow-sm">
+        <section className="rounded-2xl border border-soltas-line bg-white p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <h2 className="text-xl font-semibold text-soltas-text">Project overview</h2>
@@ -908,7 +908,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
           </div>
         </section>
 
-        <section className="rounded-3xl border border-soltas-line bg-white p-6 shadow-sm">
+        <section className="rounded-2xl border border-soltas-line bg-white p-6">
           <h2 className="text-xl font-semibold text-soltas-text">Location & beneficiaries</h2>
           <p className="mt-1 text-sm text-soltas-muted">Find the place where the project has the greatest impact.</p>
 
@@ -1079,7 +1079,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
           </div>
         </section>
 
-        <section className="rounded-3xl border border-soltas-line bg-white p-6 shadow-sm">
+        <section className="rounded-2xl border border-soltas-line bg-white p-6">
           <h2 className="text-xl font-semibold text-soltas-text">Timeline & funding</h2>
           <p className="mt-1 text-sm text-soltas-muted">Share when the project runs and what support is still required.</p>
 
@@ -1196,7 +1196,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
           </div>
         </section>
 
-        <section className="rounded-3xl border border-soltas-line bg-white p-6 shadow-sm">
+        <section className="rounded-2xl border border-soltas-line bg-white p-6">
           <h2 className="text-xl font-semibold text-soltas-text">Project media</h2>
           <p className="mt-1 text-sm text-soltas-muted">Upload images, video, or documents after submitting the form.</p>
 
@@ -1253,7 +1253,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
           </div>
         </section>
 
-        <section className="rounded-3xl border border-soltas-line bg-white p-6 shadow-sm">
+        <section className="rounded-2xl border border-soltas-line bg-white p-6">
           <h2 className="text-xl font-semibold text-soltas-text">Share to feed</h2>
           <p className="mt-1 text-sm text-soltas-muted">Optionally announce this project to the community feed.</p>
 
@@ -1299,7 +1299,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
 
         {submitError && <div className="rounded-3xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{submitError}</div>}
 
-        <div className="sticky bottom-4 z-10 rounded-3xl border border-soltas-line bg-white p-4 shadow-lg sm:static sm:border-none sm:bg-transparent sm:p-0 sm:shadow-none">
+        <div className="sticky bottom-4 z-10 rounded-2xl border border-soltas-line bg-white p-4 shadow-lg sm:static sm:border-none sm:bg-transparent sm:p-0 sm:shadow-none">
           <Button type="submit" disabled={isSubmitting} className="inline-flex w-full items-center justify-center gap-2">
             {isSubmitting && <Loader2 className="h-5 w-5 animate-spin" />}
             {isSubmitting ? (mode === "edit" ? "Saving" : "Submitting") : mode === "edit" ? "Save changes" : "Submit project"}

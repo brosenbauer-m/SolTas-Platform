@@ -135,7 +135,7 @@ export default async function ProfilePage({
       </header>
 
       {profile.bio ? (
-        <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+        <section className="card p-6">
           <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Bio</h2>
           <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-soltas-text">
             {profile.bio}
@@ -143,7 +143,7 @@ export default async function ProfilePage({
         </section>
       ) : null}
 
-      <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+      <section className="card p-6">
         <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Details</h2>
         <dl className="mt-4 grid gap-4 sm:grid-cols-2">
           <div>

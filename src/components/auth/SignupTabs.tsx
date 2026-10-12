@@ -266,7 +266,7 @@ function SignupTabsContent({ client }: { client: SupabaseClient }) {
   }
 
   return (
-    <div className="rounded-2xl border border-soltas-line bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-soltas-line bg-white p-6">
       <form onSubmit={handleIndividualSubmit} className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <Field

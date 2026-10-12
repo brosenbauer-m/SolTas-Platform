@@ -158,7 +158,7 @@ export function NewPostComposer({ userName, organisations = [] }: NewPostCompose
   };
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+    <form onSubmit={handleSubmit} className="card p-6">
       <h2 className="mb-4 text-lg font-semibold tracking-tight text-soltas-text">
         New post
       </h2>

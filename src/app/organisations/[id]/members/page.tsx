@@ -383,7 +383,7 @@ export default async function OrganisationMembersPage({
         />
 
         <div className="space-y-4 text-center">
-          <div className="mx-auto w-full max-w-md rounded-2xl border border-soltas-line bg-white p-8 shadow-sm">
+          <div className="mx-auto w-full max-w-md rounded-2xl border border-soltas-line bg-white p-8">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-soltas-light">
               <svg
                 className="h-8 w-8 text-soltas-muted"

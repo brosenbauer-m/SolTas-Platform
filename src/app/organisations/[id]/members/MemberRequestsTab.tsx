@@ -141,7 +141,7 @@ export function MemberRequestsTab({
 
       {/* Members Tab */}
       {activeTab === "members" && (
-        <div className="rounded-2xl border border-soltas-line bg-white shadow-sm">
+        <div className="rounded-2xl border border-soltas-line bg-white">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y text-sm">
               <thead className="bg-soltas-off-white text-left text-xs font-medium text-soltas-muted">
@@ -184,7 +184,7 @@ export function MemberRequestsTab({
 
       {/* Requests Tab */}
       {activeTab === "requests" && canManageMembers && (
-        <div className="rounded-2xl border border-soltas-line bg-white shadow-sm">
+        <div className="rounded-2xl border border-soltas-line bg-white">
           {requests.length === 0 ? (
             <div className="p-8 text-center">
               <p className="text-sm text-soltas-muted">No pending membership requests.</p>

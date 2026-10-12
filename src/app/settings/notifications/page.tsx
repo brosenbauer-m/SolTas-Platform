@@ -51,7 +51,7 @@ export default async function NotificationSettingsPage() {
 
       <form
         action={updateEmailNotifications}
-        className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm space-y-4"
+        className="card p-6 space-y-4"
       >
         <label className="flex items-start gap-3">
           <input

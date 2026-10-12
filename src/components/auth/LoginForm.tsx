@@ -85,7 +85,7 @@ function LoginFormContent({ client }: { client: SupabaseClient }) {
   }
 
   return (
-    <div className="rounded-3xl border border-soltas-line bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-soltas-line bg-white p-6">
       <form onSubmit={handleSubmit} className="space-y-4">
         <label className="space-y-1 text-sm text-soltas-text">
           <span className="font-medium">Email *</span>

@@ -54,7 +54,7 @@ export default function WatchdogIssueForm() {
         <p className="text-sm text-soltas-muted">Help us keep the community safe and informed.</p>
       </div>
 
-      <div className="rounded-2xl border border-soltas-line bg-white p-7 shadow-sm">
+      <div className="rounded-2xl border border-soltas-line bg-white p-7">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField

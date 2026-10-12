@@ -106,7 +106,7 @@ export function JoinOrganisationSection({ requests }: Props) {
   return (
     <div className="space-y-6">
       {/* Join Organisation Section */}
-      <div className="rounded-2xl border border-soltas-line bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-soltas-line bg-white p-6">
         <h2 className="mb-4 text-xl font-semibold text-soltas-text">
           Join an organisation
         </h2>
@@ -305,7 +305,7 @@ export function JoinOrganisationSection({ requests }: Props) {
 
       {/* Processed Requests (Approved/Rejected) */}
       {processedRequests.length > 0 && (
-        <details className="rounded-2xl border border-soltas-line bg-white p-6 shadow-sm">
+        <details className="rounded-2xl border border-soltas-line bg-white p-6">
           <summary className="cursor-pointer text-sm font-medium text-soltas-text">
             Past requests ({processedRequests.length})
           </summary>

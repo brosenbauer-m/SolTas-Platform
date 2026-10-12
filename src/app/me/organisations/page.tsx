@@ -81,7 +81,7 @@ export default async function MyOrganisationsPage() {
       </div>
 
       {organisations.length === 0 ? (
-        <div className="rounded-2xl border border-soltas-line bg-white p-8 text-center shadow-sm">
+        <div className="rounded-2xl border border-soltas-line bg-white p-8 text-center">
           <p className="mb-4 text-sm text-soltas-muted">
             You are not a member of any organisations yet.
           </p>
@@ -98,7 +98,7 @@ export default async function MyOrganisationsPage() {
             <Link
               key={org.id}
               href={`/organisations/${org.id}`}
-              className="block rounded-2xl border border-soltas-line bg-white p-5 shadow-sm transition-all hover:border-soltas-line hover:shadow"
+              className="block card p-6 transition-all hover:border-soltas-line hover:shadow"
             >
               <div className="flex items-start gap-4">
                 {org.logo_url ? (

@@ -180,6 +180,15 @@ export default async function ProjectDetailPage({
 
   const donations = formatMoney(project.donations_received, project.currency);
   const needed = formatMoney(project.amount_needed, project.currency);
+  const raised = typeof project.donations_received === "number" ? project.donations_received : null;
+  const target = typeof project.amount_needed === "number" && project.amount_needed > 0 ? project.amount_needed : null;
+  const progress = target ? Math.min(100, Math.round(((raised ?? 0) / target) * 100)) : 0;
+  const hasDetails = Boolean(
+    project.type_of_intervention?.length ||
+      project.target_demographics?.length ||
+      project.target_demographic ||
+      (Array.isArray(project.thematic_area) && project.thematic_area.length > 0),
+  );
 
   // Map project_updates to UpdateSummary format
   const updates: UpdateSummary[] = (projectUpdates ?? []).map((update) => ({
@@ -244,14 +253,55 @@ export default async function ProjectDetailPage({
         </div>
       </header>
 
+      {/* Key facts */}
+      {raised !== null || project.lives_improved != null || start || end ? (
+        <section aria-label="Key facts" className="grid gap-3 sm:grid-cols-3">
+          {raised !== null || target !== null ? (
+            <div className="card p-5">
+              <p className="text-xs font-medium text-soltas-muted">Raised</p>
+              <p className="mt-1 text-2xl font-semibold tracking-tight text-soltas-text">{donations ?? "—"}</p>
+              {target ? (
+                <>
+                  <div
+                    className="mt-3 h-1.5 overflow-hidden rounded-full bg-soltas-light"
+                    role="progressbar"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={progress}
+                    aria-label="Funding progress"
+                  >
+                    <div className="h-full rounded-full bg-soltas-green" style={{ width: `${progress}%` }} />
+                  </div>
+                  <p className="mt-2 text-xs text-soltas-muted">
+                    {progress}% of {needed}
+                  </p>
+                </>
+              ) : null}
+            </div>
+          ) : null}
+          {project.lives_improved != null ? (
+            <div className="card p-5">
+              <p className="text-xs font-medium text-soltas-muted">Lives improved</p>
+              <p className="mt-1 text-2xl font-semibold tracking-tight text-soltas-text">
+                {Number(project.lives_improved).toLocaleString()}
+              </p>
+            </div>
+          ) : null}
+          {start || end ? (
+            <div className="card p-5">
+              <p className="text-xs font-medium text-soltas-muted">Timeline</p>
+              <p className="mt-1 text-lg font-semibold tracking-tight text-soltas-text">
+                {start ?? "—"} – {end ?? "ongoing"}
+              </p>
+            </div>
+          ) : null}
+        </section>
+      ) : null}
+
       {project.description ? (
-        <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">
-            Description
-          </h2>
-          <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-soltas-text">
-            {project.description}
-          </p>
+        <section className="card p-6">
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">About this project</h2>
+          <p className="mt-3 whitespace-pre-wrap text-[15px] leading-7 text-soltas-text">{project.description}</p>
         </section>
       ) : null}
 
@@ -262,58 +312,11 @@ export default async function ProjectDetailPage({
         projectId={project.id}
       />
 
-      <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+      {hasDetails ? (
+      <section className="card p-6">
         <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Details</h2>
 
         <dl className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <dt className="text-xs font-medium text-soltas-muted">
-              Category
-            </dt>
-            <dd className="text-sm text-soltas-text">{project.category}</dd>
-          </div>
-
-          <div>
-            <dt className="text-xs font-medium text-soltas-muted">
-              Timeline
-            </dt>
-            <dd className="text-sm text-soltas-text">
-              {start || end ? (
-                <span>
-                  {start ?? "—"} <span className="text-soltas-muted">→</span> {end ?? "—"}
-                </span>
-              ) : (
-                "—"
-              )}
-            </dd>
-          </div>
-
-          <div>
-            <dt className="text-xs font-medium text-soltas-muted">Funding</dt>
-            <dd className="text-sm text-soltas-text">
-              {donations || needed ? (
-                <span>
-                  {donations ? <>Received: {donations}</> : null}
-                  {donations && needed ? <span className="text-soltas-muted"> · </span> : null}
-                  {needed ? <>Needed: {needed}</> : null}
-                </span>
-              ) : (
-                "—"
-              )}
-            </dd>
-          </div>
-
-          {project.lives_improved != null ? (
-            <div>
-              <dt className="text-xs font-medium text-soltas-muted">
-                Lives improved
-              </dt>
-              <dd className="text-sm text-soltas-text">
-                {Number(project.lives_improved).toLocaleString()}
-              </dd>
-            </div>
-          ) : null}
-
           {project.type_of_intervention?.length ? (
             <div>
               <dt className="text-xs font-medium text-soltas-muted">
@@ -362,18 +365,18 @@ export default async function ProjectDetailPage({
           ) : null}
         </dl>
       </section>
+      ) : null}
 
-      <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+      {normalizedLinks.length > 0 ? (
+      <section className="card p-6">
         <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Links</h2>
 
-        {normalizedLinks.length === 0 ? (
-          <p className="mt-3 text-sm text-soltas-muted">No links added yet.</p>
-        ) : (
+        {(
           <ul className="mt-3 space-y-2">
             {normalizedLinks.map((l, idx) => (
               <li
                 key={`${l.url}-${idx}`}
-                className="flex flex-col gap-1 rounded-lg border border-soltas-line bg-soltas-off-white px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-1 rounded-xl bg-soltas-off-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="min-w-0">
                   <div className="truncate text-sm font-medium text-soltas-text">
@@ -394,18 +397,18 @@ export default async function ProjectDetailPage({
           </ul>
         )}
       </section>
+      ) : null}
 
-      <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+      {(projectMedia?.length ?? 0) > 0 ? (
+      <section className="card p-6">
         <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Media</h2>
 
-        {(projectMedia?.length ?? 0) === 0 ? (
-          <p className="mt-3 text-sm text-soltas-muted">No media uploaded yet.</p>
-        ) : (
+        {(
           <ul className="mt-3 space-y-2">
             {(projectMedia ?? []).map((item) => (
               <li
                 key={item.id}
-                className="flex flex-col gap-1 rounded-lg border border-soltas-line bg-soltas-off-white px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-1 rounded-xl bg-soltas-off-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="min-w-0">
                   <div className="truncate text-sm font-medium text-soltas-text">
@@ -426,6 +429,7 @@ export default async function ProjectDetailPage({
           </ul>
         )}
       </section>
+      ) : null}
     </main>
   );
 }

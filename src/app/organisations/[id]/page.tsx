@@ -231,7 +231,7 @@ export default async function OrganisationPage({
         </div>
       </header>
 
-      <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+      <section className="card p-6">
         <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Overview</h2>
         <dl className="mt-4 grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
@@ -296,7 +296,7 @@ export default async function OrganisationPage({
         canPost={canEdit}
       />
 
-      <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+      <section className="card p-6">
         <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Stats</h2>
         <dl className="mt-4 grid gap-4 sm:grid-cols-3">
           <div>

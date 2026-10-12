@@ -98,7 +98,7 @@ export default async function WatchdogIssuePage({
       </header>
 
       {issue.description ? (
-        <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+        <section className="card p-6">
           <h2 className="text-lg font-semibold tracking-tight text-soltas-text">
             Description
           </h2>
@@ -114,7 +114,7 @@ export default async function WatchdogIssuePage({
         canPost={canEdit}
       />
 
-      <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+      <section className="card p-6">
         <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Details</h2>
 
         <dl className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

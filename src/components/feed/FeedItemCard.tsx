@@ -33,7 +33,7 @@ export function FeedItemCard({
   eventType,
 }: FeedItemCardProps) {
   return (
-    <article className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+    <article className="card p-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1">
           <h2 className="text-base font-semibold text-soltas-text">

@@ -119,15 +119,10 @@ export default function WatchdogFilters({
 
   return (
     <section className={`@container ${containerClassName}`}>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold text-soltas-text">Filters</h2>
-          <p className="text-sm text-soltas-muted">
-            Filter Watchdog reports by topic, demographics, and location.
-          </p>
-        </div>
-        <Button type="button" variant="ghost" onClick={clearFilters}>
-          Clear filters
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Filters</h2>
+        <Button type="button" variant="link" size="sm" onClick={clearFilters}>
+          Clear all
         </Button>
       </div>
 

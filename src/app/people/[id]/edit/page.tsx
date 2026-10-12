@@ -178,7 +178,7 @@ export default async function ProfileEditPage({
       <form action={updateProfile} className="space-y-6">
         <input type="hidden" name="id" value={profile.id} />
 
-        <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+        <section className="card p-6">
           <h2 className="text-lg font-semibold tracking-tight text-soltas-text">
             Basic information
           </h2>
@@ -234,7 +234,7 @@ export default async function ProfileEditPage({
           </div>
         </section>
 
-        <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+        <section className="card p-6">
           <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Bio</h2>
           <textarea
             name="bio"
@@ -244,7 +244,7 @@ export default async function ProfileEditPage({
           />
         </section>
 
-        <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+        <section className="card p-6">
           <h2 className="text-lg font-semibold tracking-tight text-soltas-text">
             Organisation
           </h2>
@@ -269,7 +269,7 @@ export default async function ProfileEditPage({
           </div>
         </section>
 
-        <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+        <section className="card p-6">
           <h2 className="text-lg font-semibold tracking-tight text-soltas-text">
             Social links
           </h2>

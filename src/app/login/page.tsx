@@ -10,7 +10,7 @@ export default function LoginPage() {
           Sign in to your account to continue.
         </p>
       </div>
-      <Suspense fallback={<div className="rounded-3xl border border-soltas-line bg-white p-6 shadow-sm text-sm text-soltas-muted">Loading...</div>}>
+      <Suspense fallback={<div className="rounded-2xl border border-soltas-line bg-white p-6 text-sm text-soltas-muted">Loading...</div>}>
         <LoginForm />
       </Suspense>
     </div>

@@ -141,7 +141,7 @@ export default function CreateOrganisationPage() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="rounded-2xl border border-soltas-line bg-white p-6 shadow-sm">
+      <form onSubmit={handleSubmit} className="rounded-2xl border border-soltas-line bg-white p-6">
         <div className="space-y-4">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-soltas-text mb-1">
