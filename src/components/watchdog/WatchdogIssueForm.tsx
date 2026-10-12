@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,7 +9,6 @@ import { z } from "zod";
 
 import MapGeocoder from "@/components/MapGeocoder";
 import MultiSelect, { type Option } from "@/components/ui/MultiSelect";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -32,22 +31,22 @@ const linkSchema = z.object({
 
 const formSchema = z
   .object({
-    title: z.string().trim().min(1, "Issue title is required").max(200, "Title is too long"),
+    title: z.string().trim().min(1, "Give the issue a short title.").max(200, "Title is too long"),
     description: z
       .string()
       .trim()
-      .min(1, "Issue summary is required")
+      .min(1, "Describe what’s happening.")
       .max(8000, "Summary is too long"),
-    country: z.string().trim().min(1, "Country is required"),
+    country: z.string().trim().min(1, "Enter the country."),
     region: z
       .string()
       .trim()
       .optional()
       .or(z.literal(""))
       .transform(value => (value ? value.trim() : "")),
-    city: z.string().trim().min(1, "City is required"),
-    latitude: z.number({ required_error: "Latitude is required" }),
-    longitude: z.number({ required_error: "Longitude is required" }),
+    city: z.string().trim().min(1, "Enter the town or city."),
+    latitude: z.number({ invalid_type_error: "Pick the place from the search, or enter its coordinates." }),
+    longitude: z.number({ invalid_type_error: "Enter a longitude." }),
     affected_demographics: z.array(z.string()).default([]),
     affected_groups_text: z
       .string()
@@ -74,13 +73,25 @@ const formSchema = z
       .transform(value => (value ? value.trim() : "")),
     contact_allowed: z.boolean().default(true),
     reporter_anonymous: z.boolean().default(false),
+    post_to_feed: z.boolean().default(false),
+    feed_message: z
+      .string()
+      .trim()
+      .max(1000, "Keep the message short")
+      .optional()
+      .or(z.literal(""))
+      .transform(value => (value ? value.trim() : "")),
   })
   .superRefine((values, ctx) => {
     if (!Number.isFinite(values.latitude)) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["latitude"], message: "Latitude is required" });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["latitude"],
+        message: "Pick the place from the search, or enter its coordinates.",
+      });
     }
     if (!Number.isFinite(values.longitude)) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["longitude"], message: "Longitude is required" });
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["longitude"], message: "Enter a longitude." });
     }
   });
 
@@ -104,6 +115,8 @@ const createDefaultValues = (): FormValues => ({
   desired_outcome: "",
   contact_allowed: true,
   reporter_anonymous: false,
+  post_to_feed: false,
+  feed_message: "",
 });
 
 const URGENCY_OPTIONS = [
@@ -192,15 +205,6 @@ export default function WatchdogIssueForm() {
     [setValue],
   );
 
-  const renderSdgBadges = useMemo(() => {
-    if (!sdgOptions.length) return null;
-    return sdgOptions.map(option => (
-      <Badge key={option.value} variant="outline" className="text-xs">
-        {option.label}
-      </Badge>
-    ));
-  }, [sdgOptions]);
-
   const onSubmit = async (values: FormValues) => {
     setSubmitError(null);
     setSubmitSuccess(false);
@@ -228,6 +232,8 @@ export default function WatchdogIssueForm() {
           desired_outcome: values.desired_outcome,
           contact_allowed: values.contact_allowed,
           reporter_anonymous: values.reporter_anonymous,
+          post_to_feed: values.post_to_feed,
+          feed_message: values.feed_message,
         }),
       });
 
@@ -241,8 +247,10 @@ export default function WatchdogIssueForm() {
       }
 
       setSubmitSuccess(true);
+      setSelectedPlace(null);
       form.reset(createDefaultValues());
       router.refresh();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : "Unable to submit issue");
     } finally {
@@ -255,8 +263,14 @@ export default function WatchdogIssueForm() {
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <section className="rounded-2xl border border-soltas-line bg-white p-6">
-          <h2 className="text-xl font-semibold text-soltas-text">Issue details</h2>
+        {submitSuccess ? (
+          <div role="status" className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+            Thank you, your report was sent. Our team will review it before it appears on the Watchdog map.
+          </div>
+        ) : null}
+
+        <section className="rounded-3xl border border-soltas-line bg-white p-5 sm:p-7">
+          <h2 className="text-[17px] font-semibold tracking-tight text-soltas-text">Issue details</h2>
           <p className="mt-1 text-sm text-soltas-muted">Describe the issue and who it impacts.</p>
 
           <div className="mt-6 space-y-6">
@@ -279,7 +293,7 @@ export default function WatchdogIssueForm() {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Issue summary / description</FormLabel>
+                  <FormLabel>What’s happening?</FormLabel>
                   <FormControl>
                     <Textarea placeholder="Describe what is happening and why it matters." rows={6} {...field} />
                   </FormControl>
@@ -335,60 +349,72 @@ export default function WatchdogIssueForm() {
               />
             </div>
 
-            <div className="space-y-3">
-              <FormLabel>Location search</FormLabel>
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-soltas-text">Where is it?</p>
               <MapGeocoder onSelect={handleLocationSelect} />
               {selectedPlace ? (
-                <p className="text-xs text-soltas-muted">Selected: {selectedPlace}</p>
+                <p className="text-[13px] text-soltas-muted">
+                  Pinned at <span className="font-medium text-soltas-text">{selectedPlace}</span>
+                </p>
+              ) : errors.latitude ? (
+                <p role="alert" className="text-[13px] text-rose-600">
+                  {errors.latitude.message}
+                </p>
               ) : (
-                <p className="text-xs text-soltas-muted">Search for a place to auto-fill latitude/longitude.</p>
+                <p className="text-[13px] text-soltas-muted">Search for a town or address to place it on the map.</p>
               )}
-            </div>
+              <details className="group pt-1">
+                <summary className="cursor-pointer list-none text-[13px] text-soltas-ocean hover:underline [&::-webkit-details-marker]:hidden">
+                  Enter coordinates instead
+                </summary>
+                <div className="mt-3">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <FormField
+                    control={control}
+                    name="latitude"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Latitude</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="any"
+                            value={Number.isFinite(field.value) ? field.value : ""}
+                            onChange={event => {
+                              const next = event.target.value;
+                              field.onChange(next === "" ? Number.NaN : Number(next));
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <FormField
-                control={control}
-                name="latitude"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Latitude</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="any"
-                        value={Number.isFinite(field.value) ? field.value : ""}
-                        onChange={event => {
-                          const next = event.target.value;
-                          field.onChange(next === "" ? Number.NaN : Number(next));
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={control}
-                name="longitude"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Longitude</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="any"
-                        value={Number.isFinite(field.value) ? field.value : ""}
-                        onChange={event => {
-                          const next = event.target.value;
-                          field.onChange(next === "" ? Number.NaN : Number(next));
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  <FormField
+                    control={control}
+                    name="longitude"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Longitude</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="any"
+                            value={Number.isFinite(field.value) ? field.value : ""}
+                            onChange={event => {
+                              const next = event.target.value;
+                              field.onChange(next === "" ? Number.NaN : Number(next));
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                </div>
+              </details>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
@@ -431,8 +457,8 @@ export default function WatchdogIssueForm() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-soltas-line bg-white p-6">
-          <h2 className="text-xl font-semibold text-soltas-text">Issue tags</h2>
+        <section className="rounded-3xl border border-soltas-line bg-white p-5 sm:p-7">
+          <h2 className="text-[17px] font-semibold tracking-tight text-soltas-text">Issue tags</h2>
           <p className="mt-1 text-sm text-soltas-muted">Tag the issue by topic, urgency, and date observed.</p>
 
           <div className="mt-6 space-y-6">
@@ -453,9 +479,6 @@ export default function WatchdogIssueForm() {
                     />
                   </FormControl>
                   <FormMessage />
-                  {sdgOptions.length > 0 ? (
-                    <div className="mt-2 flex flex-wrap gap-2 text-xs text-soltas-muted">{renderSdgBadges}</div>
-                  ) : null}
                 </FormItem>
               )}
             />
@@ -528,13 +551,13 @@ export default function WatchdogIssueForm() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-soltas-line bg-white p-6">
-          <h2 className="text-xl font-semibold text-soltas-text">Evidence & desired outcome</h2>
+        <section className="rounded-3xl border border-soltas-line bg-white p-5 sm:p-7">
+          <h2 className="text-[17px] font-semibold tracking-tight text-soltas-text">Evidence & desired outcome</h2>
           <p className="mt-1 text-sm text-soltas-muted">Share sources and what support is needed.</p>
 
           <div className="mt-6 space-y-6">
             <div className="space-y-3">
-              <FormLabel>Evidence links</FormLabel>
+              <p className="text-sm font-medium text-soltas-text">Evidence links</p>
               {fields.length === 0 ? (
                 <p className="text-sm text-soltas-muted">Add links to articles, photos, or reports that document the issue.</p>
               ) : null}
@@ -594,8 +617,8 @@ export default function WatchdogIssueForm() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-soltas-line bg-white p-6">
-          <h2 className="text-xl font-semibold text-soltas-text">Contact preferences</h2>
+        <section className="rounded-3xl border border-soltas-line bg-white p-5 sm:p-7">
+          <h2 className="text-[17px] font-semibold tracking-tight text-soltas-text">Contact preferences</h2>
           <p className="mt-1 text-sm text-soltas-muted">Control how the Solarpunk Taskforce may follow up.</p>
 
           <div className="mt-6 space-y-6">
@@ -637,15 +660,43 @@ export default function WatchdogIssueForm() {
           </div>
         </section>
 
+        <section className="rounded-3xl border border-soltas-line bg-white p-5 sm:p-7">
+          <FormField
+            control={control}
+            name="post_to_feed"
+            render={({ field }) => (
+              <FormItem className="flex items-center justify-between gap-4 space-y-0">
+                <div>
+                  <FormLabel>Share on the community feed</FormLabel>
+                  <FormDescription>Let others know once it’s published.</FormDescription>
+                </div>
+                <FormControl>
+                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          {form.watch("post_to_feed") ? (
+            <FormField
+              control={control}
+              name="feed_message"
+              render={({ field }) => (
+                <FormItem className="mt-5">
+                  <FormLabel>Message (optional)</FormLabel>
+                  <FormControl>
+                    <Textarea rows={3} placeholder="Add a few words for the feed" {...field} />
+                  </FormControl>
+                  <FormDescription>If you leave this empty, the issue title is used.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ) : null}
+        </section>
+
         {submitError ? (
           <div className="rounded-3xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
             {submitError}
-          </div>
-        ) : null}
-
-        {submitSuccess ? (
-          <div className="rounded-3xl border border-soltas-glacial/30 bg-soltas-glacial/15 px-4 py-3 text-sm text-soltas-ocean">
-            Issue submitted. Our team will review it before publishing it to the Watchdog Community map.
           </div>
         ) : null}
 
