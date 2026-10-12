@@ -10,7 +10,7 @@ how setup works, how Supabase integrates, and what to do for syncing, deployment
 - UI palette rebrand is complete — see `docs/REBRAND_COMPLETE.md` for the blue/brown theme coverage across components.
 - Supabase migration/RLS guardrails for agents are in `AGENT_RULES.md`; review before touching database code or policies.
 - Implementation notes and test playbooks now live under `docs/` (e.g., `docs/IMPLEMENTATION.md`, `docs/manual-tests/`); add any new Markdown docs under `docs/` — only `README.md` stays at the repo root.
-- Security hardening guidance is captured in `SECURITY_HARDENING_QUICKSTART.md` and `SECURITY_HARDENING_SUMMARY.md`; follow alongside the Supabase rules above.
+- Security hardening guidance is captured in `docs/SECURITY_HARDENING_QUICKSTART.md` and `docs/SECURITY_HARDENING_SUMMARY.md`; follow alongside the Supabase rules above.
 
 ---
 
@@ -113,9 +113,12 @@ Available via `package.json`:
 | `pnpm start` | Start production server |
 | `pnpm lint` | Run ESLint |
 | `pnpm lint:fix` | Run ESLint and fix errors |
+| `pnpm typecheck` | Type-check with `tsc --noEmit` |
+| `pnpm check:migrations` | Verify migration files are strictly ordered |
+| `pnpm sb:migration "name"` | Create a new, correctly ordered migration file |
+| `pnpm test:rls` | RLS smoke test against a Supabase project (see below) |
 | `pnpm sb:sync` | Run Supabase sync script |
 | `pnpm sb:diff` | Show schema differences |
-| `pnpm sb:commit` | Commit DB changes (dry run) |
 | `pnpm sb:login` | Authenticate Supabase |
 | `pnpm sb:link` | Link local project to Supabase |
 
@@ -284,25 +287,36 @@ The moderation tooling now relies on three Supabase-facing pieces:
   a clear error if the Supabase credentials above are not configured.
 - `src/lib/supabaseConfig.ts` centralises Supabase environment validation so the
   browser and server clients fail fast with actionable messages.
-- `supabase/migrations/20251007000000_fix_project_moderation.sql` refreshes the
-  moderation trigger to use the consolidated `status` column and to reset audit
-  fields when a project returns to `pending`.
+- The `enforce_moderation_by_admin` trigger on `public.projects` (latest version in
+  `supabase/migrations/20260106130000_fix_enforce_moderation_trigger.sql`) only lets
+  admins change the moderation `status` and stamps the approval/rejection audit fields.
 
-After pulling the latest code run `pnpm sb:sync` to apply the migration and
-regenerate types locally. Once the migration has been applied, approving a
+Migrations are applied to production automatically when they are merged to `main`
+(see section 9); run `pnpm sb:sync` locally to regenerate types. Approving a
 project in the admin UI will make it visible on the public map, and unapproving
 it will move it back to the pending queue.
 
 ---
 
-## 14. Legacy Script
+## 14. RLS smoke test (`pnpm test:rls`)
 
-The old `db-sync.sh` script is **deprecated**.  
-It has been fully replaced by:
-- `scripts/sb-sync.sh` for local development
-- The GitHub Actions workflow for automation
+`scripts/rls-smoke.ts` signs in as two test users and checks that row level
+security on `follow_edges` keeps each user's follows to themselves (it creates
+and deletes a follow between them). Run it against a staging/test project with
+dedicated test accounts:
 
-You can delete `db-sync.sh` safely.
+```bash
+SUPABASE_URL=... SUPABASE_ANON_KEY=... \
+SUPABASE_TEST_EMAIL_1=... SUPABASE_TEST_PASSWORD_1=... \
+SUPABASE_TEST_EMAIL_2=... SUPABASE_TEST_PASSWORD_2=... \
+pnpm test:rls
+```
+
+If `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` are set (e.g. in
+`.env.local` exported to the shell) they take precedence over the `SUPABASE_*` variants. SQL-level manual tests live in `supabase/tests/`.
+
+(The old `db-sync.sh` script has been removed; use `pnpm sb:sync` locally and the
+GitHub Actions workflow for production.)
 
 ---
 

@@ -1,4 +1,6 @@
-export default function OrganisationsPage() {
-  return <div className="p-6">Organisations page placeholder</div>;
-}
+import { redirect } from "next/navigation";
 
+// The organisation directory lives at /find-organisations.
+export default function OrganisationsPage() {
+  redirect("/find-organisations");
+}

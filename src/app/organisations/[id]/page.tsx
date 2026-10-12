@@ -121,7 +121,7 @@ export default async function OrganisationPage({
     <main className="mx-auto w-full max-w-5xl space-y-6 px-4 py-6 sm:space-y-8 sm:py-10">
       <Breadcrumbs
         items={[
-          { label: "Organisations", href: "/organisations" },
+          { label: "Organisations", href: "/find-organisations" },
           { label: organisation.name },
         ]}
       />

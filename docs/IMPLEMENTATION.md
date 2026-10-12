@@ -8,7 +8,7 @@ The implementation wires the existing pure UI social components (`LikeButton`, `
 
 ## What Was Implemented
 
-### 1. Database Schema (`supabase/migrations/20260214150000_update_likes_comments.sql`)
+### 1. Database Schema (`supabase/migrations/20260321100000_update_likes_comments.sql`)
 
 **`update_likes` table:**
 - `id`: UUID primary key
@@ -226,7 +226,7 @@ ALTER TABLE update_likes
 ## Files Modified
 
 ### Created
-- `supabase/migrations/20260214150000_update_likes_comments.sql`
+- `supabase/migrations/20260321100000_update_likes_comments.sql`
 - `src/app/api/updates/[id]/like/route.ts`
 - `src/app/api/updates/[id]/comments/route.ts`
 - `src/app/api/comments/[id]/route.ts`

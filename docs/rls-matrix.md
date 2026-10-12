@@ -92,7 +92,7 @@ This document outlines the Row Level Security (RLS) policy test matrix for Phase
 - ✓ indicates expected access granted
 - ✗ indicates expected access denied
 - All policies must be validated with automated tests before deployment
-- Reference `/scripts/rls-smoke.ts` for testing patterns
+- Reference `/scripts/rls-smoke.ts` (`pnpm test:rls`) for testing patterns
 
 ## Related Documentation
 
