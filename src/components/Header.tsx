@@ -135,7 +135,7 @@ export default function Header() {
         label: "Find",
         items: [
           { href: "/projects", label: "Find Projects" },
-          { href: "/organisations", label: "Find Organisations" },
+          { href: "/find-organisations", label: "Find Organisations" },
           { href: "/funding", label: "Find Funding" },
           { href: "/watchdog", label: "Watchdog Community" },
         ],

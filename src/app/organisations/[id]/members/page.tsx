@@ -376,7 +376,7 @@ export default async function OrganisationMembersPage({
       <main className="mx-auto max-w-5xl space-y-6 px-5 pb-20 pt-12">
         <Breadcrumbs
           items={[
-            { label: "Organisations", href: "/organisations" },
+            { label: "Organisations", href: "/find-organisations" },
             { label: organisation.name, href: `/organisations/${id}` },
             { label: "Members" },
           ]}
@@ -444,7 +444,7 @@ export default async function OrganisationMembersPage({
     <main className="mx-auto max-w-5xl space-y-6 px-5 pb-20 pt-12">
       <Breadcrumbs
         items={[
-          { label: "Organisations", href: "/organisations" },
+          { label: "Organisations", href: "/find-organisations" },
           { label: organisation.name, href: `/organisations/${id}` },
           { label: "Members" },
         ]}
