@@ -142,7 +142,7 @@ export default async function OrganisationEditPage({
     <main className="mx-auto max-w-3xl space-y-6 px-5 pb-20 pt-12">
       <Breadcrumbs
         items={[
-          { label: "Organisations", href: "/organisations" },
+          { label: "Organisations", href: "/find-organisations" },
           { label: organisation.name, href: `/organisations/${organisation.id}` },
           { label: "Edit" },
         ]}
