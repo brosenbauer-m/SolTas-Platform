@@ -28,7 +28,8 @@ Goal: elegant, simple, friendly — see `docs/DESIGN.md`.
 - ✅ Project, organisation, funding, issue and person pages: consistent header, key facts, sections (#184, #185, #190)
 - ✅ Forms: sign in / sign up / password reset, create organisation, add funding, report issue (#187–#189)
 - ✅ Notifications and settings as grouped lists (#185)
-- 🔄 Feed cards, project form and admin pages in the new style
+- ✅ Feed activity list, working feed links, admin dashboard with pending counts (#191)
+- ⬜ New/edit project form in the new style (long form: split into steps)
 - ⬜ Accessibility pass (keyboard, screen reader labels, contrast) and mobile pass at 390px
 
 ## Phase 2 — Complete the core blueprint

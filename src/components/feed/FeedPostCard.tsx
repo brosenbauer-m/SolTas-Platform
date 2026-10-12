@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Avatar } from "@/components/ui/avatar";
 
 function getStorageUrl(filePath: string): string {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -195,19 +196,7 @@ export function FeedPostCard({
   return (
     <article className="card p-6">
       <div className="flex gap-3">
-        {authorAvatarUrl ? (
-          <Image
-            src={authorAvatarUrl}
-            alt={authorName}
-            width={40}
-            height={40}
-            className="h-10 w-10 rounded-full border border-soltas-line object-cover"
-          />
-        ) : (
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-dashed border-soltas-line bg-soltas-off-white text-sm text-soltas-muted">
-            {authorName[0]?.toUpperCase() ?? "?"}
-          </div>
-        )}
+        <Avatar name={authorName} src={authorAvatarUrl} />
 
         <div className="flex-1 space-y-2">
           <div className="flex items-center justify-between gap-2">

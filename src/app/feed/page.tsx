@@ -3,10 +3,10 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { buttonClasses } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { segmentClass, segmentedTrack } from "@/components/ui/segmented";
-import Image from "next/image";
 import Link from "next/link";
 
 import { FeedItemCard } from "@/components/feed/FeedItemCard";
+import { Avatar } from "@/components/ui/avatar";
 import { FeedPostCard } from "@/components/feed/FeedPostCard";
 import { NewPostComposer } from "@/components/feed/NewPostComposer";
 import { getServerSupabase } from "@/lib/supabaseServer";
@@ -22,6 +22,8 @@ type FeedItem = {
   org_id: string | null;
   person_profile_id: string | null;
   update_id: string | null;
+  issue_id?: string | null;
+  grant_id?: string | null;
   created_at: string | null;
   title: string | null;
   summary: string | null;
@@ -204,6 +206,13 @@ export default async function FeedPage({
   }
 
   const items = (feedItems ?? []) as FeedItem[];
+
+  // Funding pages are addressed by slug; activity items only carry the grant id.
+  const itemGrantIds = Array.from(new Set(items.map((item) => item.grant_id).filter(Boolean))) as string[];
+  const { data: itemGrants } = itemGrantIds.length
+    ? await supabase.from("grants").select("id,slug").in("id", itemGrantIds)
+    : { data: [] as Array<{ id: string; slug: string | null }> };
+  const itemGrantSlugs = new Map((itemGrants ?? []).map((g: { id: string; slug: string | null }) => [g.id, g.slug]));
 
   // Prepare feed posts data
   const posts = feedPosts ?? [];
@@ -428,6 +437,7 @@ export default async function FeedPage({
           <h2 className="text-lg font-semibold tracking-tight text-soltas-text">
             Activity updates
           </h2>
+          <ul className="card divide-y divide-soltas-line overflow-hidden p-0">
           {items.map((item) => {
             const actor = profilesMap.get(item.actor_user_id ?? "") ?? null;
             const actorName = getProfileName(actor);
@@ -453,11 +463,12 @@ export default async function FeedPage({
               href = `/organisations/${item.org_id}`;
             } else if (item.event_type === "watchdog_update") {
               title = item.title ?? "Watchdog issue reported";
-              href = `/watchdog/${item.update_id ?? item.id}`;
+              href = item.issue_id ? `/watchdog/${item.issue_id}` : null;
             } else if (item.event_type === "grant_published") {
               // Use title/summary from RPC if available, otherwise show minimal fallback
               title = item.title ?? "New funding opportunity";
-              href = item.update_id ? `/funding/${item.update_id}` : null;
+              const grantSlug = item.grant_id ? itemGrantSlugs.get(item.grant_id) : null;
+              href = grantSlug ? `/funding/${grantSlug}` : null;
             } else if (item.event_type === "follow") {
               if (item.person_profile_id) {
                 title = `${actorName} followed ${getProfileName(targetPerson)}`;
@@ -478,18 +489,17 @@ export default async function FeedPage({
                 summary={item.summary}
                 href={href}
                 timestamp={item.created_at}
-                actorAvatarUrl={actor?.avatar_url}
-                actorName={actorName}
                 eventType={item.event_type}
               />
             );
           })}
+          </ul>
 
           {hasMore && nextCursor ? (
             <div className="pt-2">
               <Link
                 href={`/feed?${nextParams.toString()}`}
-                className="inline-flex items-center justify-center rounded-lg border border-soltas-line bg-white px-4 py-2 text-sm font-medium text-soltas-text hover:bg-soltas-off-white"
+                className={buttonClasses({ variant: "outline", size: "sm" })}
               >
                 Load more
               </Link>
@@ -513,19 +523,7 @@ export default async function FeedPage({
           <ul className="mt-4 space-y-3 text-sm text-soltas-text">
             {(discoverPeople ?? []).map((person) => (
               <li key={person.id} className="flex items-center gap-3">
-                {person.avatar_url ? (
-                  <Image
-                    src={person.avatar_url}
-                    alt={getProfileName(person)}
-                    width={32}
-                    height={32}
-                    className="h-8 w-8 rounded-full border border-soltas-line object-cover"
-                  />
-                ) : (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full border border-dashed border-soltas-line bg-soltas-off-white text-xs text-soltas-muted">
-                    —
-                  </div>
-                )}
+                <Avatar name={getProfileName(person)} src={person.avatar_url} size="sm" />
                 <Link href={`/people/${person.id}`} className="hover:underline">
                   {getProfileName(person)}
                 </Link>
