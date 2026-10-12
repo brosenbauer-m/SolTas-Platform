@@ -43,6 +43,22 @@
   --color-soltas-green: var(--soltas-green);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
+  /* Aliases for shadcn-style class names still used in a few components */
+  --color-muted-foreground: var(--soltas-muted);
+  --color-foreground: var(--soltas-text);
+  --color-background: var(--soltas-white);
+  --color-destructive: #e11d48;
+}
+
+/* Tailwind 4 draws a bare `border` in currentColor (near-black). Default to the hairline token instead. */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--soltas-line);
+  }
 }
 
 html {

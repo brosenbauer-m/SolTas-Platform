@@ -1,7 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState, type Dispatch, type SetStateAction } from "react";
+import { useEffect, useMemo, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { ChevronDown } from "lucide-react";
+
+import { AuthField, FormMessage } from "@/components/auth/AuthShell";
+import { Button } from "@/components/ui/button";
+import { SocialLinksFields, emptySocialLink, normalizeSocialLinks, type SocialLink } from "@/components/profiles/SocialLinksFields";
+import { fieldClasses, Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 
 import { MissingSupabaseEnvError } from "@/lib/supabaseConfig";
 import { supabaseClient } from "@/lib/supabaseClient";
@@ -20,30 +28,8 @@ try {
   }
 }
 
-type SocialLinkType =
-  | "LinkedIn"
-  | "YouTube"
-  | "Instagram"
-  | "Facebook"
-  | "Website"
-  | "X"
-  | "Threads";
-
-type SocialLink = { type: SocialLinkType; url: string };
-
 type VerifiedOrganisation = { id: string; name: string };
 
-const socialLinkTypes: SocialLinkType[] = [
-  "LinkedIn",
-  "YouTube",
-  "Instagram",
-  "Facebook",
-  "Website",
-  "X",
-  "Threads",
-];
-
-const emptySocialLink: SocialLink = { type: "LinkedIn", url: "" };
 
 const initialIndividual = {
   first_name: "",
@@ -61,11 +47,7 @@ const initialIndividual = {
 
 export default function SignupTabs() {
   if (!supabase) {
-    return (
-      <div className="rounded-2xl border border-soltas-line bg-white p-6 text-sm text-soltas-muted">
-        {supabaseInitializationError?.message}
-      </div>
-    );
+    return <p className="text-sm text-soltas-muted">{supabaseInitializationError?.message}</p>;
   }
 
   return <SignupTabsContent client={supabase} />;
@@ -77,7 +59,7 @@ function SignupTabsContent({ client }: { client: SupabaseClient }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [individual, setIndividual] = useState(initialIndividual);
-  const [individualLinks, setIndividualLinks] = useState<SocialLink[]>([emptySocialLink]);
+  const [individualLinks, setIndividualLinks] = useState<SocialLink[]>([]);
   const [verifiedOrgs, setVerifiedOrgs] = useState<VerifiedOrganisation[]>([]);
   const [orgsError, setOrgsError] = useState<string | null>(null);
   const [orgsLoading, setOrgsLoading] = useState(false);
@@ -145,24 +127,18 @@ function SignupTabsContent({ client }: { client: SupabaseClient }) {
     updater((prev) => prev.filter((_, idx) => idx !== index));
   }
 
-  function normalizeLinks(links: SocialLink[]) {
-    return links
-      .map((link) => ({ ...link, url: link.url.trim() }))
-      .filter((link) => link.url.length > 0);
-  }
-
   function validateIndividual() {
     const nextErrors: Record<string, string> = {};
-    if (!individual.first_name.trim()) nextErrors.first_name = "First name is required.";
-    if (!individual.last_name.trim()) nextErrors.last_name = "Last name is required.";
-    if (!individual.email.trim()) nextErrors.email = "Email is required.";
-    if (!individual.password.trim()) nextErrors.password = "Password is required.";
-    if (!individual.date_of_birth) nextErrors.date_of_birth = "Date of birth is required.";
+    if (!individual.first_name.trim()) nextErrors.first_name = "Enter your first name.";
+    if (!individual.last_name.trim()) nextErrors.last_name = "Enter your last name.";
+    if (!individual.email.trim()) nextErrors.email = "Enter your email address.";
+    if (individual.password.length < 8) nextErrors.password = "Use at least 8 characters.";
+    if (!individual.date_of_birth) nextErrors.date_of_birth = "Enter your date of birth.";
     if (!individual.organisation_id) {
-      nextErrors.organisation_id = "Organisation selection is required.";
+      nextErrors.organisation_id = "Choose an organisation, or Independent.";
     }
     if (!individual.country_based.trim()) {
-      nextErrors.country_based = "Country based is required.";
+      nextErrors.country_based = "Enter the country you live in.";
     }
 
     return nextErrors;
@@ -193,7 +169,7 @@ function SignupTabsContent({ client }: { client: SupabaseClient }) {
     console.error(`${scope} signup failed:`, err);
     const errorMessage = getSignupErrorMessage(err);
     console.error(`${scope} signup error message:`, errorMessage);
-    setMessage({ text: `Signup failed: ${errorMessage}`, tone: "error" });
+    setMessage({ text: `We couldn’t create your account: ${errorMessage}`, tone: "error" });
   }
 
 
@@ -232,7 +208,7 @@ function SignupTabsContent({ client }: { client: SupabaseClient }) {
         country_based: individual.country_based.trim(),
         occupation: individual.occupation.trim() || null,
         bio: individual.bio.trim() || null,
-        social_links: normalizeLinks(individualLinks),
+        social_links: normalizeSocialLinks(individualLinks),
         avatar_url: individual.avatar_url.trim() || null,
       };
 
@@ -251,9 +227,9 @@ function SignupTabsContent({ client }: { client: SupabaseClient }) {
         if (insertError) throw insertError;
       }
 
-      setMessage({ text: "Signup successful! Redirecting...", tone: "success" });
+      setMessage({ text: "Welcome! Taking you in…", tone: "success" });
       const returnTo = searchParams.get("returnTo");
-      const safeReturnTo = returnTo?.startsWith("/") ? returnTo : "/projects";
+      const safeReturnTo = returnTo?.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/projects";
       setTimeout(() => {
         router.replace(safeReturnTo);
         router.refresh();
@@ -265,322 +241,105 @@ function SignupTabsContent({ client }: { client: SupabaseClient }) {
     }
   }
 
+  const invalid = (key: string) =>
+    cn(errors[key] && "border-rose-400 focus:border-rose-400 focus-visible:ring-rose-100");
+  const set = (field: keyof typeof individual) => (event: { target: { value: string } }) =>
+    updateIndividualField(field, event.target.value);
+
   return (
-    <div className="rounded-2xl border border-soltas-line bg-white p-6">
-      <form onSubmit={handleIndividualSubmit} className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <Field
-              label="First name"
-              value={individual.first_name}
-              onChange={(value) => updateIndividualField("first_name", value)}
-              error={errors.first_name}
-              required
-            />
-            <Field
-              label="Last name"
-              value={individual.last_name}
-              onChange={(value) => updateIndividualField("last_name", value)}
-              error={errors.last_name}
-              required
-            />
-            <Field
-              label="Email"
-              type="email"
-              value={individual.email}
-              onChange={(value) => updateIndividualField("email", value)}
-              error={errors.email}
-              required
-            />
-            <Field
-              label="Password"
-              type="password"
-              value={individual.password}
-              onChange={(value) => updateIndividualField("password", value)}
-              error={errors.password}
-              required
-            />
-            <Field
-              label="Date of birth"
-              type="date"
-              value={individual.date_of_birth}
-              onChange={(value) => updateIndividualField("date_of_birth", value)}
-              error={errors.date_of_birth}
-              required
-            />
-            <SelectField
-              label="Organisation"
-              value={individual.organisation_id}
-              onChange={(value) => updateIndividualField("organisation_id", value)}
-              error={errors.organisation_id}
-              required
-              options={[
-                { value: "independent", label: "Independent / No organisation" },
-                ...verifiedOrgs.map((org) => ({ value: org.id, label: org.name })),
-              ]}
-              helperText={
-                orgsLoading
-                  ? "Loading verified organisations..."
-                  : orgsError
-                    ? orgsError
-                    : "Only verified organisations are shown."
-              }
-            />
-            <Field
-              label="Country from"
-              value={individual.country_from}
-              onChange={(value) => updateIndividualField("country_from", value)}
-            />
-            <Field
-              label="Country based"
-              value={individual.country_based}
-              onChange={(value) => updateIndividualField("country_based", value)}
-              error={errors.country_based}
-              required
-            />
-            <Field
-              label="Occupation"
-              value={individual.occupation}
-              onChange={(value) => updateIndividualField("occupation", value)}
-            />
-            <Field
-              label="Avatar URL"
-              value={individual.avatar_url}
-              onChange={(value) => updateIndividualField("avatar_url", value)}
-              helperText="Upload support will be added later."
-            />
-          </div>
+    <form onSubmit={handleIndividualSubmit} className="space-y-8" noValidate>
+      {message ? <FormMessage tone={message.tone === "success" ? "success" : "error"}>{message.text}</FormMessage> : null}
 
-          <TextAreaField
-            label="Bio"
-            value={individual.bio}
-            onChange={(value) => updateIndividualField("bio", value)}
-          />
+      <Section title="Your account">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <AuthField label="First name" error={errors.first_name}>
+            <Input autoComplete="given-name" value={individual.first_name} onChange={set("first_name")} className={invalid("first_name")} />
+          </AuthField>
+          <AuthField label="Last name" error={errors.last_name}>
+            <Input autoComplete="family-name" value={individual.last_name} onChange={set("last_name")} className={invalid("last_name")} />
+          </AuthField>
+        </div>
+        <AuthField label="Email" error={errors.email}>
+          <Input type="email" inputMode="email" autoComplete="email" value={individual.email} onChange={set("email")} className={invalid("email")} />
+        </AuthField>
+        <AuthField label="Password" error={errors.password} hint="Use at least 8 characters.">
+          <Input type="password" autoComplete="new-password" value={individual.password} onChange={set("password")} className={invalid("password")} />
+        </AuthField>
+      </Section>
 
-          <SocialLinksField
-            title="Social links"
+      <Section title="About you">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <AuthField label="Date of birth" error={errors.date_of_birth} hint="Never shown on your profile.">
+            <Input type="date" value={individual.date_of_birth} onChange={set("date_of_birth")} className={invalid("date_of_birth")} />
+          </AuthField>
+          <AuthField label="Country you live in" error={errors.country_based}>
+            <Input autoComplete="country-name" value={individual.country_based} onChange={set("country_based")} className={invalid("country_based")} />
+          </AuthField>
+          <AuthField label="Country you’re from" optional>
+            <Input value={individual.country_from} onChange={set("country_from")} />
+          </AuthField>
+          <AuthField label="Occupation" optional>
+            <Input autoComplete="organization-title" value={individual.occupation} onChange={set("occupation")} />
+          </AuthField>
+        </div>
+        <AuthField
+          label="Organisation"
+          error={errors.organisation_id}
+          hint={
+            orgsLoading
+              ? "Loading verified organisations…"
+              : orgsError
+                ? orgsError
+                : "Only verified organisations are listed. You can create one after signing up."
+          }
+        >
+          <select value={individual.organisation_id} onChange={set("organisation_id")} className={cn("h-11", fieldClasses)}>
+            <option value="independent">Independent, no organisation</option>
+            {verifiedOrgs.map((org) => (
+              <option key={org.id} value={org.id}>
+                {org.name}
+              </option>
+            ))}
+          </select>
+        </AuthField>
+      </Section>
+
+      <details className="group rounded-2xl bg-soltas-off-white px-4 py-3 open:pb-5 sm:px-5">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-[15px] font-medium text-soltas-text [&::-webkit-details-marker]:hidden">
+          <span>
+            Bio, photo and links
+            <span className="ml-1.5 font-normal text-soltas-muted">Optional</span>
+          </span>
+          <ChevronDown aria-hidden className="h-4 w-4 text-soltas-muted transition-transform group-open:rotate-180" />
+        </summary>
+        <div className="mt-4 space-y-5">
+          <AuthField label="Bio" hint="A sentence or two about what you care about.">
+            <Textarea rows={4} value={individual.bio} onChange={set("bio")} />
+          </AuthField>
+          <AuthField label="Photo URL" hint="A link to a picture of you. You can change it later.">
+            <Input type="url" inputMode="url" placeholder="https://" value={individual.avatar_url} onChange={set("avatar_url")} />
+          </AuthField>
+          <SocialLinksFields
             links={individualLinks}
-            onChange={(index, field, value) =>
-              updateSocialLinks(setIndividualLinks, index, field, value)
-            }
+            onChange={(index, field, value) => updateSocialLinks(setIndividualLinks, index, field, value)}
             onAdd={() => addSocialLink(setIndividualLinks)}
             onRemove={(index) => removeSocialLink(setIndividualLinks, index)}
           />
+        </div>
+      </details>
 
-          <SubmitRow
-            loading={loading}
-            message={message}
-          />
-        </form>
-    </div>
+      <Button type="submit" disabled={loading} className="w-full">
+        {loading ? "Creating your account…" : "Create account"}
+      </Button>
+    </form>
   );
 }
 
-function Field({
-  label,
-  value,
-  onChange,
-  type = "text",
-  required,
-  error,
-  helperText,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  type?: string;
-  required?: boolean;
-  error?: string;
-  helperText?: string;
-}) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <label className="space-y-1 text-sm text-soltas-text">
-      <span className="font-medium">
-        {label}
-        {required ? " *" : ""}
-      </span>
-      <input
-        type={type}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className={`w-full rounded-xl border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
-          error
-            ? "border-red-400 focus:ring-red-200"
-            : "border-soltas-line focus:border-soltas-ocean/50 focus:ring-soltas-ocean/15"
-        }`}
-      />
-      {helperText && <p className="text-xs text-soltas-muted">{helperText}</p>}
-      {error && <p className="text-xs font-semibold text-red-600">{error}</p>}
-    </label>
-  );
-}
-
-function SelectField({
-  label,
-  value,
-  onChange,
-  required,
-  error,
-  helperText,
-  options,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  required?: boolean;
-  error?: string;
-  helperText?: string;
-  options: Array<{ value: string; label: string }>;
-}) {
-  return (
-    <label className="space-y-1 text-sm text-soltas-text">
-      <span className="font-medium">
-        {label}
-        {required ? " *" : ""}
-      </span>
-      <select
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className={`w-full rounded-xl border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
-          error
-            ? "border-red-400 focus:ring-red-200"
-            : "border-soltas-line focus:border-soltas-ocean/50 focus:ring-soltas-ocean/15"
-        }`}
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-      {helperText && <p className="text-xs text-soltas-muted">{helperText}</p>}
-      {error && <p className="text-xs font-semibold text-red-600">{error}</p>}
-    </label>
-  );
-}
-
-function TextAreaField({
-  label,
-  value,
-  onChange,
-  error,
-  required,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  error?: string;
-  required?: boolean;
-}) {
-  return (
-    <label className="space-y-1 text-sm text-soltas-text">
-      <span className="font-medium">
-        {label}
-        {required ? " *" : ""}
-      </span>
-      <textarea
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        rows={4}
-        className={`w-full rounded-xl border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
-          error
-            ? "border-red-400 focus:ring-red-200"
-            : "border-soltas-line focus:border-soltas-ocean/50 focus:ring-soltas-ocean/15"
-        }`}
-      />
-      {error && <p className="text-xs font-semibold text-red-600">{error}</p>}
-    </label>
-  );
-}
-
-function SocialLinksField({
-  title,
-  links,
-  onChange,
-  onAdd,
-  onRemove,
-}: {
-  title: string;
-  links: SocialLink[];
-  onChange: (index: number, field: keyof SocialLink, value: string) => void;
-  onAdd: () => void;
-  onRemove: (index: number) => void;
-}) {
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-soltas-text">{title}</h3>
-        <button
-          type="button"
-          onClick={onAdd}
-          className="rounded-full border border-soltas-line px-3 py-1 text-xs font-medium text-soltas-ocean hover:bg-soltas-light transition-colors duration-150"
-        >
-          Add link
-        </button>
-      </div>
-      <div className="space-y-3">
-        {links.map((link, index) => (
-          <div key={`${link.type}-${index}`} className="grid gap-3 md:grid-cols-[160px,1fr,auto]">
-            <select
-              value={link.type}
-              onChange={(event) => onChange(index, "type", event.target.value)}
-              className="w-full rounded-xl border border-soltas-line bg-white px-3 py-2 text-sm focus:border-soltas-ocean/50 focus:outline-none focus:ring-2 focus:ring-soltas-ocean/15"
-            >
-              {socialLinkTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-            <input
-              type="url"
-              placeholder="https://"
-              value={link.url}
-              onChange={(event) => onChange(index, "url", event.target.value)}
-              className="w-full rounded-xl border border-soltas-line px-3 py-2 text-sm focus:border-soltas-ocean/50 focus:outline-none focus:ring-2 focus:ring-soltas-ocean/15"
-            />
-            <button
-              type="button"
-              onClick={() => onRemove(index)}
-              className="rounded-full border border-soltas-line px-3 py-1 text-xs text-soltas-muted hover:bg-soltas-light transition-colors duration-150"
-            >
-              Remove
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function SubmitRow({
-  loading,
-  message,
-}: {
-  loading: boolean;
-  message: { text: string; tone: "error" | "success" | "info" } | null;
-}) {
-  return (
-    <div className="space-y-3">
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full rounded-xl bg-soltas-ocean px-4 py-2 text-sm font-semibold text-white transition hover:bg-soltas-abyssal disabled:cursor-not-allowed disabled:opacity-70"
-      >
-        {loading ? "Creating account..." : "Create account"}
-      </button>
-      {message && (
-        <p
-          className={`text-sm font-medium ${
-            message.tone === "success"
-              ? "text-soltas-ocean"
-              : message.tone === "info"
-                ? "text-soltas-muted"
-                : "text-red-600"
-          }`}
-        >
-          {message.text}
-        </p>
-      )}
-    </div>
+    <fieldset className="space-y-5">
+      <legend className="mb-4 text-[13px] font-semibold uppercase tracking-wide text-soltas-muted">{title}</legend>
+      {children}
+    </fieldset>
   );
 }

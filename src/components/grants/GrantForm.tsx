@@ -20,7 +20,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import { Badge } from "@/components/ui/badge"
 import {
   Select,
   SelectContent,
@@ -196,6 +195,16 @@ function slugify(input: string) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 80)
+}
+
+/** Toggleable pill used for themes and SDGs. */
+function chipClass(active: boolean) {
+  return [
+    "inline-flex min-h-9 items-center rounded-full border px-3.5 text-[13px] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-soltas-ocean/40",
+    active
+      ? "border-soltas-ocean bg-soltas-ocean text-white"
+      : "border-soltas-line bg-white text-soltas-text hover:bg-soltas-light",
+  ].join(" ")
 }
 
 export default function GrantForm({ grant, mode = "create" }: GrantFormProps) {
@@ -415,9 +424,9 @@ export default function GrantForm({ grant, mode = "create" }: GrantFormProps) {
         ) : null}
 
         {/* Basic info */}
-        <div className="space-y-6 rounded-xl border p-6">
+        <div className="space-y-6 rounded-3xl border border-soltas-line bg-white p-5 sm:p-7">
           <div className="space-y-2">
-            <h2 className="text-lg font-semibold">Basic information</h2>
+            <h2 className="text-[17px] font-semibold tracking-tight text-soltas-text">Basic information</h2>
             <p className="text-sm text-muted-foreground">
               Provide the main details about the funding opportunity.
             </p>
@@ -469,9 +478,9 @@ export default function GrantForm({ grant, mode = "create" }: GrantFormProps) {
         </div>
 
         {/* Funding & type */}
-        <div className="space-y-6 rounded-xl border p-6">
+        <div className="space-y-6 rounded-3xl border border-soltas-line bg-white p-5 sm:p-7">
           <div className="space-y-2">
-            <h2 className="text-lg font-semibold">Funding details</h2>
+            <h2 className="text-[17px] font-semibold tracking-tight text-soltas-text">Funding details</h2>
             <p className="text-sm text-muted-foreground">
               Help users understand what type of support this is.
             </p>
@@ -589,9 +598,9 @@ export default function GrantForm({ grant, mode = "create" }: GrantFormProps) {
         </div>
 
         {/* Dates */}
-        <div className="space-y-6 rounded-xl border p-6">
+        <div className="space-y-6 rounded-3xl border border-soltas-line bg-white p-5 sm:p-7">
           <div className="space-y-2">
-            <h2 className="text-lg font-semibold">Timeline</h2>
+            <h2 className="text-[17px] font-semibold tracking-tight text-soltas-text">Timeline</h2>
             <p className="text-sm text-muted-foreground">
               Dates help applicants plan. Leave blank if unknown.
             </p>
@@ -659,9 +668,9 @@ export default function GrantForm({ grant, mode = "create" }: GrantFormProps) {
         </div>
 
         {/* Eligibility & location */}
-        <div className="space-y-6 rounded-xl border p-6">
+        <div className="space-y-6 rounded-3xl border border-soltas-line bg-white p-5 sm:p-7">
           <div className="space-y-2">
-            <h2 className="text-lg font-semibold">Eligibility & location</h2>
+            <h2 className="text-[17px] font-semibold tracking-tight text-soltas-text">Eligibility & location</h2>
             <p className="text-sm text-muted-foreground">
               Where can applicants apply from? Is remote participation allowed?
             </p>
@@ -682,7 +691,7 @@ export default function GrantForm({ grant, mode = "create" }: GrantFormProps) {
             )}
           />
 
-          <div className="flex items-center justify-between rounded-lg border p-4">
+          <div className="flex items-center justify-between gap-4 rounded-2xl bg-soltas-off-white p-4">
             <div className="space-y-1">
               {/* IMPORTANT: use plain elements here (FormLabel/FormDescription require FormFieldContext) */}
               <div className="text-base font-medium">Remote OK</div>
@@ -750,9 +759,9 @@ export default function GrantForm({ grant, mode = "create" }: GrantFormProps) {
         </div>
 
         {/* Classification */}
-        <div className="space-y-6 rounded-xl border p-6">
+        <div className="space-y-6 rounded-3xl border border-soltas-line bg-white p-5 sm:p-7">
           <div className="space-y-2">
-            <h2 className="text-lg font-semibold">Classification</h2>
+            <h2 className="text-[17px] font-semibold tracking-tight text-soltas-text">Classification</h2>
             <p className="text-sm text-muted-foreground">
               Themes and SDGs help filter and match opportunities.
             </p>
@@ -760,13 +769,13 @@ export default function GrantForm({ grant, mode = "create" }: GrantFormProps) {
 
           {/* IMPORTANT: No FormLabel here (requires FormFieldContext). Use plain text. */}
           <div className="space-y-2">
-            <div className="text-sm font-medium leading-none">Themes</div>
+            <div className="text-sm font-medium text-soltas-text">Themes</div>
             <div className="flex flex-wrap gap-2">
               {THEME_OPTIONS.map((t) => {
                 const active = selectedThemes.includes(t)
                 return (
-                  <button type="button" key={t} className="rounded-full" onClick={() => toggleTheme(t)}>
-                    <Badge variant={active ? "default" : "outline"}>{t}</Badge>
+                  <button type="button" key={t} aria-pressed={active} className={chipClass(active)} onClick={() => toggleTheme(t)}>
+                    {t}
                   </button>
                 )
               })}
@@ -774,15 +783,13 @@ export default function GrantForm({ grant, mode = "create" }: GrantFormProps) {
           </div>
 
           <div className="space-y-2">
-            <div className="text-sm font-medium leading-none">SDGs</div>
+            <div className="text-sm font-medium text-soltas-text">Sustainable Development Goals</div>
             <div className="flex flex-wrap gap-2">
               {SDG_OPTIONS.map((s) => {
                 const active = selectedSdgs.includes(s.id)
                 return (
-                  <button type="button" key={s.id} className="rounded-full" onClick={() => toggleSdg(s.id)}>
-                    <Badge variant={active ? "default" : "outline"}>
-                      {s.id}. {s.label}
-                    </Badge>
+                  <button type="button" key={s.id} aria-pressed={active} className={chipClass(active)} onClick={() => toggleSdg(s.id)}>
+                    {s.id}. {s.label}
                   </button>
                 )
               })}
@@ -806,9 +813,9 @@ export default function GrantForm({ grant, mode = "create" }: GrantFormProps) {
         </div>
 
         {/* Funder */}
-        <div className="space-y-6 rounded-xl border p-6">
+        <div className="space-y-6 rounded-3xl border border-soltas-line bg-white p-5 sm:p-7">
           <div className="space-y-2">
-            <h2 className="text-lg font-semibold">Funder information</h2>
+            <h2 className="text-[17px] font-semibold tracking-tight text-soltas-text">Funder information</h2>
             <p className="text-sm text-muted-foreground">
               Optional details about the organization offering the funding.
             </p>
@@ -860,9 +867,9 @@ export default function GrantForm({ grant, mode = "create" }: GrantFormProps) {
         </div>
 
         {/* Post to feed */}
-        <div className="space-y-6 rounded-xl border p-6">
+        <div className="space-y-6 rounded-3xl border border-soltas-line bg-white p-5 sm:p-7">
           <div className="space-y-2">
-            <h2 className="text-lg font-semibold">Share to feed</h2>
+            <h2 className="text-[17px] font-semibold tracking-tight text-soltas-text">Share to feed</h2>
             <p className="text-sm text-muted-foreground">
               Optionally post a message to the community feed when this funding opportunity is created.
             </p>
@@ -872,7 +879,7 @@ export default function GrantForm({ grant, mode = "create" }: GrantFormProps) {
             control={form.control}
             name="post_to_feed"
             render={({ field }) => (
-              <FormItem className="flex items-center justify-between rounded-lg border p-4">
+              <FormItem className="flex items-center justify-between gap-4 rounded-2xl bg-soltas-off-white p-4">
                 <div className="space-y-1">
                   <FormLabel>Post to feed</FormLabel>
                   <FormDescription>
@@ -907,19 +914,18 @@ export default function GrantForm({ grant, mode = "create" }: GrantFormProps) {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <Button type="button" variant="outline" disabled={submitting} onClick={() => router.back()}>
+            Cancel
+          </Button>
           <Button type="submit" disabled={submitting || !supabaseConfigured}>
             {submitting
               ? mode === "edit"
-                ? "Saving..."
-                : "Creating..."
+                ? "Saving…"
+                : "Submitting…"
               : mode === "edit"
                 ? "Save changes"
-                : "Create funding"}
-          </Button>
-
-          <Button type="button" variant="outline" disabled={submitting} onClick={() => router.back()}>
-            Cancel
+                : "Submit for review"}
           </Button>
         </div>
       </form>
