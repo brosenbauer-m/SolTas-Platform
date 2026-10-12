@@ -18,6 +18,7 @@ type UpdateCardWithSocialProps = {
   date: string;
   authorName?: string;
   href?: string;
+  membersOnly?: boolean;
   isAuthenticated: boolean;
   initialLikeCount: number;
   initialLiked: boolean;
@@ -36,6 +37,7 @@ export default function UpdateCardWithSocial({
   date,
   authorName,
   href,
+  membersOnly = false,
   isAuthenticated,
   initialLikeCount,
   initialLiked,
@@ -154,7 +156,14 @@ export default function UpdateCardWithSocial({
   const card = (
     <article className="rounded-xl border border-slate-200 bg-white p-4 hover:border-slate-300 transition-colors">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-        <h3 className="text-base font-semibold text-soltas-bark">{title}</h3>
+        <div className="flex flex-wrap items-center gap-2">
+          <h3 className="text-base font-semibold text-soltas-bark">{title}</h3>
+          {membersOnly ? (
+            <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-800">
+              Members only
+            </span>
+          ) : null}
+        </div>
         <span className="text-xs text-soltas-muted">{formattedDate}</span>
       </div>
       {authorName ? (

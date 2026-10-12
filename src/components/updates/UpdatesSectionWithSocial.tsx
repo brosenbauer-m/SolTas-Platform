@@ -9,18 +9,22 @@ export type UpdateSummary = {
   created_at: string;
   author_name?: string;
   href?: string;
+  // "project" = visible to project members only
+  visibility?: "public" | "project";
 };
 
 type UpdatesSectionWithSocialProps = {
   updates: UpdateSummary[];
   isAuthenticated: boolean;
   canPost?: boolean;
+  projectId?: string;
 };
 
 export default async function UpdatesSectionWithSocial({
   updates,
   isAuthenticated,
   canPost = false,
+  projectId,
 }: UpdatesSectionWithSocialProps) {
   const supabase = await getServerSupabase();
   const { data: { user } } = await supabase.auth.getUser();
@@ -65,7 +69,7 @@ export default async function UpdatesSectionWithSocial({
         <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">
           Updates
         </h2>
-        {canPost ? <NewUpdateButton isAuthenticated={isAuthenticated} /> : null}
+        {canPost ? <NewUpdateButton isAuthenticated={isAuthenticated} projectId={projectId} /> : null}
       </div>
 
       {updates.length > 0 ? (
@@ -78,6 +82,7 @@ export default async function UpdatesSectionWithSocial({
               summary={update.summary}
               date={update.created_at}
               authorName={update.author_name}
+              membersOnly={update.visibility === "project"}
               href={update.href}
               isAuthenticated={isAuthenticated}
               initialLikeCount={likeCounts[update.id] || 0}
