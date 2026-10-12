@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { ProjectApprovalActions } from "@/components/admin/ProjectApprovalActions";
 import type { Database } from "@/lib/database.types";
+import { fetchProfilesByIds } from "@/lib/profiles/byIds";
 import { MissingSupabaseEnvError } from "@/lib/supabaseConfig";
 import { getServerSupabase } from "@/lib/supabaseServer";
 import { cn } from "@/lib/utils";
@@ -37,11 +38,7 @@ type ProjectListItem = Pick<
 type RawProjectListItem = Omit<
   ProjectListItem,
   "created_by_profile" | "approved_by_profile" | "rejected_by_profile"
-> & {
-  created_by_profile: Pick<ProfileRow, "full_name" | "organisation_name">[] | null;
-  approved_by_profile: Pick<ProfileRow, "full_name" | "organisation_name">[] | null;
-  rejected_by_profile: Pick<ProfileRow, "full_name" | "organisation_name">[] | null;
-};
+>;
 
 function formatDate(value: string | null) {
   if (!value) return "—";
@@ -176,10 +173,7 @@ export default async function AdminProjectsPage({
       `id,name,created_at,created_by,place_name,links,status,
        approved_at,approved_by,rejected_at,rejected_by,rejection_reason,
        project_links:project_links(id),
-       project_media:project_media(id),
-       created_by_profile:profiles(full_name,organisation_name),
-       approved_by_profile:profiles!projects_approved_by_fkey(full_name,organisation_name),
-       rejected_by_profile:profiles!projects_rejected_by_fkey(full_name,organisation_name)
+       project_media:project_media(id)
       `
     )
     .eq("status", selectedView)
@@ -190,14 +184,17 @@ export default async function AdminProjectsPage({
     throw error;
   }
 
-  const projects: ProjectListItem[] = (data as RawProjectListItem[] | null)?.map(
-    project => ({
-      ...project,
-      created_by_profile: project.created_by_profile?.[0] ?? null,
-      approved_by_profile: project.approved_by_profile?.[0] ?? null,
-      rejected_by_profile: project.rejected_by_profile?.[0] ?? null,
-    })
-  ) ?? [];
+  const rows = (data as RawProjectListItem[] | null) ?? [];
+  const profiles = await fetchProfilesByIds(
+    supabase,
+    rows.flatMap(project => [project.created_by, project.approved_by, project.rejected_by]),
+  );
+  const projects: ProjectListItem[] = rows.map(project => ({
+    ...project,
+    created_by_profile: project.created_by ? profiles.get(project.created_by) ?? null : null,
+    approved_by_profile: project.approved_by ? profiles.get(project.approved_by) ?? null : null,
+    rejected_by_profile: project.rejected_by ? profiles.get(project.rejected_by) ?? null : null,
+  }));
 
   return (
     <main className="space-y-6 p-6">

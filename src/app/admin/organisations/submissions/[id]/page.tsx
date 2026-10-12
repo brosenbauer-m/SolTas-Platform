@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
 import type { Database } from "@/lib/database.types";
+import { fetchProfilesByIds, one, profileDisplayName } from "@/lib/profiles/byIds";
 import { getServerSupabase } from "@/lib/supabaseServer";
 import { cn } from "@/lib/utils";
 
@@ -20,9 +21,7 @@ type RawSubmissionDetail = Omit<
   SubmissionDetail,
   "organisation" | "submitted_by_profile" | "reviewed_by_profile"
 > & {
-  organisation: OrganisationRow[] | null;
-  submitted_by_profile: Pick<ProfileRow, "full_name">[] | null;
-  reviewed_by_profile: Pick<ProfileRow, "full_name">[] | null;
+  organisation: OrganisationRow | OrganisationRow[] | null;
 };
 
 function formatDateTime(value: string | null | undefined) {
@@ -270,9 +269,7 @@ export default async function AdminSubmissionDetailPage({
     .from("organisation_verification_submissions")
     .select(
       `*,
-       organisation:organisations(*),
-       submitted_by_profile:profiles!organisation_verification_submissions_submitted_by_fkey(full_name),
-       reviewed_by_profile:profiles!organisation_verification_submissions_reviewed_by_fkey(full_name)
+       organisation:organisations(*)
       `
     )
     .eq("id", id)
@@ -288,11 +285,16 @@ export default async function AdminSubmissionDetailPage({
 
   const rawSubmission = data as RawSubmissionDetail;
 
+  const people = await fetchProfilesByIds(supabase, [rawSubmission.submitted_by, rawSubmission.reviewed_by]);
+  const nameOf = (id: string | null) => {
+    const profile = id ? people.get(id) : undefined;
+    return profile ? { full_name: profileDisplayName(profile) } : null;
+  };
   const submission: SubmissionDetail = {
     ...rawSubmission,
-    organisation: rawSubmission.organisation?.[0] ?? null,
-    submitted_by_profile: rawSubmission.submitted_by_profile?.[0] ?? null,
-    reviewed_by_profile: rawSubmission.reviewed_by_profile?.[0] ?? null,
+    organisation: one(rawSubmission.organisation),
+    submitted_by_profile: nameOf(rawSubmission.submitted_by),
+    reviewed_by_profile: nameOf(rawSubmission.reviewed_by),
   };
 
   const resolvedSearchParams = searchParams ? await searchParams : undefined;

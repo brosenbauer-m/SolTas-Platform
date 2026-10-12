@@ -1,9 +1,11 @@
+import { notFound } from "next/navigation";
+
 import { getServerSupabase } from "@/lib/supabaseServer";
 
 export default async function Page() {
   const supabase = await getServerSupabase();
   const { data: isSuper } = await supabase.rpc("is_superadmin");
-  if (!isSuper) return new Response(null, { status: 404 }) as never;
+  if (!isSuper) notFound();
 
   const [{ data: admins }, { data: settings }] = await Promise.all([
     supabase.from("admin_emails").select("email,added_at").order("email"),
