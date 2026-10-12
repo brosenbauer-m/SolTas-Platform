@@ -24,7 +24,7 @@ try {
 export default function LoginForm() {
   if (!supabase) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-soltas-muted">
+      <div className="rounded-2xl border border-soltas-line bg-white p-6 text-sm text-soltas-muted">
         {supabaseInitializationError?.message}
       </div>
     );
@@ -85,7 +85,7 @@ function LoginFormContent({ client }: { client: SupabaseClient }) {
   }
 
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="rounded-3xl border border-soltas-line bg-white p-6 shadow-sm">
       <form onSubmit={handleSubmit} className="space-y-4">
         <label className="space-y-1 text-sm text-soltas-text">
           <span className="font-medium">Email *</span>
@@ -96,7 +96,7 @@ function LoginFormContent({ client }: { client: SupabaseClient }) {
             className={`w-full rounded-xl border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
               errors.email
                 ? "border-red-400 focus:ring-red-200"
-                : "border-slate-200 focus:ring-slate-200"
+                : "border-soltas-line focus:ring-soltas-ocean/15"
             }`}
           />
           {errors.email && <p className="text-xs font-semibold text-red-600">{errors.email}</p>}
@@ -111,7 +111,7 @@ function LoginFormContent({ client }: { client: SupabaseClient }) {
             className={`w-full rounded-xl border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
               errors.password
                 ? "border-red-400 focus:ring-red-200"
-                : "border-slate-200 focus:ring-slate-200"
+                : "border-soltas-line focus:ring-soltas-ocean/15"
             }`}
           />
           {errors.password && (
@@ -123,7 +123,7 @@ function LoginFormContent({ client }: { client: SupabaseClient }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
+            className="w-full rounded-xl bg-soltas-ocean px-4 py-2 text-sm font-semibold text-white transition hover:bg-soltas-abyssal disabled:cursor-not-allowed disabled:opacity-70"
           >
             {loading ? "Signing in..." : "Sign in"}
           </button>

@@ -80,11 +80,11 @@ export default async function WatchdogIssuePage({
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="truncate text-2xl font-semibold tracking-tight text-soltas-bark">
+            <h1 className="truncate text-2xl font-semibold tracking-tight text-soltas-text">
               {issue.title}
             </h1>
             {issue.urgency != null ? (
-              <span className="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-xs font-medium text-soltas-muted">
+              <span className="rounded-full border border-soltas-line bg-white px-2 py-0.5 text-xs font-medium text-soltas-muted">
                 Urgency: {issue.urgency}/10
               </span>
             ) : null}
@@ -98,11 +98,11 @@ export default async function WatchdogIssuePage({
       </header>
 
       {issue.description ? (
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">
+        <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">
             Description
           </h2>
-          <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-soltas-bark">
+          <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-soltas-text">
             {issue.description}
           </p>
         </section>
@@ -114,34 +114,34 @@ export default async function WatchdogIssuePage({
         canPost={canEdit}
       />
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">Details</h2>
+      <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+        <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Details</h2>
 
         <dl className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {issue.date_observed ? (
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+              <dt className="text-xs font-medium text-soltas-muted">
                 Date observed
               </dt>
-              <dd className="text-sm text-soltas-bark">{formatDate(issue.date_observed)}</dd>
+              <dd className="text-sm text-soltas-text">{formatDate(issue.date_observed)}</dd>
             </div>
           ) : null}
 
           {issue.urgency != null ? (
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+              <dt className="text-xs font-medium text-soltas-muted">
                 Urgency
               </dt>
-              <dd className="text-sm text-soltas-bark">{issue.urgency} / 10</dd>
+              <dd className="text-sm text-soltas-text">{issue.urgency} / 10</dd>
             </div>
           ) : null}
 
           {Array.isArray(issue.affected_demographics) && issue.affected_demographics.length > 0 ? (
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+              <dt className="text-xs font-medium text-soltas-muted">
                 Affected demographics
               </dt>
-              <dd className="text-sm text-soltas-bark">
+              <dd className="text-sm text-soltas-text">
                 {(issue.affected_demographics as string[]).join(", ")}
               </dd>
             </div>
@@ -149,14 +149,14 @@ export default async function WatchdogIssuePage({
 
           {Array.isArray(issue.global_challenges) && issue.global_challenges.length > 0 ? (
             <div className="sm:col-span-2 lg:col-span-3">
-              <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+              <dt className="text-xs font-medium text-soltas-muted">
                 Global challenges
               </dt>
               <dd className="mt-1 flex flex-wrap gap-2">
                 {(issue.global_challenges as string[]).map((challenge: string) => (
                   <span
                     key={challenge}
-                    className="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-xs font-medium text-soltas-text"
+                    className="rounded-full border border-soltas-line bg-white px-2 py-0.5 text-xs font-medium text-soltas-text"
                   >
                     {challenge}
                   </span>
@@ -167,14 +167,14 @@ export default async function WatchdogIssuePage({
 
           {Array.isArray(issue.sdgs) && issue.sdgs.length > 0 ? (
             <div className="sm:col-span-2 lg:col-span-3">
-              <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+              <dt className="text-xs font-medium text-soltas-muted">
                 SDGs
               </dt>
               <dd className="mt-1 flex flex-wrap gap-2">
                 {(issue.sdgs as number[]).map((sdg: number) => (
                   <span
                     key={sdg}
-                    className="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-xs font-medium text-soltas-text"
+                    className="rounded-full border border-soltas-line bg-white px-2 py-0.5 text-xs font-medium text-soltas-text"
                   >
                     SDG {sdg}
                   </span>

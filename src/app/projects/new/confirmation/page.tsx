@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function ProjectConfirmationPage() {
   return (
     <main className="mx-auto max-w-xl space-y-6 px-4 pb-16 pt-20 text-center sm:px-6">
-      <h1 className="text-3xl font-semibold text-soltas-bark">Project submitted</h1>
+      <h1 className="text-3xl font-semibold text-soltas-text">Project submitted</h1>
       <p className="text-base text-soltas-muted">
         Thank you for sharing your work with the Solarpunk Taskforce. Our team will review the details and reach out if we
         need anything else. You will receive an update once the project is approved.

@@ -225,7 +225,7 @@ export default function OrganisationsGlobeSplitView({
 
   if (isMobile) {
     return (
-      <section className="relative h-full w-full min-h-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <section className="relative h-full w-full min-h-0 overflow-hidden rounded-2xl border border-soltas-line bg-white shadow-sm">
         <div className="h-full w-full">
           <Map
             markers={markers}
@@ -250,17 +250,17 @@ export default function OrganisationsGlobeSplitView({
         {/* Mobile filters drawer */}
         {mobileFiltersOpen && (
           <>
-            <div className="absolute inset-0 z-20 bg-soltas-peat/20" onClick={() => setMobileFiltersOpen(false)} />
+            <div className="absolute inset-0 z-20 bg-soltas-text/20" onClick={() => setMobileFiltersOpen(false)} />
             <div className="absolute bottom-0 left-0 right-0 z-30 max-h-[70vh] overflow-y-auto rounded-t-2xl bg-white p-4 shadow-2xl">
               <div className="mb-3 flex items-center justify-between">
-                <span className="text-sm font-semibold text-soltas-bark">Filters</span>
-                <button type="button" onClick={() => setMobileFiltersOpen(false)} className="rounded-lg p-1 hover:bg-slate-100">
+                <span className="text-sm font-semibold text-soltas-text">Filters</span>
+                <button type="button" onClick={() => setMobileFiltersOpen(false)} className="rounded-lg p-1 hover:bg-soltas-light">
                   <X className="h-4 w-4" />
                 </button>
               </div>
               <div className="space-y-4">
                 <OrganisationsFilters options={options} />
-                <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-3 text-sm text-soltas-muted">
+                <div className="rounded-lg border border-dashed border-soltas-line bg-soltas-off-white p-3 text-sm text-soltas-muted">
                   {markers.length} mapped · {totalCount} total
                 </div>
               </div>
@@ -274,7 +274,7 @@ export default function OrganisationsGlobeSplitView({
   return (
     <section
       ref={containerRef}
-      className="h-full w-full min-h-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+      className="h-full w-full min-h-0 overflow-hidden rounded-2xl border border-soltas-line bg-white shadow-sm"
     >
       <div
         className="grid h-full w-full"
@@ -283,7 +283,7 @@ export default function OrganisationsGlobeSplitView({
         {/* Left panel */}
         <div
           className={[
-            "min-w-0 h-full border-r border-slate-200 bg-white transition-[opacity] duration-150",
+            "min-w-0 h-full border-r border-soltas-line bg-white transition-[opacity] duration-150",
             collapsed ? "pointer-events-none opacity-0" : "opacity-100",
           ].join(" ")}
           aria-hidden={collapsed ? "true" : "false"}
@@ -291,7 +291,7 @@ export default function OrganisationsGlobeSplitView({
           <div className="h-full overflow-y-auto p-4">
             <div className="space-y-4">
               <OrganisationsFilters options={options} />
-              <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-4 text-sm text-soltas-muted">
+              <div className="rounded-lg border border-dashed border-soltas-line bg-soltas-off-white p-4 text-sm text-soltas-muted">
                 {markers.length} organisations mapped · {totalCount} total matching filters
               </div>
             </div>
@@ -299,7 +299,7 @@ export default function OrganisationsGlobeSplitView({
         </div>
 
         {/* Handle column */}
-        <div className="relative h-full w-full bg-slate-100">
+        <div className="relative h-full w-full bg-soltas-light">
           <button
             type="button"
             aria-label="Resize panel"
@@ -308,7 +308,7 @@ export default function OrganisationsGlobeSplitView({
           >
             <div className="absolute left-1/2 top-0 h-full w-[3px] -translate-x-1/2 bg-slate-300" />
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none">
-              <div className="rounded-lg bg-slate-900 px-2.5 py-1.5 text-sm font-bold text-white shadow-lg ring-1 ring-black/10">
+              <div className="rounded-lg bg-soltas-ocean px-2.5 py-1.5 text-sm font-bold text-white shadow-lg ring-1 ring-black/10">
                 {"<>"}
               </div>
             </div>

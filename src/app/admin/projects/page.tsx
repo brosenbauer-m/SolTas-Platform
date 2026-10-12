@@ -218,7 +218,7 @@ export default async function AdminProjectsPage({
                 "rounded-full border px-3 py-1 text-xs font-medium transition",
                 isActive
                   ? "border-soltas-ocean bg-soltas-glacial/15 text-soltas-ocean"
-                  : "border-slate-200 text-soltas-muted hover:border-slate-300 hover:text-soltas-bark"
+                  : "border-soltas-line text-soltas-muted hover:border-soltas-line hover:text-soltas-text"
               )}
             >
               {views[view].label}
@@ -229,7 +229,7 @@ export default async function AdminProjectsPage({
 
       <div className="overflow-x-auto rounded-xl border">
         <table className="min-w-full divide-y text-sm">
-          <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-soltas-muted">
+          <thead className="bg-soltas-off-white text-left text-xs font-medium text-soltas-muted">
             <tr>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Created</th>
@@ -261,7 +261,7 @@ export default async function AdminProjectsPage({
                 return (
                   <tr key={project.id} className="align-top">
                     <td className="px-4 py-3">
-                      <div className="font-medium text-soltas-bark">{project.name}</div>
+                      <div className="font-medium text-soltas-text">{project.name}</div>
                       <div className="text-xs text-soltas-muted">{project.id}</div>
                       <Link
                         href={`/admin/projects/${project.id}`}

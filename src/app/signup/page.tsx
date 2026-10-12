@@ -6,7 +6,7 @@ export default function SignupPage() {
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 p-6">
       <div className="space-y-2">
-        <h1 className="text-3xl font-semibold text-soltas-bark">Create your account</h1>
+        <h1 className="text-3xl font-semibold text-soltas-text">Create your account</h1>
         <p className="text-sm text-soltas-muted">
           Create your personal account. You can create an organisation page after signing in.
         </p>

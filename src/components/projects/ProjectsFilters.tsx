@@ -93,14 +93,14 @@ export default function ProjectsFilters({
 
   const containerClassName =
     variant === "panel"
-      ? "space-y-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+      ? "space-y-4 rounded-lg border border-soltas-line bg-white p-4 shadow-sm"
       : "space-y-4";
 
   return (
     <section className={containerClassName}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-soltas-bark">Filters</h2>
+          <h2 className="text-lg font-semibold text-soltas-text">Filters</h2>
           <p className="text-sm text-soltas-muted">Use these controls to refine the project list.</p>
         </div>
         <Button type="button" variant="ghost" onClick={clearFilters}>
@@ -110,7 +110,7 @@ export default function ProjectsFilters({
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Search</span>
+          <span className="font-medium text-soltas-text">Search</span>
           <Input
             value={qValue}
             placeholder="Project name or place"
@@ -119,7 +119,7 @@ export default function ProjectsFilters({
         </label>
 
         <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Project type</span>
+          <span className="font-medium text-soltas-text">Project type</span>
           <Select
             value={categoryValue || "all"}
             onValueChange={value =>
@@ -141,7 +141,7 @@ export default function ProjectsFilters({
         </label>
 
         <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Country</span>
+          <span className="font-medium text-soltas-text">Country</span>
           <Input
             value={countryValue}
             placeholder="US, CA"
@@ -150,7 +150,7 @@ export default function ProjectsFilters({
         </label>
 
         <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Region</span>
+          <span className="font-medium text-soltas-text">Region</span>
           <Input
             value={regionValue}
             placeholder="Region names"
@@ -159,11 +159,11 @@ export default function ProjectsFilters({
         </label>
       </div>
 
-      <details className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+      <details className="rounded-lg border border-soltas-line bg-soltas-off-white p-4">
         <summary className="cursor-pointer text-sm font-medium text-soltas-text">Advanced filters</summary>
         <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-bark">Thematic areas</span>
+            <span className="font-medium text-soltas-text">Thematic areas</span>
             <Input
               value={thematicValue}
               placeholder="comma-separated"
@@ -172,7 +172,7 @@ export default function ProjectsFilters({
           </label>
 
           <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-bark">Intervention types</span>
+            <span className="font-medium text-soltas-text">Intervention types</span>
             <Input
               value={interventionValue}
               placeholder="comma-separated"
@@ -181,7 +181,7 @@ export default function ProjectsFilters({
           </label>
 
           <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-bark">Target demographics</span>
+            <span className="font-medium text-soltas-text">Target demographics</span>
             <Input
               value={demographicValue}
               placeholder="comma-separated"
@@ -190,7 +190,7 @@ export default function ProjectsFilters({
           </label>
 
           <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-bark">Partner org IDs</span>
+            <span className="font-medium text-soltas-text">Partner org IDs</span>
             <Input
               value={partnerValue}
               placeholder="uuid, uuid"
@@ -199,7 +199,7 @@ export default function ProjectsFilters({
           </label>
 
           <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-bark">Currency</span>
+            <span className="font-medium text-soltas-text">Currency</span>
             <Input
               value={currencyValue}
               placeholder="USD, EUR"
@@ -208,7 +208,7 @@ export default function ProjectsFilters({
           </label>
 
           <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-bark">Min funding needed</span>
+            <span className="font-medium text-soltas-text">Min funding needed</span>
             <Input
               type="number"
               value={minNeededValue}
@@ -217,7 +217,7 @@ export default function ProjectsFilters({
           </label>
 
           <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-bark">Max funding needed</span>
+            <span className="font-medium text-soltas-text">Max funding needed</span>
             <Input
               type="number"
               value={maxNeededValue}
@@ -226,7 +226,7 @@ export default function ProjectsFilters({
           </label>
 
           <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-bark">Min funding received</span>
+            <span className="font-medium text-soltas-text">Min funding received</span>
             <Input
               type="number"
               value={minReceivedValue}
@@ -235,7 +235,7 @@ export default function ProjectsFilters({
           </label>
 
           <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-bark">Max funding received</span>
+            <span className="font-medium text-soltas-text">Max funding received</span>
             <Input
               type="number"
               value={maxReceivedValue}
@@ -244,7 +244,7 @@ export default function ProjectsFilters({
           </label>
 
           <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-bark">Min lives improved</span>
+            <span className="font-medium text-soltas-text">Min lives improved</span>
             <Input
               type="number"
               value={minLivesValue}
@@ -253,7 +253,7 @@ export default function ProjectsFilters({
           </label>
 
           <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-bark">Max lives improved</span>
+            <span className="font-medium text-soltas-text">Max lives improved</span>
             <Input
               type="number"
               value={maxLivesValue}
@@ -262,7 +262,7 @@ export default function ProjectsFilters({
           </label>
 
           <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-bark">Start date from</span>
+            <span className="font-medium text-soltas-text">Start date from</span>
             <Input
               type="date"
               value={startFromValue}
@@ -271,7 +271,7 @@ export default function ProjectsFilters({
           </label>
 
           <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-bark">End date to</span>
+            <span className="font-medium text-soltas-text">End date to</span>
             <Input
               type="date"
               value={endToValue}
@@ -282,7 +282,7 @@ export default function ProjectsFilters({
           {showSorting ? (
             <>
               <label className="space-y-1 text-sm text-soltas-muted">
-                <span className="font-medium text-soltas-bark">Sort by</span>
+                <span className="font-medium text-soltas-text">Sort by</span>
                 <Select value={sortValue} onValueChange={value => updateParams({ sort: value })}>
                   <SelectTrigger>
                     <SelectValue />
@@ -298,7 +298,7 @@ export default function ProjectsFilters({
               </label>
 
               <label className="space-y-1 text-sm text-soltas-muted">
-                <span className="font-medium text-soltas-bark">Sort direction</span>
+                <span className="font-medium text-soltas-text">Sort direction</span>
                 <Select value={dirValue} onValueChange={value => updateParams({ dir: value })}>
                   <SelectTrigger>
                     <SelectValue />

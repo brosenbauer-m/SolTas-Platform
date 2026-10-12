@@ -59,14 +59,14 @@ export default async function GrantDetailPage({
     <main className="mx-auto w-full max-w-4xl space-y-8 px-4 pb-16 pt-10 sm:px-6 lg:px-8">
       <header className="space-y-3">
         <p className="text-sm font-semibold uppercase tracking-wide text-soltas-ocean">Funding opportunity</p>
-        <h1 className="text-3xl font-semibold text-soltas-bark">{grant.title}</h1>
+        <h1 className="text-3xl font-semibold text-soltas-text">{grant.title}</h1>
         {grant.summary ? <p className="text-base text-soltas-muted">{grant.summary}</p> : null}
       </header>
 
-      <section className="grid gap-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:grid-cols-2">
+      <section className="grid gap-6 rounded-3xl border border-soltas-line bg-white p-6 shadow-sm sm:grid-cols-2">
         <div className="space-y-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">Funder</h2>
-          <p className="text-base text-soltas-bark">{grant.funder_name ?? "Not listed"}</p>
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Funder</h2>
+          <p className="text-base text-soltas-text">{grant.funder_name ?? "Not listed"}</p>
           {grant.funder_website ? (
             <Link href={grant.funder_website} className="text-sm text-soltas-ocean hover:text-soltas-abyssal transition-colors">
               Visit funder website
@@ -74,7 +74,7 @@ export default async function GrantDetailPage({
           ) : null}
         </div>
         <div className="space-y-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">Application</h2>
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Application</h2>
           <Link
             href={grant.application_url}
             className="inline-flex items-center justify-center rounded-2xl bg-soltas-ocean px-4 py-2 text-sm font-semibold text-white hover:bg-soltas-abyssal"
@@ -84,20 +84,20 @@ export default async function GrantDetailPage({
           {grant.contact_email ? <p className="text-sm text-soltas-muted">Contact: {grant.contact_email}</p> : null}
         </div>
         <div className="space-y-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">Funding</h2>
-          <p className="text-base text-soltas-bark capitalize">{grant.funding_type}</p>
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Funding</h2>
+          <p className="text-base text-soltas-text capitalize">{grant.funding_type}</p>
           <p className="text-sm text-soltas-muted">Amount: {amountRange ?? "Not specified"}</p>
         </div>
         <div className="space-y-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">Focus</h2>
-          <p className="text-base text-soltas-bark capitalize">{grant.project_type}</p>
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Focus</h2>
+          <p className="text-base text-soltas-text capitalize">{grant.project_type}</p>
           <p className="text-sm text-soltas-muted">Status: {grant.status}</p>
         </div>
       </section>
 
-      <section className="grid gap-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:grid-cols-2">
+      <section className="grid gap-6 rounded-3xl border border-soltas-line bg-white p-6 shadow-sm sm:grid-cols-2">
         <div className="space-y-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">Key dates</h2>
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Key dates</h2>
           <ul className="space-y-1 text-sm text-soltas-muted">
             <li>Open date: {openDate ?? "—"}</li>
             <li>Deadline: {deadline ?? "—"}</li>
@@ -106,7 +106,7 @@ export default async function GrantDetailPage({
           </ul>
         </div>
         <div className="space-y-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">Eligibility</h2>
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Eligibility</h2>
           <p className="text-sm text-soltas-muted">
             Eligible countries: {grant.eligible_countries?.length ? grant.eligible_countries.join(", ") : "Not specified"}
           </p>
@@ -116,8 +116,8 @@ export default async function GrantDetailPage({
       </section>
 
       {grant.description ? (
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-soltas-bark">Details</h2>
+        <section className="rounded-3xl border border-soltas-line bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-soltas-text">Details</h2>
           <p className="mt-3 whitespace-pre-wrap text-sm text-soltas-muted">{grant.description}</p>
         </section>
       ) : null}

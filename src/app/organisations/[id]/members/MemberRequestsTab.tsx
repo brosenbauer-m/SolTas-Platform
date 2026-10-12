@@ -101,14 +101,14 @@ export function MemberRequestsTab({
   return (
     <div className="space-y-4">
       {/* Tab Navigation */}
-      <div className="border-b border-slate-200">
+      <div className="border-b border-soltas-line">
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab("members")}
             className={`border-b-2 pb-4 text-sm font-medium transition-colors ${
               activeTab === "members"
                 ? "border-soltas-ocean text-soltas-ocean"
-                : "border-transparent text-soltas-muted hover:border-slate-300 hover:text-soltas-bark"
+                : "border-transparent text-soltas-muted hover:border-soltas-line hover:text-soltas-text"
             }`}
           >
             Members ({members.length})
@@ -119,7 +119,7 @@ export function MemberRequestsTab({
               className={`relative border-b-2 pb-4 text-sm font-medium transition-colors ${
                 activeTab === "requests"
                   ? "border-soltas-ocean text-soltas-ocean"
-                  : "border-transparent text-soltas-muted hover:border-slate-300 hover:text-soltas-bark"
+                  : "border-transparent text-soltas-muted hover:border-soltas-line hover:text-soltas-text"
               }`}
             >
               Requests
@@ -144,7 +144,7 @@ export function MemberRequestsTab({
         <div className="rounded-2xl border border-soltas-line bg-white shadow-sm">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y text-sm">
-              <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-soltas-muted">
+              <thead className="bg-soltas-off-white text-left text-xs font-medium text-soltas-muted">
                 <tr>
                   <th className="px-6 py-3">User ID</th>
                   <th className="px-6 py-3">Role</th>
@@ -196,7 +196,7 @@ export function MemberRequestsTab({
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="mb-1 flex items-center gap-2">
-                        <h3 className="font-medium text-soltas-bark">
+                        <h3 className="font-medium text-soltas-text">
                           User ID: {request.user_id}
                         </h3>
                         <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
@@ -208,11 +208,11 @@ export function MemberRequestsTab({
                         at {new Date(request.created_at).toLocaleTimeString()}
                       </p>
                       {request.message && (
-                        <div className="mt-3 rounded-lg bg-slate-50 p-3">
+                        <div className="mt-3 rounded-lg bg-soltas-off-white p-3">
                           <p className="text-xs font-medium text-soltas-muted mb-1">
                             Message:
                           </p>
-                          <p className="text-sm text-soltas-bark">{request.message}</p>
+                          <p className="text-sm text-soltas-text">{request.message}</p>
                         </div>
                       )}
                     </div>

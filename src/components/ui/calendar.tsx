@@ -16,13 +16,13 @@ export function Calendar({ className, classNames, showOutsideDays = true, ...pro
         months: "flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
         caption: "flex items-center justify-between px-1 text-sm font-medium",
-        caption_label: "text-base font-semibold text-soltas-bark",
+        caption_label: "text-base font-semibold text-soltas-text",
         nav: "flex items-center gap-1",
         nav_button:
           "flex h-9 w-9 items-center justify-center rounded-full border border-soltas-glacial/30 text-soltas-muted transition hover:bg-soltas-light",
         table: "w-full border-collapse space-y-1",
         head_row: "flex",
-        head_cell: "w-9 text-center text-xs font-semibold uppercase tracking-wide text-soltas-muted",
+        head_cell: "w-9 text-center text-xs font-medium text-soltas-muted",
         row: "flex w-full",
         cell: "relative w-9 text-center text-sm",
         day: cn(

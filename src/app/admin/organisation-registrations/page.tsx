@@ -100,7 +100,7 @@ export default async function OrganisationRegistrationsPage({
   return (
     <main className="p-6">
       <h1 className="mb-2 text-2xl font-semibold">Organisation Registrations</h1>
-      <p className="mb-4 text-sm text-gray-600">Review organisation submissions and verify them for public listing.</p>
+      <p className="mb-4 text-sm text-soltas-muted">Review organisation submissions and verify them for public listing.</p>
 
       {(messageParam || errorParam) && (
         <div
@@ -124,7 +124,7 @@ export default async function OrganisationRegistrationsPage({
               "rounded-full border px-4 py-1 text-sm transition",
               currentView === view.id
                 ? "border-blue-600 bg-blue-600 text-white shadow"
-                : "border-gray-200 bg-white text-gray-700 hover:border-blue-400 hover:text-blue-600",
+                : "border-soltas-line bg-white text-soltas-muted hover:border-blue-400 hover:text-blue-600",
             )}
             title={view.description}
           >
@@ -135,7 +135,7 @@ export default async function OrganisationRegistrationsPage({
 
       <div className="overflow-hidden rounded-xl border">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left">
+          <thead className="bg-soltas-off-white text-left">
             <tr>
               <th className="px-4 py-2">Name</th>
               <th className="px-4 py-2">Country</th>
@@ -164,14 +164,14 @@ export default async function OrganisationRegistrationsPage({
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td className="px-4 py-6 text-center text-sm text-gray-500" colSpan={columnCount}>
+                <td className="px-4 py-6 text-center text-sm text-soltas-muted" colSpan={columnCount}>
                   No {currentView} organisations found.
                 </td>
               </tr>
             ) : (
               rows.map(org => (
                 <tr key={org.id} className="border-t align-top">
-                  <td className="px-4 py-3 font-medium text-gray-900">{org.name ?? ""}</td>
+                  <td className="px-4 py-3 font-medium text-soltas-text">{org.name ?? ""}</td>
                   <td className="px-4 py-3">{org.country_based ?? ""}</td>
                   <td className="px-4 py-3">
                     {org.website ? (
@@ -240,7 +240,7 @@ export default async function OrganisationRegistrationsPage({
         </table>
       </div>
 
-      <p className="mt-2 text-xs text-gray-500">
+      <p className="mt-2 text-xs text-soltas-muted">
         Verified organisations are public in the organisation directory. Rejected organisations remain private.
       </p>
     </main>

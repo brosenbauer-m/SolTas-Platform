@@ -113,14 +113,14 @@ export default function OrganisationsFilters({
 
   const containerClassName =
     variant === "panel"
-      ? "space-y-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+      ? "space-y-4 rounded-lg border border-soltas-line bg-white p-4 shadow-sm"
       : "space-y-4";
 
   return (
     <section className={containerClassName}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-soltas-bark">Filters</h2>
+          <h2 className="text-lg font-semibold text-soltas-text">Filters</h2>
           <p className="text-sm text-soltas-muted">Refine organisations by location, impact, and capacity.</p>
         </div>
         <Button type="button" variant="ghost" onClick={clearFilters}>
@@ -130,7 +130,7 @@ export default function OrganisationsFilters({
 
       <div className="grid gap-4 lg:grid-cols-2">
         <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">AI Search (beta)</span>
+          <span className="font-medium text-soltas-text">AI Search (beta)</span>
           <Input
             value={searchValue}
             placeholder="Organisation name or focus area"
@@ -140,7 +140,7 @@ export default function OrganisationsFilters({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-bark">Countries</span>
+            <span className="font-medium text-soltas-text">Countries</span>
             <MultiSelect
               options={options.countries}
               value={countryValue}
@@ -152,7 +152,7 @@ export default function OrganisationsFilters({
           </div>
 
           <div className="space-y-2 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-bark">Regions</span>
+            <span className="font-medium text-soltas-text">Regions</span>
             <MultiSelect
               options={options.regions}
               value={regionValue}
@@ -167,7 +167,7 @@ export default function OrganisationsFilters({
 
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="space-y-2 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Thematic areas</span>
+          <span className="font-medium text-soltas-text">Thematic areas</span>
           <MultiSelect
             options={options.thematic}
             value={thematicValue}
@@ -179,7 +179,7 @@ export default function OrganisationsFilters({
         </div>
 
         <div className="space-y-2 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Intervention types</span>
+          <span className="font-medium text-soltas-text">Intervention types</span>
           <MultiSelect
             options={options.interventions}
             value={interventionValue}
@@ -191,7 +191,7 @@ export default function OrganisationsFilters({
         </div>
 
         <div className="space-y-2 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Target demographics</span>
+          <span className="font-medium text-soltas-text">Target demographics</span>
           <MultiSelect
             options={options.demographics}
             value={demographicValue}
@@ -205,7 +205,7 @@ export default function OrganisationsFilters({
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Age (years) min</span>
+          <span className="font-medium text-soltas-text">Age (years) min</span>
           <Input
             type="number"
             value={minAgeValue}
@@ -214,7 +214,7 @@ export default function OrganisationsFilters({
         </label>
 
         <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Age (years) max</span>
+          <span className="font-medium text-soltas-text">Age (years) max</span>
           <Input
             type="number"
             value={maxAgeValue}
@@ -223,7 +223,7 @@ export default function OrganisationsFilters({
         </label>
 
         <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Projects carried out min</span>
+          <span className="font-medium text-soltas-text">Projects carried out min</span>
           <Input
             type="number"
             value={minProjectsValue}
@@ -232,7 +232,7 @@ export default function OrganisationsFilters({
         </label>
 
         <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Projects carried out max</span>
+          <span className="font-medium text-soltas-text">Projects carried out max</span>
           <Input
             type="number"
             value={maxProjectsValue}
@@ -241,7 +241,7 @@ export default function OrganisationsFilters({
         </label>
 
         <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Funding needed min</span>
+          <span className="font-medium text-soltas-text">Funding needed min</span>
           <Input
             type="number"
             value={minFundingValue}
@@ -250,7 +250,7 @@ export default function OrganisationsFilters({
         </label>
 
         <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Funding needed max</span>
+          <span className="font-medium text-soltas-text">Funding needed max</span>
           <Input
             type="number"
             value={maxFundingValue}
@@ -262,7 +262,7 @@ export default function OrganisationsFilters({
       {showSorting ? (
         <div className="grid gap-4 md:grid-cols-2">
           <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-bark">Sort by</span>
+            <span className="font-medium text-soltas-text">Sort by</span>
             <Select value={sortValue} onValueChange={value => updateParams({ sort: value })}>
               <SelectTrigger>
                 <SelectValue />
@@ -278,7 +278,7 @@ export default function OrganisationsFilters({
           </label>
 
           <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-bark">Sort direction</span>
+            <span className="font-medium text-soltas-text">Sort direction</span>
             <Select value={dirValue} onValueChange={value => updateParams({ dir: value })}>
               <SelectTrigger>
                 <SelectValue />

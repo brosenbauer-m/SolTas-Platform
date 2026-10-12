@@ -191,13 +191,13 @@ export default function Map({
       popupNode.className = "space-y-2 text-sm text-soltas-text"
 
       const titleEl = document.createElement("h3")
-      titleEl.className = "text-base font-semibold text-soltas-bark"
+      titleEl.className = "text-base font-semibold text-soltas-text"
       titleEl.textContent = m.title
       popupNode.appendChild(titleEl)
 
       if (m.placeName) {
         const placeEl = document.createElement("p")
-        placeEl.className = "text-xs uppercase tracking-wide text-soltas-muted"
+        placeEl.className = "text-xs font-medium text-soltas-muted"
         placeEl.textContent = m.placeName
         popupNode.appendChild(placeEl)
       }
@@ -212,7 +212,7 @@ export default function Map({
       const cta = document.createElement("button")
       cta.type = "button"
       cta.className =
-        "mt-2 inline-flex w-full items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-xs font-medium text-white hover:bg-slate-800"
+        "mt-2 inline-flex w-full items-center justify-center rounded-md bg-soltas-ocean px-3 py-2 text-xs font-medium text-white hover:bg-soltas-abyssal"
       cta.textContent = ctaLabel
       cta.addEventListener("click", () => {
         const href = m.ctaHref ?? `/projects/${m.slug}`
@@ -268,9 +268,9 @@ export default function Map({
   // If token missing, render a safe fallback *after* hooks (no conditional hooks)
   if (!HAS_MAPBOX_TOKEN) {
     return (
-      <div className="grid h-full w-full place-items-center rounded-md border border-slate-200 bg-slate-50 p-6 text-center">
+      <div className="grid h-full w-full place-items-center rounded-md border border-soltas-line bg-soltas-off-white p-6 text-center">
         <div className="space-y-2">
-          <div className="text-sm font-semibold text-soltas-bark">Map view unavailable</div>
+          <div className="text-sm font-semibold text-soltas-text">Map view unavailable</div>
           <div className="text-sm text-soltas-muted">
             This deployment is missing the Mapbox token (<code>NEXT_PUBLIC_MAPBOX_TOKEN</code>).
             Use the table view instead.
@@ -281,7 +281,7 @@ export default function Map({
   }
 
   return (
-    <div className="relative h-full w-full bg-slate-100">
+    <div className="relative h-full w-full bg-soltas-light">
       <div
         ref={containerRef}
         className={["h-full w-full", freeze ? "opacity-0" : "opacity-100"].join(" ")}

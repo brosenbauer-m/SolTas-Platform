@@ -196,7 +196,7 @@ export default async function AdminOrganisationsPage({
               "rounded-full border px-3 py-1 text-xs font-medium transition",
               currentView === view.id
                 ? "border-blue-600 bg-blue-50 text-blue-700"
-                : "border-slate-200 text-soltas-muted hover:border-slate-300 hover:text-soltas-bark",
+                : "border-soltas-line text-soltas-muted hover:border-soltas-line hover:text-soltas-text",
             )}
           >
             {view.label}
@@ -206,7 +206,7 @@ export default async function AdminOrganisationsPage({
 
       <div className="overflow-x-auto rounded-xl border">
         <table className="min-w-full divide-y text-sm">
-          <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-soltas-muted">
+          <thead className="bg-soltas-off-white text-left text-xs font-medium text-soltas-muted">
             <tr>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Country based</th>
@@ -241,7 +241,7 @@ export default async function AdminOrganisationsPage({
                 return (
                   <tr key={org.id}>
                     <td className="px-4 py-3">
-                      <div className="font-medium text-soltas-bark">{org.name ?? "—"}</div>
+                      <div className="font-medium text-soltas-text">{org.name ?? "—"}</div>
                       <div className="text-xs text-soltas-muted">{org.id}</div>
                     </td>
                     <td className="px-4 py-3">{org.country_based ?? "—"}</td>

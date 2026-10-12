@@ -106,8 +106,8 @@ export function JoinOrganisationSection({ requests }: Props) {
   return (
     <div className="space-y-6">
       {/* Join Organisation Section */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-soltas-bark">
+      <div className="rounded-2xl border border-soltas-line bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-soltas-text">
           Join an organisation
         </h2>
         <p className="mb-4 text-sm text-soltas-muted">
@@ -123,7 +123,7 @@ export function JoinOrganisationSection({ requests }: Props) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                className="flex-1 rounded-lg border border-slate-300 px-4 py-2 text-sm focus:border-soltas-ocean focus:outline-none focus:ring-2 focus:ring-soltas-ocean/20"
+                className="flex-1 rounded-lg border border-soltas-line px-4 py-2 text-sm focus:border-soltas-ocean focus:outline-none focus:ring-2 focus:ring-soltas-ocean/20"
               />
               <button
                 onClick={handleSearch}
@@ -153,7 +153,7 @@ export function JoinOrganisationSection({ requests }: Props) {
                   return (
                     <div
                       key={org.id}
-                      className="flex items-center gap-4 rounded-lg border border-slate-200 p-4"
+                      className="flex items-center gap-4 rounded-lg border border-soltas-line p-4"
                     >
                       {org.logo_url ? (
                         <Image
@@ -161,15 +161,15 @@ export function JoinOrganisationSection({ requests }: Props) {
                           alt={org.name}
                           width={48}
                           height={48}
-                          className="h-12 w-12 rounded-lg border border-slate-200 object-cover"
+                          className="h-12 w-12 rounded-lg border border-soltas-line object-cover"
                         />
                       ) : (
-                        <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 text-sm text-soltas-muted">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-dashed border-soltas-line bg-soltas-off-white text-sm text-soltas-muted">
                           —
                         </div>
                       )}
                       <div className="flex-1">
-                        <h3 className="font-medium text-soltas-bark">
+                        <h3 className="font-medium text-soltas-text">
                           {org.name}
                         </h3>
                         {org.country_based && (
@@ -220,7 +220,7 @@ export function JoinOrganisationSection({ requests }: Props) {
         ) : (
           <div className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm font-medium text-soltas-bark">
+              <label className="mb-2 block text-sm font-medium text-soltas-text">
                 Message (optional)
               </label>
               <textarea
@@ -228,7 +228,7 @@ export function JoinOrganisationSection({ requests }: Props) {
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Tell the organisation why you'd like to join..."
                 rows={4}
-                className="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm focus:border-soltas-ocean focus:outline-none focus:ring-2 focus:ring-soltas-ocean/20"
+                className="w-full rounded-lg border border-soltas-line px-4 py-2 text-sm focus:border-soltas-ocean focus:outline-none focus:ring-2 focus:ring-soltas-ocean/20"
               />
             </div>
 
@@ -247,7 +247,7 @@ export function JoinOrganisationSection({ requests }: Props) {
                   setMessage("");
                 }}
                 disabled={isSubmitting}
-                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-soltas-bark hover:bg-slate-50"
+                className="rounded-lg border border-soltas-line px-4 py-2 text-sm font-medium text-soltas-text hover:bg-soltas-off-white"
               >
                 Cancel
               </button>
@@ -274,15 +274,15 @@ export function JoinOrganisationSection({ requests }: Props) {
                     alt={request.organisation_name}
                     width={40}
                     height={40}
-                    className="h-10 w-10 rounded-lg border border-slate-200 object-cover"
+                    className="h-10 w-10 rounded-lg border border-soltas-line object-cover"
                   />
                 ) : (
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 text-xs text-soltas-muted">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-dashed border-soltas-line bg-soltas-off-white text-xs text-soltas-muted">
                     —
                   </div>
                 )}
                 <div className="flex-1">
-                  <h4 className="font-medium text-soltas-bark">
+                  <h4 className="font-medium text-soltas-text">
                     {request.organisation_name}
                   </h4>
                   <p className="text-xs text-soltas-muted">
@@ -305,15 +305,15 @@ export function JoinOrganisationSection({ requests }: Props) {
 
       {/* Processed Requests (Approved/Rejected) */}
       {processedRequests.length > 0 && (
-        <details className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <summary className="cursor-pointer text-sm font-medium text-soltas-bark">
+        <details className="rounded-2xl border border-soltas-line bg-white p-6 shadow-sm">
+          <summary className="cursor-pointer text-sm font-medium text-soltas-text">
             Past requests ({processedRequests.length})
           </summary>
           <div className="mt-4 space-y-3">
             {processedRequests.map((request) => (
               <div
                 key={request.id}
-                className="flex items-center gap-4 rounded-lg border border-slate-200 p-4"
+                className="flex items-center gap-4 rounded-lg border border-soltas-line p-4"
               >
                 {request.organisation_logo ? (
                   <Image
@@ -321,15 +321,15 @@ export function JoinOrganisationSection({ requests }: Props) {
                     alt={request.organisation_name}
                     width={40}
                     height={40}
-                    className="h-10 w-10 rounded-lg border border-slate-200 object-cover"
+                    className="h-10 w-10 rounded-lg border border-soltas-line object-cover"
                   />
                 ) : (
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 text-xs text-soltas-muted">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-dashed border-soltas-line bg-soltas-off-white text-xs text-soltas-muted">
                     —
                   </div>
                 )}
                 <div className="flex-1">
-                  <h4 className="font-medium text-soltas-bark">
+                  <h4 className="font-medium text-soltas-text">
                     {request.organisation_name}
                   </h4>
                   <p className="text-xs text-soltas-muted">

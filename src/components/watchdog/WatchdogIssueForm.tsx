@@ -255,8 +255,8 @@ export default function WatchdogIssueForm() {
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-soltas-bark">Issue details</h2>
+        <section className="rounded-3xl border border-soltas-line bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-soltas-text">Issue details</h2>
           <p className="mt-1 text-sm text-soltas-muted">Describe the issue and who it impacts.</p>
 
           <div className="mt-6 space-y-6">
@@ -431,8 +431,8 @@ export default function WatchdogIssueForm() {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-soltas-bark">Issue tags</h2>
+        <section className="rounded-3xl border border-soltas-line bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-soltas-text">Issue tags</h2>
           <p className="mt-1 text-sm text-soltas-muted">Tag the issue by topic, urgency, and date observed.</p>
 
           <div className="mt-6 space-y-6">
@@ -528,8 +528,8 @@ export default function WatchdogIssueForm() {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-soltas-bark">Evidence & desired outcome</h2>
+        <section className="rounded-3xl border border-soltas-line bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-soltas-text">Evidence & desired outcome</h2>
           <p className="mt-1 text-sm text-soltas-muted">Share sources and what support is needed.</p>
 
           <div className="mt-6 space-y-6">
@@ -594,8 +594,8 @@ export default function WatchdogIssueForm() {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-soltas-bark">Contact preferences</h2>
+        <section className="rounded-3xl border border-soltas-line bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-soltas-text">Contact preferences</h2>
           <p className="mt-1 text-sm text-soltas-muted">Control how the Solarpunk Taskforce may follow up.</p>
 
           <div className="mt-6 space-y-6">
@@ -603,7 +603,7 @@ export default function WatchdogIssueForm() {
               control={control}
               name="reporter_anonymous"
               render={({ field }) => (
-                <FormItem className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 p-4">
+                <FormItem className="flex items-center justify-between gap-4 rounded-2xl border border-soltas-line p-4">
                   <div>
                     <FormLabel>Report anonymously</FormLabel>
                     <FormDescription>
@@ -621,7 +621,7 @@ export default function WatchdogIssueForm() {
               control={control}
               name="contact_allowed"
               render={({ field }) => (
-                <FormItem className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 p-4">
+                <FormItem className="flex items-center justify-between gap-4 rounded-2xl border border-soltas-line p-4">
                   <div>
                     <FormLabel>Can SolTas contact you?</FormLabel>
                     <FormDescription>
@@ -649,7 +649,7 @@ export default function WatchdogIssueForm() {
           </div>
         ) : null}
 
-        <div className="sticky bottom-4 z-10 rounded-3xl border border-slate-200 bg-white p-4 shadow-lg sm:static sm:border-none sm:bg-transparent sm:p-0 sm:shadow-none">
+        <div className="sticky bottom-4 z-10 rounded-3xl border border-soltas-line bg-white p-4 shadow-lg sm:static sm:border-none sm:bg-transparent sm:p-0 sm:shadow-none">
           <Button type="submit" disabled={isSubmitting} className="inline-flex w-full items-center justify-center gap-2">
             {isSubmitting && <Loader2 className="h-5 w-5 animate-spin" />}
             {isSubmitting ? "Submitting" : "Submit issue"}

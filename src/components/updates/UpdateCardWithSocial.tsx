@@ -154,10 +154,10 @@ export default function UpdateCardWithSocial({
   };
 
   const card = (
-    <article className="rounded-xl border border-slate-200 bg-white p-4 hover:border-slate-300 transition-colors">
+    <article className="rounded-xl border border-soltas-line bg-white p-4 hover:border-soltas-line transition-colors">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap items-center gap-2">
-          <h3 className="text-base font-semibold text-soltas-bark">{title}</h3>
+          <h3 className="text-base font-semibold text-soltas-text">{title}</h3>
           {membersOnly ? (
             <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-800">
               Members only
@@ -191,7 +191,7 @@ export default function UpdateCardWithSocial({
 
       {/* Comments section */}
       {showComments && (
-        <div className="mt-4 border-t border-slate-200 pt-4">
+        <div className="mt-4 border-t border-soltas-line pt-4">
           <Comments
             comments={comments}
             onSubmit={handleCommentSubmit}

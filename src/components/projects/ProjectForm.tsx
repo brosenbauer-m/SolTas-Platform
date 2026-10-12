@@ -620,10 +620,10 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="rounded-3xl border border-soltas-line bg-white p-6 shadow-sm">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h2 className="text-xl font-semibold text-soltas-bark">Project overview</h2>
+              <h2 className="text-xl font-semibold text-soltas-text">Project overview</h2>
               <p className="mt-1 text-sm text-soltas-muted">Tell us the basics so our reviewers understand what you are proposing.</p>
             </div>
           </div>
@@ -656,7 +656,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
 
                     {creatableOrgOptions.length > 0 && (
                       <div className="space-y-2">
-                        <p className="text-sm font-medium text-soltas-bark">Or create as organisation:</p>
+                        <p className="text-sm font-medium text-soltas-text">Or create as organisation:</p>
                         {creatableOrgOptions.map(org => (
                           <Button
                             key={org.value}
@@ -781,7 +781,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
             <div className="space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <h3 className="text-sm font-medium text-soltas-bark">Supporting links</h3>
+                  <h3 className="text-sm font-medium text-soltas-text">Supporting links</h3>
                   <p className="text-sm text-soltas-muted">Include press, documentation, or public updates that help validate the project.</p>
                 </div>
                 <Button type="button" variant="outline" size="sm" onClick={() => linkArray.append({ url: "", label: undefined })}>
@@ -790,14 +790,14 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
               </div>
 
               {linkArray.fields.length === 0 && (
-                <p className="rounded-2xl border border-dashed border-slate-200 px-4 py-3 text-sm text-soltas-muted">No links added yet.</p>
+                <p className="rounded-2xl border border-dashed border-soltas-line px-4 py-3 text-sm text-soltas-muted">No links added yet.</p>
               )}
 
               <div className="space-y-3">
                 {linkArray.fields.map((fieldItem, index) => (
                   <div
                     key={fieldItem.id}
-                    className="grid gap-3 rounded-2xl border border-slate-200 p-4 sm:grid-cols-[1fr_1fr_auto]"
+                    className="grid gap-3 rounded-2xl border border-soltas-line p-4 sm:grid-cols-[1fr_1fr_auto]"
                   >
                     <FormField
                       control={control}
@@ -805,7 +805,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="flex items-center gap-2 text-sm font-medium text-soltas-text">
-                            <LinkIcon className="h-4 w-4 text-slate-400" /> URL
+                            <LinkIcon className="h-4 w-4 text-soltas-muted" /> URL
                           </FormLabel>
                           <FormControl>
                             <Input placeholder="https://example.org" {...field} />
@@ -908,8 +908,8 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
           </div>
         </section>
 
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-soltas-bark">Location & beneficiaries</h2>
+        <section className="rounded-3xl border border-soltas-line bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-soltas-text">Location & beneficiaries</h2>
           <p className="mt-1 text-sm text-soltas-muted">Find the place where the project has the greatest impact.</p>
 
           <div className="mt-6 space-y-6">
@@ -920,7 +920,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
                 <FormItem>
                   <FormLabel>Search for a location</FormLabel>
                   <FormDescription>Use the map search to pin the primary impact location.</FormDescription>
-                  <div className="mt-2 space-y-3 rounded-2xl border border-slate-200 p-4">
+                  <div className="mt-2 space-y-3 rounded-2xl border border-soltas-line p-4">
                     <Button
                       type="button"
                       variant="outline"
@@ -990,7 +990,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
             <div className="space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <h3 className="text-sm font-medium text-soltas-bark">Type of intervention</h3>
+                  <h3 className="text-sm font-medium text-soltas-text">Type of intervention</h3>
                   <p className="text-sm text-soltas-muted">Add tags that describe the intervention (e.g. Urban farming, Cooling, Renewable energy).</p>
                 </div>
               </div>
@@ -1035,7 +1035,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
             <div className="space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <h3 className="text-sm font-medium text-soltas-bark">Thematic areas</h3>
+                  <h3 className="text-sm font-medium text-soltas-text">Thematic areas</h3>
                   <p className="text-sm text-soltas-muted">Capture themes that describe the work (e.g. Climate adaptation).</p>
                 </div>
               </div>
@@ -1079,8 +1079,8 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
           </div>
         </section>
 
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-soltas-bark">Timeline & funding</h2>
+        <section className="rounded-3xl border border-soltas-line bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-soltas-text">Timeline & funding</h2>
           <p className="mt-1 text-sm text-soltas-muted">Share when the project runs and what support is still required.</p>
 
           <div className="mt-6 grid gap-6 md:grid-cols-2">
@@ -1196,14 +1196,14 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
           </div>
         </section>
 
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-soltas-bark">Project media</h2>
+        <section className="rounded-3xl border border-soltas-line bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-soltas-text">Project media</h2>
           <p className="mt-1 text-sm text-soltas-muted">Upload images, video, or documents after submitting the form.</p>
 
           <div className="mt-4 space-y-4">
             <label
               htmlFor="project-media"
-              className="flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-8 text-center text-soltas-muted transition hover:border-soltas-ocean/30 hover:bg-soltas-glacial/15"
+              className="flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-soltas-line bg-soltas-off-white px-6 py-8 text-center text-soltas-muted transition hover:border-soltas-ocean/30 hover:bg-soltas-glacial/15"
             >
               <UploadCloud className="h-6 w-6" />
               <span className="text-sm font-semibold">Click to select files</span>
@@ -1221,7 +1221,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
             {files.length > 0 && (
               <ul className="space-y-2 text-sm text-soltas-muted">
                 {files.map(file => (
-                  <li key={file.name} className="rounded-2xl border border-slate-200 bg-white px-4 py-2">
+                  <li key={file.name} className="rounded-2xl border border-soltas-line bg-white px-4 py-2">
                     {file.name}
                   </li>
                 ))}
@@ -1233,15 +1233,15 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
                 {uploads.map(upload => (
                   <li
                     key={`${upload.fileName}-${upload.status}`}
-                    className="rounded-2xl border border-slate-200 bg-white p-4 text-sm text-soltas-text"
+                    className="rounded-2xl border border-soltas-line bg-white p-4 text-sm text-soltas-text"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <span className="font-medium">{upload.fileName}</span>
-                      <span className="text-xs uppercase tracking-wide text-soltas-muted">{upload.status}</span>
+                      <span className="text-xs font-medium text-soltas-muted">{upload.status}</span>
                     </div>
-                    <div className="mt-2 h-2 rounded-full bg-slate-100">
+                    <div className="mt-2 h-2 rounded-full bg-soltas-light">
                       <div
-                        className={cn("h-2 rounded-full", upload.status === "error" ? "bg-rose-400" : "bg-emerald-500")}
+                        className={cn("h-2 rounded-full", upload.status === "error" ? "bg-rose-400" : "bg-soltas-green")}
                         style={{ width: `${upload.progress}%` }}
                       />
                     </div>
@@ -1253,8 +1253,8 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
           </div>
         </section>
 
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-soltas-bark">Share to feed</h2>
+        <section className="rounded-3xl border border-soltas-line bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-soltas-text">Share to feed</h2>
           <p className="mt-1 text-sm text-soltas-muted">Optionally announce this project to the community feed.</p>
 
           <div className="mt-6 space-y-6">
@@ -1262,7 +1262,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
               control={control}
               name="post_to_feed"
               render={({ field }) => (
-                <FormItem className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 p-4">
+                <FormItem className="flex items-center justify-between gap-4 rounded-2xl border border-soltas-line p-4">
                   <div>
                     <FormLabel>Post this to the feed</FormLabel>
                     <FormDescription>Create a feed post announcing this new project.</FormDescription>
@@ -1299,7 +1299,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
 
         {submitError && <div className="rounded-3xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{submitError}</div>}
 
-        <div className="sticky bottom-4 z-10 rounded-3xl border border-slate-200 bg-white p-4 shadow-lg sm:static sm:border-none sm:bg-transparent sm:p-0 sm:shadow-none">
+        <div className="sticky bottom-4 z-10 rounded-3xl border border-soltas-line bg-white p-4 shadow-lg sm:static sm:border-none sm:bg-transparent sm:p-0 sm:shadow-none">
           <Button type="submit" disabled={isSubmitting} className="inline-flex w-full items-center justify-center gap-2">
             {isSubmitting && <Loader2 className="h-5 w-5 animate-spin" />}
             {isSubmitting ? (mode === "edit" ? "Saving" : "Submitting") : mode === "edit" ? "Save changes" : "Submit project"}

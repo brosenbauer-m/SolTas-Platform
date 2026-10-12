@@ -135,7 +135,7 @@ export default function CreateOrganisationPage() {
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 p-6">
       <div className="space-y-2">
-        <h1 className="text-3xl font-semibold text-soltas-bark">Create Organisation</h1>
+        <h1 className="text-3xl font-semibold text-soltas-text">Create Organisation</h1>
         <p className="text-sm text-soltas-muted">
           Set up your organisation profile. It will be submitted for verification.
         </p>
@@ -144,7 +144,7 @@ export default function CreateOrganisationPage() {
       <form onSubmit={handleSubmit} className="rounded-2xl border border-soltas-line bg-white p-6 shadow-sm">
         <div className="space-y-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-soltas-bark mb-1">
+            <label htmlFor="name" className="block text-sm font-medium text-soltas-text mb-1">
               Organisation Name <span className="text-rose-500">*</span>
             </label>
             <input
@@ -159,7 +159,7 @@ export default function CreateOrganisationPage() {
           </div>
 
           <div>
-            <label htmlFor="country_based" className="block text-sm font-medium text-soltas-bark mb-1">
+            <label htmlFor="country_based" className="block text-sm font-medium text-soltas-text mb-1">
               Country Based <span className="text-rose-500">*</span>
             </label>
             <input
@@ -174,7 +174,7 @@ export default function CreateOrganisationPage() {
           </div>
 
           <div>
-            <label htmlFor="what_we_do" className="block text-sm font-medium text-soltas-bark mb-1">
+            <label htmlFor="what_we_do" className="block text-sm font-medium text-soltas-text mb-1">
               What We Do <span className="text-rose-500">*</span>
             </label>
             <textarea
@@ -189,7 +189,7 @@ export default function CreateOrganisationPage() {
           </div>
 
           <div>
-            <label htmlFor="existing_since" className="block text-sm font-medium text-soltas-bark mb-1">
+            <label htmlFor="existing_since" className="block text-sm font-medium text-soltas-text mb-1">
               Existing Since
             </label>
             <input
@@ -203,7 +203,7 @@ export default function CreateOrganisationPage() {
           </div>
 
           <div>
-            <label htmlFor="website" className="block text-sm font-medium text-soltas-bark mb-1">
+            <label htmlFor="website" className="block text-sm font-medium text-soltas-text mb-1">
               Website
             </label>
             <input
@@ -217,7 +217,7 @@ export default function CreateOrganisationPage() {
           </div>
 
           <div>
-            <label htmlFor="logo_url" className="block text-sm font-medium text-soltas-bark mb-1">
+            <label htmlFor="logo_url" className="block text-sm font-medium text-soltas-text mb-1">
               Logo URL
             </label>
             <input
@@ -231,7 +231,7 @@ export default function CreateOrganisationPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-soltas-bark mb-2">Social Links</label>
+            <label className="block text-sm font-medium text-soltas-text mb-2">Social Links</label>
             {socialLinks.map((link, index) => (
               <div key={index} className="mb-2 flex gap-2">
                 <select

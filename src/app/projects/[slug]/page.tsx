@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 
 import type { Database } from "@/lib/database.types";
 import FollowButton from "@/components/FollowButton";
+import { Badge } from "@/components/ui/badge";
+import { buttonClasses } from "@/components/ui/button";
 import UpdatesSectionWithSocial, { type UpdateSummary } from "@/components/updates/UpdatesSectionWithSocial";
 import { getServerSupabase } from "@/lib/supabaseServer";
 
@@ -194,53 +196,40 @@ export default async function ProjectDetailPage({
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="truncate text-2xl font-semibold tracking-tight text-soltas-bark">
-              {project.name}
-            </h1>
-            <span className="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-xs font-medium text-soltas-muted">
+            <Badge variant={project.category === "humanitarian" ? "ocean" : "green"} className="capitalize">
               {project.category}
-            </span>
+            </Badge>
             {project.status !== "approved" && user ? (
-              <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-800">
-                {project.status}
-              </span>
+              <Badge variant={project.status === "rejected" ? "rose" : "amber"} className="capitalize">
+                {project.status === "pending" ? "Waiting for review" : project.status}
+              </Badge>
             ) : null}
           </div>
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-soltas-text sm:text-4xl">{project.name}</h1>
 
-          {leadOrganisation?.name ? (
-            <p className="mt-1 text-sm text-soltas-muted">
-              Lead organisation:{" "}
-              {leadOrganisation.website ? (
-                <Link
-                  className="font-medium text-soltas-ocean hover:underline"
-                  href={leadOrganisation.website}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {leadOrganisation.name}
-                </Link>
-              ) : (
-                <span className="font-medium text-soltas-bark">{leadOrganisation.name}</span>
-              )}
+          {leadOrganisation?.name || locationLabel ? (
+            <p className="mt-2 text-[15px] text-soltas-muted">
+              {leadOrganisation?.name ? (
+                <>
+                  by{" "}
+                  <Link className="font-medium text-soltas-ocean hover:underline" href={`/organisations/${leadOrganisation.id}`}>
+                    {leadOrganisation.name}
+                  </Link>
+                </>
+              ) : null}
+              {leadOrganisation?.name && locationLabel ? <span aria-hidden="true"> · </span> : null}
+              {locationLabel}
             </p>
           ) : null}
-
-          {locationLabel ? <p className="mt-1 text-sm text-soltas-muted">{locationLabel}</p> : null}
         </div>
 
         <div className="flex shrink-0 flex-col gap-2 sm:items-end">
           {canEdit ? (
             <div className="flex flex-wrap gap-2">
-              <Link
-                href={`/projects/${slug}/edit`}
-                className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"
-              >
+              <Link href={`/projects/${slug}/edit`} className={buttonClasses({ size: "sm" })}>
                 Edit
               </Link>
-              <Link
-                href={`/projects/${slug}/edit#sharing`}
-                className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-soltas-bark hover:bg-slate-50"
-              >
+              <Link href={`/projects/${slug}/edit#sharing`} className={buttonClasses({ variant: "outline", size: "sm" })}>
                 Share
               </Link>
             </div>
@@ -256,11 +245,11 @@ export default async function ProjectDetailPage({
       </header>
 
       {project.description ? (
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">
+        <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">
             Description
           </h2>
-          <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-soltas-bark">
+          <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-soltas-text">
             {project.description}
           </p>
         </section>
@@ -273,25 +262,25 @@ export default async function ProjectDetailPage({
         projectId={project.id}
       />
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">Details</h2>
+      <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+        <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Details</h2>
 
         <dl className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+            <dt className="text-xs font-medium text-soltas-muted">
               Category
             </dt>
-            <dd className="text-sm text-soltas-bark">{project.category}</dd>
+            <dd className="text-sm text-soltas-text">{project.category}</dd>
           </div>
 
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+            <dt className="text-xs font-medium text-soltas-muted">
               Timeline
             </dt>
-            <dd className="text-sm text-soltas-bark">
+            <dd className="text-sm text-soltas-text">
               {start || end ? (
                 <span>
-                  {start ?? "—"} <span className="text-slate-400">→</span> {end ?? "—"}
+                  {start ?? "—"} <span className="text-soltas-muted">→</span> {end ?? "—"}
                 </span>
               ) : (
                 "—"
@@ -300,12 +289,12 @@ export default async function ProjectDetailPage({
           </div>
 
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">Funding</dt>
-            <dd className="text-sm text-soltas-bark">
+            <dt className="text-xs font-medium text-soltas-muted">Funding</dt>
+            <dd className="text-sm text-soltas-text">
               {donations || needed ? (
                 <span>
                   {donations ? <>Received: {donations}</> : null}
-                  {donations && needed ? <span className="text-slate-400"> · </span> : null}
+                  {donations && needed ? <span className="text-soltas-muted"> · </span> : null}
                   {needed ? <>Needed: {needed}</> : null}
                 </span>
               ) : (
@@ -316,10 +305,10 @@ export default async function ProjectDetailPage({
 
           {project.lives_improved != null ? (
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+              <dt className="text-xs font-medium text-soltas-muted">
                 Lives improved
               </dt>
-              <dd className="text-sm text-soltas-bark">
+              <dd className="text-sm text-soltas-text">
                 {Number(project.lives_improved).toLocaleString()}
               </dd>
             </div>
@@ -327,10 +316,10 @@ export default async function ProjectDetailPage({
 
           {project.type_of_intervention?.length ? (
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+              <dt className="text-xs font-medium text-soltas-muted">
                 Type of intervention
               </dt>
-              <dd className="text-sm text-soltas-bark">
+              <dd className="text-sm text-soltas-text">
                 {project.type_of_intervention.join(", ")}
               </dd>
             </div>
@@ -338,32 +327,32 @@ export default async function ProjectDetailPage({
 
           {project.target_demographics?.length ? (
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+              <dt className="text-xs font-medium text-soltas-muted">
                 Target demographics
               </dt>
-              <dd className="text-sm text-soltas-bark">
+              <dd className="text-sm text-soltas-text">
                 {project.target_demographics.join(", ")}
               </dd>
             </div>
           ) : project.target_demographic ? (
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+              <dt className="text-xs font-medium text-soltas-muted">
                 Target demographic
               </dt>
-              <dd className="text-sm text-soltas-bark">{project.target_demographic}</dd>
+              <dd className="text-sm text-soltas-text">{project.target_demographic}</dd>
             </div>
           ) : null}
 
           {Array.isArray(project.thematic_area) && project.thematic_area.length > 0 ? (
             <div className="sm:col-span-2 lg:col-span-3">
-              <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+              <dt className="text-xs font-medium text-soltas-muted">
                 Thematic areas
               </dt>
               <dd className="mt-1 flex flex-wrap gap-2">
                 {(project.thematic_area as string[]).map((item: string) => (
                   <span
                     key={item}
-                    className="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-xs font-medium text-soltas-text"
+                    className="rounded-full border border-soltas-line bg-white px-2 py-0.5 text-xs font-medium text-soltas-text"
                   >
                     {item}
                   </span>
@@ -374,8 +363,8 @@ export default async function ProjectDetailPage({
         </dl>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">Links</h2>
+      <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+        <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Links</h2>
 
         {normalizedLinks.length === 0 ? (
           <p className="mt-3 text-sm text-soltas-muted">No links added yet.</p>
@@ -384,10 +373,10 @@ export default async function ProjectDetailPage({
             {normalizedLinks.map((l, idx) => (
               <li
                 key={`${l.url}-${idx}`}
-                className="flex flex-col gap-1 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-1 rounded-lg border border-soltas-line bg-soltas-off-white px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="min-w-0">
-                  <div className="truncate text-sm font-medium text-soltas-bark">
+                  <div className="truncate text-sm font-medium text-soltas-text">
                     {l.label ?? l.url}
                   </div>
                   {l.label ? <div className="truncate text-xs text-soltas-muted">{l.url}</div> : null}
@@ -406,8 +395,8 @@ export default async function ProjectDetailPage({
         )}
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">Media</h2>
+      <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
+        <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Media</h2>
 
         {(projectMedia?.length ?? 0) === 0 ? (
           <p className="mt-3 text-sm text-soltas-muted">No media uploaded yet.</p>
@@ -416,10 +405,10 @@ export default async function ProjectDetailPage({
             {(projectMedia ?? []).map((item) => (
               <li
                 key={item.id}
-                className="flex flex-col gap-1 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-1 rounded-lg border border-soltas-line bg-soltas-off-white px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="min-w-0">
-                  <div className="truncate text-sm font-medium text-soltas-bark">
+                  <div className="truncate text-sm font-medium text-soltas-text">
                     {item.caption || item.path}
                   </div>
                   <div className="text-xs text-soltas-muted">{item.mime_type || "Unknown type"}</div>

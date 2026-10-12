@@ -1,9 +1,11 @@
+import Link from "next/link";
+import { PageHeader } from "@/components/ui/page-header";
+import { buttonClasses } from "@/components/ui/button";
 import ProjectsFilters from "@/components/projects/ProjectsFilters";
 import ProjectsGlobeSplitView from "@/components/projects/ProjectsGlobeSplitView";
 import ProjectsTableView from "@/components/projects/ProjectsTableView";
 import ProjectsViewToggle from "@/components/projects/ProjectsViewToggle";
 import {
-  PAGE_SIZE,
   fetchFindProjects,
   fetchProjectMarkers,
   type ProjectListRow,
@@ -47,19 +49,24 @@ export default async function FindProjectsPage({
   }
 
   return (
-    <main className="flex-1 min-h-0 px-4 py-6 flex flex-col gap-4 sm:px-6 sm:py-8 sm:gap-6">
-      <header className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-semibold text-soltas-bark sm:text-3xl">Find Projects</h1>
-          <p className="text-sm text-soltas-muted">
-            Browse projects submitted to the Solarpunk Taskforce. Filter across environmental and humanitarian work.
-          </p>
-          <p className="text-sm text-soltas-muted">
-            Showing {rows.length} of {count} projects · {PAGE_SIZE} per page
-          </p>
-        </div>
-        <ProjectsViewToggle view={view} />
-      </header>
+    <main className="mx-auto flex w-full max-w-7xl flex-1 min-h-0 flex-col gap-5 px-4 py-8 sm:gap-6 sm:px-6 sm:py-10">
+      <PageHeader
+        title="Projects"
+        description={
+          <>
+            Humanitarian and environmental projects from around the world.{" "}
+            <span className="whitespace-nowrap">{count.toLocaleString()} projects</span>
+          </>
+        }
+        actions={
+          <>
+            <ProjectsViewToggle view={view} />
+            <Link href="/projects/new" className={buttonClasses({ size: "sm" })}>
+              New project
+            </Link>
+          </>
+        }
+      />
 
       {view === "globe" ? (
         <div className="flex-1 min-h-0">

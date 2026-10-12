@@ -20,21 +20,21 @@ export default async function Page() {
         <form action="/api/admin/admin-emails" method="post" className="flex gap-2">
           <input name="email" type="email" required placeholder="new.admin@example.org" className="flex-1 rounded border px-3 py-2" />
           <input type="hidden" name="op" value="add" />
-          <button className="rounded border px-3 py-2 hover:bg-gray-50">Add Admin</button>
+          <button className="rounded border px-3 py-2 hover:bg-soltas-off-white">Add Admin</button>
         </form>
         <form action="/api/admin/admin-emails" method="post" className="mt-2 flex gap-2">
           <input name="email" type="email" required placeholder="remove.admin@example.org" className="flex-1 rounded border px-3 py-2" />
           <input type="hidden" name="op" value="remove" />
-          <button className="rounded border px-3 py-2 hover:bg-gray-50">Remove Admin</button>
+          <button className="rounded border px-3 py-2 hover:bg-soltas-off-white">Remove Admin</button>
         </form>
       </section>
 
       <section className="rounded-xl border p-4">
         <h2 className="mb-2 font-medium">Superadmin Email</h2>
-        <p className="mb-2 text-sm text-gray-600">Current: {settings?.superadmin_email}</p>
+        <p className="mb-2 text-sm text-soltas-muted">Current: {settings?.superadmin_email}</p>
         <form action="/api/admin/superadmin-email" method="post" className="flex gap-2">
           <input name="email" type="email" required placeholder="new.superadmin@example.org" className="flex-1 rounded border px-3 py-2" />
-          <button className="rounded border px-3 py-2 hover:bg-gray-50">Change Superadmin</button>
+          <button className="rounded border px-3 py-2 hover:bg-soltas-off-white">Change Superadmin</button>
         </form>
       </section>
     </main>

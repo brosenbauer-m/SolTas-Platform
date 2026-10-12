@@ -32,7 +32,7 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
                 </Link>
               ) : (
                 <span
-                  className={isLast ? "text-soltas-bark font-medium" : "text-soltas-muted"}
+                  className={isLast ? "text-soltas-text font-medium" : "text-soltas-muted"}
                   aria-current={isLast ? "page" : undefined}
                 >
                   {item.label}

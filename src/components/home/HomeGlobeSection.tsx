@@ -388,7 +388,7 @@ export default function HomeGlobeSection({
             type="button"
             onClick={scrollToNextSection}
             aria-label="Scroll to next section"
-            className="pointer-events-auto inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-soltas-peat/35 text-white/90 backdrop-blur-md transition hover:bg-soltas-peat/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-soltas-glacial"
+            className="pointer-events-auto inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-soltas-text/35 text-white/90 backdrop-blur-md transition hover:bg-soltas-text/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-soltas-glacial"
           >
             <ChevronDown className="h-5 w-5" aria-hidden="true" />
           </button>

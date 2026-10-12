@@ -157,7 +157,7 @@ export default async function OrganisationEditPage({
         <input type="hidden" name="id" value={organisation.id} />
 
         <section className="rounded-2xl border border-soltas-line bg-white p-7 shadow-sm">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-soltas-muted">
+          <h2 className="text-xs font-medium text-soltas-muted">
             Basic information
           </h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -219,7 +219,7 @@ export default async function OrganisationEditPage({
         </section>
 
         <section className="rounded-2xl border border-soltas-line bg-white p-7 shadow-sm">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-soltas-muted">
+          <h2 className="text-xs font-medium text-soltas-muted">
             What we do
           </h2>
           <textarea
@@ -231,7 +231,7 @@ export default async function OrganisationEditPage({
         </section>
 
         <section className="rounded-2xl border border-soltas-line bg-white p-7 shadow-sm">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-soltas-muted">
+          <h2 className="text-xs font-medium text-soltas-muted">
             Social links
           </h2>
           <div className="mt-4">

@@ -64,9 +64,9 @@ export default async function UpdatesSectionWithSocial({
   }
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <section className="rounded-2xl border border-soltas-line bg-white p-5 shadow-sm">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">
+        <h2 className="text-lg font-semibold tracking-tight text-soltas-text">
           Updates
         </h2>
         {canPost ? <NewUpdateButton isAuthenticated={isAuthenticated} projectId={projectId} /> : null}

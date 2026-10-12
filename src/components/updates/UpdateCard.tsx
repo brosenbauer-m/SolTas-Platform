@@ -16,9 +16,9 @@ export default function UpdateCard({ title, summary, date, authorName, href }: U
   const formattedDate = formatDate(date);
 
   const card = (
-    <article className="rounded-xl border border-slate-200 p-4 hover:border-slate-300 transition-colors">
+    <article className="rounded-xl border border-soltas-line p-4 hover:border-soltas-line transition-colors">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-        <h3 className="text-base font-semibold text-soltas-bark">{title}</h3>
+        <h3 className="text-base font-semibold text-soltas-text">{title}</h3>
         <span className="text-xs text-soltas-muted">{formattedDate}</span>
       </div>
       {authorName ? (

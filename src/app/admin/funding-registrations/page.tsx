@@ -113,7 +113,7 @@ export default async function FundingRegistrationsPage({
   return (
     <main className="p-6">
       <h1 className="mb-2 text-2xl font-semibold">Funding Registrations</h1>
-      <p className="mb-4 text-sm text-gray-600">Review grant submissions and approve them for public listing.</p>
+      <p className="mb-4 text-sm text-soltas-muted">Review grant submissions and approve them for public listing.</p>
 
       {(messageParam || errorParam) && (
         <div
@@ -137,7 +137,7 @@ export default async function FundingRegistrationsPage({
               "rounded-full border px-4 py-1 text-sm transition",
               currentView === view.id
                 ? "border-blue-600 bg-blue-600 text-white shadow"
-                : "border-gray-200 bg-white text-gray-700 hover:border-blue-400 hover:text-blue-600",
+                : "border-soltas-line bg-white text-soltas-muted hover:border-blue-400 hover:text-blue-600",
             )}
             title={view.description}
           >
@@ -148,7 +148,7 @@ export default async function FundingRegistrationsPage({
 
       <div className="overflow-hidden rounded-xl border">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left">
+          <thead className="bg-soltas-off-white text-left">
             <tr>
               <th className="px-4 py-2">Title</th>
               <th className="px-4 py-2">Funder</th>
@@ -178,14 +178,14 @@ export default async function FundingRegistrationsPage({
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td className="px-4 py-6 text-center text-sm text-gray-500" colSpan={columnCount}>
+                <td className="px-4 py-6 text-center text-sm text-soltas-muted" colSpan={columnCount}>
                   No {currentView} grants found.
                 </td>
               </tr>
             ) : (
               rows.map(grant => (
                 <tr key={grant.id} className="border-t align-top">
-                  <td className="px-4 py-3 font-medium text-gray-900">{grant.title ?? ""}</td>
+                  <td className="px-4 py-3 font-medium text-soltas-text">{grant.title ?? ""}</td>
                   <td className="px-4 py-3">{grant.funder_name ?? ""}</td>
                   <td className="px-4 py-3">{formatAmount(grant.amount_min, grant.amount_max, grant.currency)}</td>
                   <td className="px-4 py-3">{grant.deadline ? formatDate(grant.deadline) : ""}</td>
@@ -242,7 +242,7 @@ export default async function FundingRegistrationsPage({
         </table>
       </div>
 
-      <p className="mt-2 text-xs text-gray-500">
+      <p className="mt-2 text-xs text-soltas-muted">
         Approved grants are public on the funding opportunities page. Rejected grants remain private.
       </p>
     </main>
