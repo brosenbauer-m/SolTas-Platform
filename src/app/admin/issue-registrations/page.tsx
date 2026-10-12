@@ -129,7 +129,7 @@ export default async function IssueRegistrationsPage({
   return (
     <main className="p-6">
       <h1 className="mb-2 text-2xl font-semibold">Issue Registrations</h1>
-      <p className="mb-4 text-sm text-gray-600">Review Watchdog issue submissions and approve them for the public map.</p>
+      <p className="mb-4 text-sm text-soltas-muted">Review Watchdog issue submissions and approve them for the public map.</p>
 
       {(messageParam || errorParam) && (
         <div
@@ -153,7 +153,7 @@ export default async function IssueRegistrationsPage({
               "rounded-full border px-4 py-1 text-sm transition",
               currentView === view.id
                 ? "border-blue-600 bg-blue-600 text-white shadow"
-                : "border-gray-200 bg-white text-gray-700 hover:border-blue-400 hover:text-blue-600",
+                : "border-soltas-line bg-white text-soltas-muted hover:border-blue-400 hover:text-blue-600",
             )}
             title={view.description}
           >
@@ -164,7 +164,7 @@ export default async function IssueRegistrationsPage({
 
       <div className="overflow-hidden rounded-xl border">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left">
+          <thead className="bg-soltas-off-white text-left">
             <tr>
               <th className="px-4 py-2">Title</th>
               <th className="px-4 py-2">Location</th>
@@ -194,21 +194,21 @@ export default async function IssueRegistrationsPage({
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td className="px-4 py-6 text-center text-sm text-gray-500" colSpan={columnCount}>
+                <td className="px-4 py-6 text-center text-sm text-soltas-muted" colSpan={columnCount}>
                   No {currentView} issues found.
                 </td>
               </tr>
             ) : (
               rows.map(issue => (
                 <tr key={issue.id} className="border-t align-top">
-                  <td className="px-4 py-3 font-medium text-gray-900">{issue.title ?? ""}</td>
+                  <td className="px-4 py-3 font-medium text-soltas-text">{issue.title ?? ""}</td>
                   <td className="px-4 py-3">{formatLocation(issue)}</td>
                   <td className="px-4 py-3">
                     {issue.urgency ? `${issue.urgency} · ${formatUrgency(issue.urgency)}` : ""}
                   </td>
                   <td className="px-4 py-3">{formatDate(issue.created_at)}</td>
                   <td className="px-4 py-3">
-                    <details className="rounded-lg border border-slate-200 bg-white p-3">
+                    <details className="rounded-lg border border-soltas-line bg-white p-3">
                       <summary className="cursor-pointer text-sm font-medium text-soltas-text">View details</summary>
                       <div className="mt-3 space-y-2 text-xs text-soltas-muted">
                         <p className="text-sm text-soltas-text">{issue.description ?? ""}</p>
@@ -309,7 +309,7 @@ export default async function IssueRegistrationsPage({
         </table>
       </div>
 
-      <p className="mt-2 text-xs text-gray-500">
+      <p className="mt-2 text-xs text-soltas-muted">
         Approved issues are public on the Watchdog Community map and table. Rejected issues remain private.
       </p>
     </main>

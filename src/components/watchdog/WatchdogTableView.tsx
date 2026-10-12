@@ -49,9 +49,9 @@ export default function WatchdogTableView({
         <WatchdogPagination page={page} pageCount={pageCount} searchParams={searchParams} />
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-        <table className="min-w-[700px] divide-y divide-slate-200 text-sm">
-          <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+      <div className="overflow-x-auto rounded-lg border border-soltas-line bg-white">
+        <table className="min-w-[700px] divide-y divide-soltas-line text-sm">
+          <thead className="bg-soltas-off-white text-left text-xs font-medium text-soltas-muted">
             <tr>
               <th className="px-4 py-3">Issue</th>
               <th className="px-4 py-3">Location</th>
@@ -61,7 +61,7 @@ export default function WatchdogTableView({
               <th className="px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-soltas-line">
             {rows.map(issue => {
               const mapParams = new URLSearchParams();
               mapParams.set("view", "globe");
@@ -75,7 +75,7 @@ export default function WatchdogTableView({
               return (
                 <tr key={issue.id} className="align-top">
                   <td className="px-4 py-4">
-                    <div className="font-semibold text-soltas-bark">{issue.title}</div>
+                    <div className="font-semibold text-soltas-text">{issue.title}</div>
                     <p className="mt-1 text-sm text-soltas-muted">
                       {issue.description.length > 160
                         ? `${issue.description.slice(0, 160).trimEnd()}…`
@@ -85,7 +85,7 @@ export default function WatchdogTableView({
                   <td className="px-4 py-4 text-soltas-muted">{formatLocation(issue)}</td>
                   <td className="px-4 py-4 text-soltas-muted">{formatDate(issue.date_observed ?? issue.created_at)}</td>
                   <td className="px-4 py-4">
-                    <div className="text-sm font-medium text-soltas-bark">{issue.urgency ?? "—"}</div>
+                    <div className="text-sm font-medium text-soltas-text">{issue.urgency ?? "—"}</div>
                     <div className="text-xs text-soltas-muted">{formatUrgency(issue.urgency)}</div>
                   </td>
                   <td className="px-4 py-4">
@@ -106,14 +106,14 @@ export default function WatchdogTableView({
                         </Badge>
                       ))}
                       {sdgTags.length + challengeTags.length + demographicTags.length === 0 ? (
-                        <span className="text-xs text-slate-400">No tags</span>
+                        <span className="text-xs text-soltas-muted">No tags</span>
                       ) : null}
                     </div>
                   </td>
                   <td className="px-4 py-4 text-right">
                     <Link
                       href={mapHref}
-                      className="inline-flex items-center justify-center rounded-2xl border border-slate-200 px-3 py-1 text-sm font-semibold text-soltas-text hover:bg-slate-100"
+                      className="inline-flex items-center justify-center rounded-2xl border border-soltas-line px-3 py-1 text-sm font-semibold text-soltas-text hover:bg-soltas-light"
                     >
                       See on map
                     </Link>
@@ -126,7 +126,7 @@ export default function WatchdogTableView({
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-slate-200 p-8 text-center text-sm text-soltas-muted">
+        <div className="rounded-lg border border-dashed border-soltas-line p-8 text-center text-sm text-soltas-muted">
           No approved watchdog issues match the selected filters.
         </div>
       ) : null}

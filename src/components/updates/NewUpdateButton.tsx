@@ -23,7 +23,7 @@ export default function NewUpdateButton({ isAuthenticated, projectId }: NewUpdat
       <button
         type="button"
         disabled
-        className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-soltas-muted cursor-not-allowed opacity-60"
+        className="inline-flex items-center justify-center rounded-lg border border-soltas-line bg-white px-3 py-2 text-sm font-medium text-soltas-muted cursor-not-allowed opacity-60"
       >
         Log in to post an update
       </button>
@@ -43,7 +43,7 @@ export default function NewUpdateButton({ isAuthenticated, projectId }: NewUpdat
       <button
         type="button"
         onClick={handleClick}
-        className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"
+        className="inline-flex items-center justify-center rounded-lg bg-soltas-ocean px-3 py-2 text-sm font-medium text-white hover:bg-soltas-abyssal"
       >
         New update
       </button>
@@ -126,9 +126,9 @@ function UpdateComposerModal({ projectId, onClose }: { projectId: string; onClos
         aria-modal="true"
         aria-labelledby={headingId}
         onSubmit={handleSubmit}
-        className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-5 shadow-xl"
+        className="w-full max-w-lg rounded-2xl border border-soltas-line bg-white p-5 shadow-xl"
       >
-        <h2 id={headingId} className="text-base font-semibold text-soltas-bark">
+        <h2 id={headingId} className="text-base font-semibold text-soltas-text">
           New project update
         </h2>
 
@@ -145,7 +145,7 @@ function UpdateComposerModal({ projectId, onClose }: { projectId: string; onClos
               onChange={(e) => setTitle(e.target.value)}
               maxLength={200}
               disabled={isSubmitting}
-              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-soltas-bark focus:outline-none focus:ring-2 focus:ring-soltas-ocean"
+              className="w-full rounded-md border border-soltas-line px-3 py-2 text-sm text-soltas-text focus:outline-none focus:ring-2 focus:ring-soltas-ocean"
             />
           </div>
 

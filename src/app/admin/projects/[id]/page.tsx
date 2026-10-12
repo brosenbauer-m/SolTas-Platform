@@ -168,7 +168,7 @@ export default async function AdminProjectDetail({
     <main className="space-y-6 p-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="space-y-1">
-          <h1 className="text-3xl font-semibold text-soltas-bark">{project.name}</h1>
+          <h1 className="text-3xl font-semibold text-soltas-text">{project.name}</h1>
           <p className="text-sm text-soltas-muted">
             Created {formatDateTime(project.created_at)} by {createdBy}
           </p>
@@ -178,43 +178,43 @@ export default async function AdminProjectDetail({
       </div>
 
       <section className="rounded-xl border p-4">
-        <h2 className="mb-3 text-lg font-semibold text-soltas-bark">Overview</h2>
+        <h2 className="mb-3 text-lg font-semibold text-soltas-text">Overview</h2>
         <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">Status</dt>
-            <dd className="text-sm text-soltas-bark">{project.status}</dd>
+            <dt className="text-xs font-medium text-soltas-muted">Status</dt>
+            <dd className="text-sm text-soltas-text">{project.status}</dd>
           </div>
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+            <dt className="text-xs font-medium text-soltas-muted">
               Lifecycle status
             </dt>
-            <dd className="text-sm text-soltas-bark">{project.lifecycle_status ?? "—"}</dd>
+            <dd className="text-sm text-soltas-text">{project.lifecycle_status ?? "—"}</dd>
           </div>
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+            <dt className="text-xs font-medium text-soltas-muted">
               Review status
             </dt>
-            <dd className="text-sm text-soltas-bark">{project.review_status ?? "—"}</dd>
+            <dd className="text-sm text-soltas-text">{project.review_status ?? "—"}</dd>
           </div>
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+            <dt className="text-xs font-medium text-soltas-muted">
               Location
             </dt>
-            <dd className="text-sm text-soltas-bark">
+            <dd className="text-sm text-soltas-text">
               {[project.place_name, project.region, project.country].filter(Boolean).join(", ") || "—"}
             </dd>
           </div>
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">Timeline</dt>
-            <dd className="text-sm text-soltas-bark">
+            <dt className="text-xs font-medium text-soltas-muted">Timeline</dt>
+            <dd className="text-sm text-soltas-text">
               {[formatDate(project.start_date), formatDate(project.end_date)]
                 .filter(value => value !== "—")
                 .join(" → ") || "—"}
             </dd>
           </div>
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">Funding</dt>
-            <dd className="text-sm text-soltas-bark">
+            <dt className="text-xs font-medium text-soltas-muted">Funding</dt>
+            <dd className="text-sm text-soltas-text">
               {fundingParts.length ? fundingParts.join(" · ") : "—"}
             </dd>
           </div>
@@ -222,14 +222,14 @@ export default async function AdminProjectDetail({
       </section>
 
       <section className="rounded-xl border p-4">
-        <h2 className="mb-3 text-lg font-semibold text-soltas-bark">Description</h2>
+        <h2 className="mb-3 text-lg font-semibold text-soltas-text">Description</h2>
         <p className="whitespace-pre-line text-sm leading-relaxed text-soltas-text">
           {project.description || "No description provided."}
         </p>
       </section>
 
       <section className="rounded-xl border p-4">
-        <h2 className="mb-3 text-lg font-semibold text-soltas-bark">Links</h2>
+        <h2 className="mb-3 text-lg font-semibold text-soltas-text">Links</h2>
         <div className="space-y-2 text-sm">
           {project.project_links.length === 0 && jsonLinks.length === 0 ? (
             <p className="text-soltas-muted">No links submitted.</p>
@@ -269,7 +269,7 @@ export default async function AdminProjectDetail({
       </section>
 
       <section className="rounded-xl border p-4">
-        <h2 className="mb-3 text-lg font-semibold text-soltas-bark">Partners</h2>
+        <h2 className="mb-3 text-lg font-semibold text-soltas-text">Partners</h2>
         {project.project_partners.length === 0 && !project.partner_org_ids?.length ? (
           <p className="text-sm text-soltas-muted">No partner organisations listed.</p>
         ) : (
@@ -285,7 +285,7 @@ export default async function AdminProjectDetail({
       </section>
 
       <section className="rounded-xl border p-4">
-        <h2 className="mb-3 text-lg font-semibold text-soltas-bark">Sustainable Development Goals</h2>
+        <h2 className="mb-3 text-lg font-semibold text-soltas-text">Sustainable Development Goals</h2>
         {project.project_sdgs.length === 0 && !project.sdgs?.length ? (
           <p className="text-sm text-soltas-muted">No SDGs specified.</p>
         ) : (
@@ -305,7 +305,7 @@ export default async function AdminProjectDetail({
       </section>
 
       <section className="rounded-xl border p-4">
-        <h2 className="mb-3 text-lg font-semibold text-soltas-bark">IFRC Global Challenges</h2>
+        <h2 className="mb-3 text-lg font-semibold text-soltas-text">IFRC Global Challenges</h2>
         {project.project_ifrc_challenges.length === 0 && !project.ifrc_global_challenges?.length ? (
           <p className="text-sm text-soltas-muted">No IFRC challenges specified.</p>
         ) : (
@@ -325,7 +325,7 @@ export default async function AdminProjectDetail({
       </section>
 
       <section className="rounded-xl border p-4">
-        <h2 className="mb-3 text-lg font-semibold text-soltas-bark">Media</h2>
+        <h2 className="mb-3 text-lg font-semibold text-soltas-text">Media</h2>
         {project.project_media.length === 0 ? (
           <p className="text-sm text-soltas-muted">No media uploaded.</p>
         ) : (
@@ -333,7 +333,7 @@ export default async function AdminProjectDetail({
             {project.project_media.map(item => (
               <li key={item.id} className="flex items-center justify-between gap-2">
                 <div>
-                  <div className="font-medium text-soltas-bark">{item.caption || item.path}</div>
+                  <div className="font-medium text-soltas-text">{item.caption || item.path}</div>
                   <div className="text-xs text-soltas-muted">
                     {item.mime_type || "Unknown type"} · {formatDateTime(item.created_at)}
                   </div>
@@ -354,7 +354,7 @@ export default async function AdminProjectDetail({
 
       {hasLocation ? (
         <section className="rounded-xl border p-4">
-          <h2 className="mb-3 text-lg font-semibold text-soltas-bark">Location</h2>
+          <h2 className="mb-3 text-lg font-semibold text-soltas-text">Location</h2>
           <p className="mb-3 text-sm text-soltas-muted">
             Coordinates: {project.lat?.toFixed(4)}, {project.lng?.toFixed(4)}
           </p>

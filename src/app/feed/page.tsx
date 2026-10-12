@@ -1,3 +1,7 @@
+import { EmptyState } from "@/components/ui/empty-state";
+import { buttonClasses } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/page-header";
+import { segmentClass, segmentedTrack } from "@/components/ui/segmented";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -55,6 +59,13 @@ function getProfileName(profile: ProfileSummary | null) {
   const fullName = [profile.first_name, profile.last_name].filter(Boolean).join(" ");
   return fullName || "Someone";
 }
+
+const FEED_TABS = [
+  { key: "popular", label: "Popular" },
+  { key: "following", label: "Following" },
+  { key: "watchdog", label: "Watchdog" },
+  { key: "funding", label: "Funding" },
+] as const;
 
 export default async function FeedPage({
   searchParams,
@@ -320,57 +331,20 @@ export default async function FeedPage({
     .limit(5);
 
   return (
-    <main className="mx-auto w-full max-w-5xl space-y-6 px-4 py-6 sm:space-y-8 sm:py-10">
-      <header className="space-y-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-soltas-bark">Activity feed</h1>
-          <p className="text-sm text-soltas-muted">
-            Calm, chronological updates from projects and people you follow.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
+    <main className="mx-auto w-full max-w-2xl space-y-6 px-4 py-8 sm:space-y-8 sm:py-10">
+      <PageHeader title="Feed" description="Updates and stories from the projects, organisations and people you follow." />
+      <nav aria-label="Feed views" className={`${segmentedTrack} flex w-full sm:w-auto`}>
+        {FEED_TABS.map((tab) => (
           <Link
-            href="/feed?tab=popular"
-            className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-              activeTab === "popular"
-                ? "bg-slate-900 text-white"
-                : "border border-slate-200 bg-white text-soltas-text hover:bg-slate-50"
-            }`}
+            key={tab.key}
+            href={`/feed?tab=${tab.key}`}
+            aria-current={activeTab === tab.key ? "page" : undefined}
+            className={`${segmentClass(activeTab === tab.key)} flex-1 sm:flex-none`}
           >
-            Popular
+            {tab.label}
           </Link>
-          <Link
-            href="/feed?tab=following"
-            className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-              activeTab === "following"
-                ? "bg-slate-900 text-white"
-                : "border border-slate-200 bg-white text-soltas-text hover:bg-slate-50"
-            }`}
-          >
-            Following
-          </Link>
-          <Link
-            href="/feed?tab=watchdog"
-            className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-              activeTab === "watchdog"
-                ? "bg-slate-900 text-white"
-                : "border border-slate-200 bg-white text-soltas-text hover:bg-slate-50"
-            }`}
-          >
-            Watchdog
-          </Link>
-          <Link
-            href="/feed?tab=funding"
-            className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-              activeTab === "funding"
-                ? "bg-slate-900 text-white"
-                : "border border-slate-200 bg-white text-soltas-text hover:bg-slate-50"
-            }`}
-          >
-            Funding
-          </Link>
-        </div>
-      </header>
+        ))}
+      </nav>
 
       {user && userProfile && (
         <NewPostComposer
@@ -382,7 +356,7 @@ export default async function FeedPage({
 
       {posts.length > 0 && (
         <section className="space-y-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">
             Recent posts
           </h2>
           {posts.map((post: FeedPost) => {
@@ -439,12 +413,18 @@ export default async function FeedPage({
       )}
 
       {activeTab === "following" && !user ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-soltas-muted">
-          Sign in to see updates from the people, organisations, and projects you follow.
-        </div>
+        <EmptyState
+          title="See what the people and projects you follow are up to"
+          description="Log in to see updates from the projects, organisations and people you follow."
+          action={
+            <Link href="/login?returnTo=/feed?tab=following" className={buttonClasses()}>
+              Log in
+            </Link>
+          }
+        />
       ) : items.length ? (
         <section className="space-y-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">
             Activity updates
           </h2>
           {items.map((item) => {
@@ -508,7 +488,7 @@ export default async function FeedPage({
             <div className="pt-2">
               <Link
                 href={`/feed?${nextParams.toString()}`}
-                className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-soltas-bark hover:bg-slate-50"
+                className="inline-flex items-center justify-center rounded-lg border border-soltas-line bg-white px-4 py-2 text-sm font-medium text-soltas-text hover:bg-soltas-off-white"
               >
                 Load more
               </Link>
@@ -516,7 +496,7 @@ export default async function FeedPage({
           ) : null}
         </section>
       ) : (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-soltas-muted">
+        <div className="rounded-2xl border border-soltas-line bg-white p-6 text-sm text-soltas-muted">
           {activeTab === "popular" && "No activity yet"}
           {activeTab === "following" && "Follow projects, organisations, or people to personalize your feed"}
           {activeTab === "watchdog" && "No verified watchdog items yet"}
@@ -525,8 +505,8 @@ export default async function FeedPage({
       )}
 
       <section className="grid gap-4 lg:grid-cols-3">
-        <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">
+        <div className="rounded-2xl border border-soltas-line bg-white p-5">
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">
             Discover people
           </h2>
           <ul className="mt-4 space-y-3 text-sm text-soltas-text">
@@ -538,10 +518,10 @@ export default async function FeedPage({
                     alt={getProfileName(person)}
                     width={32}
                     height={32}
-                    className="h-8 w-8 rounded-full border border-slate-200 object-cover"
+                    className="h-8 w-8 rounded-full border border-soltas-line object-cover"
                   />
                 ) : (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full border border-dashed border-slate-300 bg-slate-50 text-xs text-soltas-muted">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full border border-dashed border-soltas-line bg-soltas-off-white text-xs text-soltas-muted">
                     —
                   </div>
                 )}
@@ -553,8 +533,8 @@ export default async function FeedPage({
           </ul>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">
+        <div className="rounded-2xl border border-soltas-line bg-white p-5">
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">
             Discover organisations
           </h2>
           <ul className="mt-4 space-y-3 text-sm text-soltas-text">
@@ -568,8 +548,8 @@ export default async function FeedPage({
           </ul>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">
+        <div className="rounded-2xl border border-soltas-line bg-white p-5">
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">
             Discover projects
           </h2>
           <ul className="mt-4 space-y-3 text-sm text-soltas-text">

@@ -1,3 +1,5 @@
+import { PageHeader } from "@/components/ui/page-header";
+import { buttonClasses } from "@/components/ui/button";
 // src/app/find-organisations/page.tsx
 import Link from "next/link";
 
@@ -80,19 +82,24 @@ export default async function FindOrganisationsPage({
 
   return (
     // CRITICAL: this must be a flex child that can grow
-    <main className="flex-1 min-h-0 px-4 py-6 flex flex-col gap-4 sm:px-6 sm:py-8 sm:gap-6">
-      <header className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-semibold text-soltas-bark sm:text-3xl">Find Organisations</h1>
-          <p className="text-sm text-soltas-muted">
-            Discover verified organisations on the Solarpunk Taskforce and explore their global reach, impact, and needs.
-          </p>
-          <p className="text-sm text-soltas-muted">
-            Showing {rows.length} of {count} organisations · {PAGE_SIZE} per page
-          </p>
-        </div>
-        <OrganisationsViewToggle view={view} />
-      </header>
+    <main className="mx-auto flex w-full max-w-7xl flex-1 min-h-0 flex-col gap-5 px-4 py-8 sm:gap-6 sm:px-6 sm:py-10">
+      <PageHeader
+        title="Organisations"
+        description={
+          <>
+            Verified organisations, where they work and what they need.{" "}
+            <span className="whitespace-nowrap">{count.toLocaleString()} organisations</span>
+          </>
+        }
+        actions={
+          <>
+            <OrganisationsViewToggle view={view} />
+            <Link href="/organisations/create" className={buttonClasses({ size: "sm" })}>
+              Register organisation
+            </Link>
+          </>
+        }
+      />
 
       {view === "globe" ? (
         // CRITICAL: allow the split view to fill remaining height under header
@@ -116,9 +123,9 @@ export default async function FindOrganisationsPage({
               <OrganisationsPagination page={page} pageCount={pageCount} searchParams={params} />
             </div>
 
-            <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-              <table className="min-w-[900px] divide-y divide-slate-200 text-sm">
-                <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+            <div className="overflow-x-auto rounded-lg border border-soltas-line bg-white">
+              <table className="min-w-[900px] divide-y divide-soltas-line text-sm">
+                <thead className="bg-soltas-off-white text-left text-xs font-medium text-soltas-muted">
                   <tr>
                     <th className="px-4 py-3">Organisation</th>
                     <th className="px-4 py-3">Location</th>
@@ -131,7 +138,7 @@ export default async function FindOrganisationsPage({
                   </tr>
                 </thead>
 
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-soltas-line">
                   {rows.map((organisation) => (
                     <tr key={organisation.id} className="align-top">
                       <td className="px-4 py-4">
@@ -156,7 +163,7 @@ export default async function FindOrganisationsPage({
                       <td className="px-4 py-4 text-right">
                         <Link
                           href={`/organisations/${organisation.id}`}
-                          className="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800"
+                          className="inline-flex items-center justify-center rounded-2xl bg-soltas-ocean px-3 py-2 text-xs font-semibold text-white hover:bg-soltas-abyssal"
                         >
                           Open
                         </Link>
@@ -168,7 +175,7 @@ export default async function FindOrganisationsPage({
             </div>
 
             {rows.length === 0 ? (
-              <div className="rounded-lg border border-dashed border-slate-200 p-8 text-center text-sm text-soltas-muted">
+              <div className="rounded-lg border border-dashed border-soltas-line p-8 text-center text-sm text-soltas-muted">
                 No organisations match the selected filters.
               </div>
             ) : null}

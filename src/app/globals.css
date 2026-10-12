@@ -14,14 +14,17 @@
 
   /* Neutrals */
   --soltas-white: #FFFFFF;
-  --soltas-off-white: #F7F8F9;
-  --soltas-light: #EEF2F5;
-  --soltas-muted: #8A9BAB;
+  --soltas-off-white: #F5F6F8;
+  --soltas-light: #EDF1F4;
+  --soltas-muted: #5B6B79; /* 5.5:1 on white (was #8A9BAB, 2.9:1) */
   --soltas-text: #1A2B38;
+  --soltas-line: rgba(26, 43, 56, 0.09);
+  --soltas-green: #2F855A;
 
-  /* Geist fonts */
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Native system fonts: SF Pro on Apple, Segoe UI on Windows, Roboto on Android */
+  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 }
 
 @theme {
@@ -36,6 +39,8 @@
   --color-soltas-light: var(--soltas-light);
   --color-soltas-muted: var(--soltas-muted);
   --color-soltas-text: var(--soltas-text);
+  --color-soltas-line: var(--soltas-line);
+  --color-soltas-green: var(--soltas-green);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
 }
@@ -48,37 +53,44 @@ html {
 body {
   background: var(--soltas-off-white);
   color: var(--soltas-text);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-sans);
+  font-feature-settings: "kern", "liga";
+  text-rendering: optimizeLegibility;
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Glass morphism effects - Apple-inspired */
+::selection {
+  background: rgba(46, 107, 138, 0.18);
+}
+
+/* Translucent surfaces (Apple-style) */
 .glass-card {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(107, 159, 184, 0.2);
-  border-radius: 1.5rem;
-  box-shadow: 0 8px 32px rgba(26, 59, 84, 0.08);
+  border: 1px solid var(--soltas-line);
+  border-radius: 1.25rem;
+  box-shadow: 0 10px 30px rgba(26, 43, 56, 0.08);
 }
 
 .soltas-header-glass {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border-bottom: 1px solid rgba(107, 159, 184, 0.15);
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--soltas-line);
 }
 
-/* Enhanced card styles with better spacing */
+/* Cards: white surface, hairline border, lift on hover only when interactive */
 .card {
-  @apply rounded-3xl border border-soltas-glacial/25 bg-white shadow-sm transition-all duration-200;
+  @apply rounded-2xl border border-soltas-line bg-white transition-all duration-200;
 }
 
-.card:hover {
-  @apply shadow-md border-soltas-glacial/35;
+a.card:hover,
+.card-interactive:hover {
+  @apply shadow-md -translate-y-px;
 }
 
 /* Improved focus styles */
@@ -94,5 +106,16 @@ body {
 
 /* Smooth transitions */
 * {
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

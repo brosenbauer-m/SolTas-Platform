@@ -193,7 +193,7 @@ export function FeedPostCard({
   };
 
   return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <article className="card p-6">
       <div className="flex gap-3">
         {authorAvatarUrl ? (
           <Image
@@ -201,17 +201,17 @@ export function FeedPostCard({
             alt={authorName}
             width={40}
             height={40}
-            className="h-10 w-10 rounded-full border border-slate-200 object-cover"
+            className="h-10 w-10 rounded-full border border-soltas-line object-cover"
           />
         ) : (
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-dashed border-slate-300 bg-slate-50 text-sm text-soltas-muted">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-dashed border-soltas-line bg-soltas-off-white text-sm text-soltas-muted">
             {authorName[0]?.toUpperCase() ?? "?"}
           </div>
         )}
 
         <div className="flex-1 space-y-2">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-medium text-soltas-bark">{authorName}</p>
+            <p className="text-sm font-medium text-soltas-text">{authorName}</p>
             <div className="flex items-center gap-2">
               <time className="text-xs text-soltas-muted" dateTime={timestamp ?? undefined}>
                 {formatTimestamp(timestamp)}
@@ -220,7 +220,7 @@ export function FeedPostCard({
                 <div className="relative">
                   <button
                     onClick={() => setShowMenu(!showMenu)}
-                    className="rounded p-1 text-soltas-muted hover:bg-slate-100"
+                    className="rounded p-1 text-soltas-muted hover:bg-soltas-light"
                     aria-label="Post options"
                   >
                     <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 16 16">
@@ -235,16 +235,16 @@ export function FeedPostCard({
                         className="fixed inset-0 z-10"
                         onClick={() => setShowMenu(false)}
                       />
-                      <div className="absolute right-0 top-8 z-20 w-32 rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
+                      <div className="absolute right-0 top-8 z-20 w-32 rounded-lg border border-soltas-line bg-white py-1 shadow-lg">
                         <button
                           onClick={handleEdit}
-                          className="w-full px-4 py-2 text-left text-sm text-soltas-text hover:bg-slate-50"
+                          className="w-full px-4 py-2 text-left text-sm text-soltas-text hover:bg-soltas-off-white"
                         >
                           Edit
                         </button>
                         <button
                           onClick={handleDeleteClick}
-                          className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-slate-50"
+                          className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-soltas-off-white"
                         >
                           Delete
                         </button>
@@ -261,7 +261,7 @@ export function FeedPostCard({
               <textarea
                 value={editedContent}
                 onChange={(e) => setEditedContent(e.target.value)}
-                className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:border-soltas-ocean focus:outline-none focus:ring-1 focus:ring-soltas-ocean"
+                className="w-full rounded-lg border border-soltas-line p-3 text-sm focus:border-soltas-ocean focus:outline-none focus:ring-1 focus:ring-soltas-ocean"
                 rows={4}
                 maxLength={5000}
                 disabled={isSaving}
@@ -274,7 +274,7 @@ export function FeedPostCard({
                   <button
                     onClick={handleCancelEdit}
                     disabled={isSaving}
-                    className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-soltas-text hover:bg-slate-50 disabled:opacity-50"
+                    className="rounded-lg border border-soltas-line px-3 py-1.5 text-sm text-soltas-text hover:bg-soltas-off-white disabled:opacity-50"
                   >
                     Cancel
                   </button>
@@ -295,7 +295,7 @@ export function FeedPostCard({
           {!isEditing && attachments.length > 0 && (
             <div className={`grid gap-2 ${attachments.length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
               {attachments.map((attachment) => (
-                <div key={attachment.id} className="relative aspect-video overflow-hidden rounded-lg border border-slate-200">
+                <div key={attachment.id} className="relative aspect-video overflow-hidden rounded-lg border border-soltas-line">
                   <Image
                     src={getStorageUrl(attachment.file_path)}
                     alt="Post attachment"
@@ -329,8 +329,8 @@ export function FeedPostCard({
 
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-semibold text-soltas-bark">Delete post?</h3>
+          <div className="w-full max-w-md rounded-2xl border border-soltas-line bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-soltas-text">Delete post?</h3>
             <p className="mt-2 text-sm text-soltas-muted">
               This action cannot be undone. Your post will be permanently deleted.
             </p>
@@ -338,7 +338,7 @@ export function FeedPostCard({
               <button
                 onClick={handleCancelDelete}
                 disabled={isDeleting}
-                className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-soltas-text hover:bg-slate-50 disabled:opacity-50"
+                className="rounded-lg border border-soltas-line px-4 py-2 text-sm text-soltas-text hover:bg-soltas-off-white disabled:opacity-50"
               >
                 Cancel
               </button>

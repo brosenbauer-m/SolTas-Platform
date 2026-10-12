@@ -438,7 +438,7 @@ export default async function ProjectEditPage({
   return (
     <main className="mx-auto max-w-4xl space-y-10 px-4 pb-16 pt-10 sm:px-6 lg:px-8">
       <div className="space-y-2">
-        <h1 className="text-3xl font-semibold text-soltas-bark">Edit project</h1>
+        <h1 className="text-3xl font-semibold text-soltas-text">Edit project</h1>
         <p className="text-sm text-soltas-muted">
           Changes are saved under the same access rules (owner/admin/shared editors).
         </p>
@@ -447,10 +447,10 @@ export default async function ProjectEditPage({
       <ProjectForm mode="edit" projectId={project.id} initialValues={initialValues} />
 
       {/* Sharing */}
-      <section id="sharing" className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section id="sharing" className="card p-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">Sharing</h2>
+            <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Sharing</h2>
             <p className="mt-1 text-sm text-soltas-muted">
               Invite collaborators to view or edit this project. Access is enforced by Supabase RLS.
             </p>
@@ -458,7 +458,7 @@ export default async function ProjectEditPage({
 
           <Link
             href={`/projects/${encodeURIComponent(projectSlugOrId)}`}
-            className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-soltas-bark hover:bg-slate-50"
+            className="inline-flex items-center justify-center rounded-lg border border-soltas-line bg-white px-3 py-2 text-sm font-medium text-soltas-text hover:bg-soltas-off-white"
           >
             View public page
           </Link>
@@ -467,10 +467,10 @@ export default async function ProjectEditPage({
         {/* Invite */}
         <form
           action={inviteCollaborator}
-          className="mt-5 flex flex-col gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4 sm:flex-row sm:items-end"
+          className="mt-5 flex flex-col gap-3 rounded-xl border border-soltas-line bg-soltas-off-white p-4 sm:flex-row sm:items-end"
         >
           <div className="flex-1">
-            <label className="block text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+            <label className="block text-xs font-medium text-soltas-muted">
               Invite by email
             </label>
             <input
@@ -478,16 +478,16 @@ export default async function ProjectEditPage({
               type="email"
               required
               placeholder="person@example.com"
-              className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+              className="mt-1 w-full rounded-lg border border-soltas-line bg-white px-3 py-2 text-sm"
             />
           </div>
 
           <div className="sm:w-44">
-            <label className="block text-xs font-semibold uppercase tracking-wide text-soltas-muted">Role</label>
+            <label className="block text-xs font-medium text-soltas-muted">Role</label>
             <select
               name="role"
               defaultValue="viewer"
-              className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+              className="mt-1 w-full rounded-lg border border-soltas-line bg-white px-3 py-2 text-sm"
             >
               <option value="viewer">Viewer</option>
               <option value="editor">Editor</option>
@@ -496,7 +496,7 @@ export default async function ProjectEditPage({
 
           <button
             type="submit"
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-slate-900 px-4 text-sm font-medium text-white hover:bg-slate-800"
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-soltas-ocean px-4 text-sm font-medium text-white hover:bg-soltas-abyssal"
           >
             Invite
           </button>
@@ -504,7 +504,7 @@ export default async function ProjectEditPage({
 
         {/* List */}
         <div className="mt-5 space-y-3">
-          <h3 className="text-sm font-semibold text-soltas-bark">Collaborators</h3>
+          <h3 className="text-sm font-semibold text-soltas-text">Collaborators</h3>
 
           {collaborators.length ? (
             <ul className="space-y-2">
@@ -514,10 +514,10 @@ export default async function ProjectEditPage({
                 return (
                   <li
                     key={c.user_id}
-                    className="flex flex-col gap-2 rounded-xl border border-slate-100 bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+                    className="flex flex-col gap-2 rounded-xl border border-soltas-line bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
                   >
                     <div className="min-w-0">
-                      <div className="truncate text-sm font-medium text-soltas-bark">{display}</div>
+                      <div className="truncate text-sm font-medium text-soltas-text">{display}</div>
                       <div className="truncate text-xs text-soltas-muted">{c.email ?? "—"}</div>
                     </div>
 
@@ -527,14 +527,14 @@ export default async function ProjectEditPage({
                         <select
                           name="role"
                           defaultValue={c.role}
-                          className="h-9 rounded-lg border border-slate-200 bg-white px-2 text-sm"
+                          className="h-9 rounded-lg border border-soltas-line bg-white px-2 text-sm"
                         >
                           <option value="viewer">viewer</option>
                           <option value="editor">editor</option>
                         </select>
                         <button
                           type="submit"
-                          className="inline-flex h-9 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-soltas-bark hover:bg-slate-50"
+                          className="inline-flex h-9 items-center justify-center rounded-lg border border-soltas-line bg-white px-3 text-sm font-medium text-soltas-text hover:bg-soltas-off-white"
                         >
                           Update
                         </button>
@@ -565,10 +565,10 @@ export default async function ProjectEditPage({
         </div>
       </section>
 
-      <section id="updates" className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section id="updates" className="card p-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">
+            <h2 className="text-lg font-semibold tracking-tight text-soltas-text">
               Updates
             </h2>
             <p className="mt-1 text-sm text-soltas-muted">
@@ -577,7 +577,7 @@ export default async function ProjectEditPage({
           </div>
           <Link
             href={`/projects/${encodeURIComponent(projectSlugOrId)}#updates`}
-            className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-soltas-bark hover:bg-slate-50"
+            className="inline-flex items-center justify-center rounded-lg border border-soltas-line bg-white px-3 py-2 text-sm font-medium text-soltas-text hover:bg-soltas-off-white"
           >
             View public updates
           </Link>
@@ -585,21 +585,21 @@ export default async function ProjectEditPage({
 
         <form
           action={createProjectUpdate}
-          className="mt-5 space-y-4 rounded-xl border border-slate-100 bg-slate-50 p-4"
+          className="mt-5 space-y-4 rounded-xl border border-soltas-line bg-soltas-off-white p-4"
         >
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+            <label className="block text-xs font-medium text-soltas-muted">
               Title
             </label>
             <input
               name="title"
               required
               placeholder="What changed since the last update?"
-              className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+              className="mt-1 w-full rounded-lg border border-soltas-line bg-white px-3 py-2 text-sm"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+            <label className="block text-xs font-medium text-soltas-muted">
               Update details
             </label>
             <textarea
@@ -607,17 +607,17 @@ export default async function ProjectEditPage({
               required
               rows={4}
               placeholder="Share progress, milestones, or needs."
-              className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+              className="mt-1 w-full rounded-lg border border-soltas-line bg-white px-3 py-2 text-sm"
             />
           </div>
           <div className="sm:w-56">
-            <label className="block text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+            <label className="block text-xs font-medium text-soltas-muted">
               Visibility
             </label>
             <select
               name="visibility"
               defaultValue="project"
-              className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+              className="mt-1 w-full rounded-lg border border-soltas-line bg-white px-3 py-2 text-sm"
             >
               <option value="project">Project members</option>
               <option value="public">Public</option>
@@ -625,29 +625,29 @@ export default async function ProjectEditPage({
           </div>
           <button
             type="submit"
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-slate-900 px-4 text-sm font-medium text-white hover:bg-slate-800"
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-soltas-ocean px-4 text-sm font-medium text-white hover:bg-soltas-abyssal"
           >
             Publish update
           </button>
         </form>
 
         <div className="mt-5 space-y-3">
-          <h3 className="text-sm font-semibold text-soltas-bark">Recent updates</h3>
+          <h3 className="text-sm font-semibold text-soltas-text">Recent updates</h3>
           {projectUpdates && projectUpdates.length > 0 ? (
             <ul className="space-y-3">
               {projectUpdates.map((update) => (
                 <li
                   key={update.id}
-                  className="rounded-xl border border-slate-100 bg-white px-4 py-3"
+                  className="rounded-xl border border-soltas-line bg-white px-4 py-3"
                 >
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="text-sm font-medium text-soltas-bark">{update.title}</div>
+                    <div className="text-sm font-medium text-soltas-text">{update.title}</div>
                     <span className="text-xs text-soltas-muted">
                       {formatDate(update.published_at)}
                     </span>
                   </div>
                   <p className="mt-2 whitespace-pre-wrap text-sm text-soltas-text">{update.body}</p>
-                  <p className="mt-2 text-xs font-medium uppercase tracking-wide text-soltas-muted">
+                  <p className="mt-2 text-xs font-medium text-soltas-muted">
                     Visibility: {update.visibility}
                   </p>
                 </li>

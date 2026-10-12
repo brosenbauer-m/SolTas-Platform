@@ -54,7 +54,7 @@ export function ProjectStatusControl({
 
   return (
     <div className="flex items-center gap-2">
-      <label className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+      <label className="text-xs font-medium text-soltas-muted">
         Status
       </label>
       <select

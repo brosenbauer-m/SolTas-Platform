@@ -347,13 +347,13 @@ export default function HomeGlobe({
       }
 
       const titleEl = document.createElement("h3");
-      titleEl.className = "text-base font-semibold text-soltas-bark";
+      titleEl.className = "text-base font-semibold text-soltas-text";
       titleEl.textContent = marker.title;
       popupNode.appendChild(titleEl);
 
       if (marker.placeName) {
         const placeEl = document.createElement("p");
-        placeEl.className = "text-xs uppercase tracking-wide text-soltas-muted";
+        placeEl.className = "text-xs font-medium text-soltas-muted";
         placeEl.textContent = marker.placeName;
         popupNode.appendChild(placeEl);
       }
@@ -386,8 +386,9 @@ export default function HomeGlobe({
         width: "14px",
         height: "14px",
         borderRadius: "9999px",
-        backgroundColor: marker.markerColor ?? "#10b981",
-        boxShadow: "0 4px 12px rgba(15, 23, 42, 0.35)",
+        backgroundColor: marker.markerColor ?? "#2E6B8A",
+        border: "2px solid #ffffff",
+        boxShadow: "0 2px 8px rgba(15, 23, 42, 0.35)",
         transform: "translate(-50%, -50%)",
       });
 
@@ -490,7 +491,7 @@ export default function HomeGlobe({
     return (
       <div className="grid h-full w-full place-items-center bg-soltas-light p-6 text-center">
         <div className="space-y-2">
-          <div className="text-sm font-semibold text-soltas-bark">Globe view unavailable</div>
+          <div className="text-sm font-semibold text-soltas-text">Globe view unavailable</div>
           <div className="text-sm text-soltas-muted">
             This deployment is missing the Mapbox token (<code>NEXT_PUBLIC_MAPBOX_TOKEN</code>).
           </div>
@@ -514,7 +515,7 @@ export default function HomeGlobe({
 
 
       {debugEnabled ? (
-        <div className="pointer-events-none absolute left-6 top-6 rounded-2xl bg-soltas-peat/85 px-4 py-3 text-xs text-soltas-light shadow-lg ring-1 ring-soltas-bark/10">
+        <div className="pointer-events-none absolute left-6 top-6 rounded-2xl bg-soltas-text/85 px-4 py-3 text-xs text-soltas-light shadow-lg ring-1 ring-white/10">
           <div className="font-semibold uppercase tracking-wide text-soltas-glacial">Globe debug</div>
           <div className="mt-1 space-y-1">
             <div>

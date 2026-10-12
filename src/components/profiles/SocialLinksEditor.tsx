@@ -56,7 +56,7 @@ export default function SocialLinksEditor({
             name={typeName}
             value={link.type}
             onChange={(event) => updateLink(index, "type", event.target.value)}
-            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-soltas-bark shadow-sm"
+            className="rounded-lg border border-soltas-line bg-white px-3 py-2 text-sm text-soltas-text shadow-sm"
           >
             <option value="">Platform</option>
             {SOCIAL_LINK_TYPES.map((type) => (
@@ -70,12 +70,12 @@ export default function SocialLinksEditor({
             value={link.url}
             onChange={(event) => updateLink(index, "url", event.target.value)}
             placeholder="https://"
-            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-soltas-bark shadow-sm"
+            className="w-full rounded-lg border border-soltas-line bg-white px-3 py-2 text-sm text-soltas-text shadow-sm"
           />
           <button
             type="button"
             onClick={() => removeLink(index)}
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-soltas-muted hover:bg-slate-50"
+            className="rounded-lg border border-soltas-line px-3 py-2 text-sm text-soltas-muted hover:bg-soltas-off-white"
             aria-label="Remove social link"
             disabled={links.length === 1}
           >
@@ -86,7 +86,7 @@ export default function SocialLinksEditor({
       <button
         type="button"
         onClick={addLink}
-        className="inline-flex items-center justify-center rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-soltas-text hover:bg-slate-50"
+        className="inline-flex items-center justify-center rounded-lg border border-soltas-line px-3 py-2 text-sm font-medium text-soltas-text hover:bg-soltas-off-white"
       >
         Add social link
       </button>

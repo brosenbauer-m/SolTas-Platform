@@ -84,15 +84,15 @@ export default async function ProfilePage({
               alt={name || "Profile avatar"}
               width={80}
               height={80}
-              className="h-20 w-20 rounded-full border border-slate-200 object-cover"
+              className="h-20 w-20 rounded-full border border-soltas-line object-cover"
             />
           ) : (
-            <div className="flex h-20 w-20 items-center justify-center rounded-full border border-dashed border-slate-300 bg-slate-50 text-sm text-soltas-muted">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full border border-dashed border-soltas-line bg-soltas-off-white text-sm text-soltas-muted">
               —
             </div>
           )}
           <div className="min-w-0">
-            <h1 className="truncate text-2xl font-semibold tracking-tight text-soltas-bark">
+            <h1 className="truncate text-2xl font-semibold tracking-tight text-soltas-text">
               {name || "Unnamed profile"}
             </h1>
             <p className="mt-1 text-sm text-soltas-muted">
@@ -118,7 +118,7 @@ export default async function ProfilePage({
           {isOwner ? (
             <Link
               href={`/people/${profile.id}/edit`}
-              className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"
+              className="inline-flex items-center justify-center rounded-lg bg-soltas-ocean px-3 py-2 text-sm font-medium text-white hover:bg-soltas-abyssal"
             >
               Edit Profile
             </Link>
@@ -135,45 +135,45 @@ export default async function ProfilePage({
       </header>
 
       {profile.bio ? (
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">Bio</h2>
-          <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-soltas-bark">
+        <section className="card p-6">
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Bio</h2>
+          <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-soltas-text">
             {profile.bio}
           </p>
         </section>
       ) : null}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-soltas-muted">Details</h2>
+      <section className="card p-6">
+        <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Details</h2>
         <dl className="mt-4 grid gap-4 sm:grid-cols-2">
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+            <dt className="text-xs font-medium text-soltas-muted">
               Country from
             </dt>
-            <dd className="text-sm text-soltas-bark">{profile.country_from ?? "—"}</dd>
+            <dd className="text-sm text-soltas-text">{profile.country_from ?? "—"}</dd>
           </div>
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+            <dt className="text-xs font-medium text-soltas-muted">
               Country based
             </dt>
-            <dd className="text-sm text-soltas-bark">{profile.country_based ?? "—"}</dd>
+            <dd className="text-sm text-soltas-text">{profile.country_based ?? "—"}</dd>
           </div>
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+            <dt className="text-xs font-medium text-soltas-muted">
               Occupation
             </dt>
-            <dd className="text-sm text-soltas-bark">{profile.occupation ?? "—"}</dd>
+            <dd className="text-sm text-soltas-text">{profile.occupation ?? "—"}</dd>
           </div>
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+            <dt className="text-xs font-medium text-soltas-muted">
               Followers
             </dt>
-            <dd className="text-sm text-soltas-bark">
+            <dd className="text-sm text-soltas-text">
               {resolvedFollowerCount === null ? "—" : resolvedFollowerCount}
             </dd>
           </div>
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+            <dt className="text-xs font-medium text-soltas-muted">
               Social links
             </dt>
             <dd className="mt-2">

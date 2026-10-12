@@ -56,15 +56,15 @@ const getTagPreview = (project: ProjectListRow) => {
 const getProjectSlug = (project: ProjectListRow) => project.slug ?? project.id;
 
 const buttonClasses =
-  "inline-flex items-center justify-center gap-2 rounded-2xl font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-2xl font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-soltas-ocean disabled:pointer-events-none disabled:opacity-50";
 
 const buttonSizes = {
   sm: "h-9 px-3",
 } as const;
 
 const buttonVariants = {
-  secondary: "bg-slate-900 text-white hover:bg-slate-800",
-  outline: "border border-slate-200 text-soltas-bark hover:bg-slate-100",
+  secondary: "bg-soltas-ocean text-white hover:bg-soltas-abyssal",
+  outline: "border border-soltas-line text-soltas-text hover:bg-soltas-light",
 } as const;
 
 type ProjectsTableViewProps = {
@@ -89,9 +89,9 @@ export default function ProjectsTableView({
         <ProjectsPagination page={page} pageCount={pageCount} searchParams={searchParams} basePath="/projects" />
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-        <table className="min-w-[800px] divide-y divide-slate-200 text-sm">
-          <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+      <div className="overflow-x-auto rounded-lg border border-soltas-line bg-white">
+        <table className="min-w-[800px] divide-y divide-soltas-line text-sm">
+          <thead className="bg-soltas-off-white text-left text-xs font-medium text-soltas-muted">
             <tr>
               <th className="px-4 py-3">Project</th>
               <th className="px-4 py-3">Category</th>
@@ -102,7 +102,7 @@ export default function ProjectsTableView({
               <th className="px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-soltas-line">
             {rows.map(project => {
               const slugForPath = getProjectSlug(project);
               const tags = getTagPreview(project);
@@ -134,7 +134,7 @@ export default function ProjectsTableView({
                   </td>
                   <td className="px-4 py-4 text-soltas-muted">
                     <div>{formatCurrency(project.donations_received, project.currency)}</div>
-                    <div className="text-xs text-slate-400">
+                    <div className="text-xs text-soltas-muted">
                       of {formatCurrency(project.amount_needed, project.currency)}
                     </div>
                   </td>
@@ -147,7 +147,7 @@ export default function ProjectsTableView({
                           </Badge>
                         ))
                       ) : (
-                        <span className="text-xs text-slate-400">No tags</span>
+                        <span className="text-xs text-soltas-muted">No tags</span>
                       )}
                     </div>
                   </td>
@@ -172,7 +172,7 @@ export default function ProjectsTableView({
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-slate-200 p-8 text-center text-sm text-soltas-muted">
+        <div className="rounded-lg border border-dashed border-soltas-line p-8 text-center text-sm text-soltas-muted">
           No projects match the selected filters.
         </div>
       ) : null}

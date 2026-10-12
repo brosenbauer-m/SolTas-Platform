@@ -33,10 +33,10 @@ export function FeedItemCard({
   eventType,
 }: FeedItemCardProps) {
   return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <article className="card p-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1">
-          <h2 className="text-base font-semibold text-soltas-bark">
+          <h2 className="text-base font-semibold text-soltas-text">
             {href ? (
               <Link href={href} className="hover:underline">
                 {title}
@@ -61,10 +61,10 @@ export function FeedItemCard({
             alt={actorName}
             width={40}
             height={40}
-            className="h-10 w-10 rounded-full border border-slate-200 object-cover"
+            className="h-10 w-10 rounded-full border border-soltas-line object-cover"
           />
         ) : eventType !== "funding" && eventType !== "watchdog" ? (
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-dashed border-slate-300 bg-slate-50 text-xs text-soltas-muted">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-dashed border-soltas-line bg-soltas-off-white text-xs text-soltas-muted">
             —
           </div>
         ) : null}

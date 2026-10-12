@@ -150,24 +150,21 @@ export default function GrantsFilters({
 
   const containerClassName =
     variant === "panel"
-      ? "space-y-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+      ? "space-y-4 rounded-2xl border border-soltas-line bg-white p-5"
       : "space-y-4";
 
   return (
-    <section className={containerClassName}>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold text-soltas-bark">Filters</h2>
-          <p className="text-sm text-soltas-muted">Refine funding opportunities by eligibility, funding, and timing.</p>
-        </div>
-        <Button type="button" variant="ghost" onClick={clearFilters}>
-          Clear filters
+    <section className={`@container ${containerClassName}`}>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Filters</h2>
+        <Button type="button" variant="link" size="sm" onClick={clearFilters}>
+          Clear all
         </Button>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 @md:grid-cols-2 @3xl:grid-cols-3">
         <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Keyword search</span>
+          <span className="font-medium text-soltas-text">Keyword search</span>
           <Input
             value={searchValue}
             placeholder="Title, funder, or summary"
@@ -176,7 +173,7 @@ export default function GrantsFilters({
         </label>
 
         <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Project type</span>
+          <span className="font-medium text-soltas-text">Project type</span>
           <Select
             value={projectTypeValue || "all"}
             onValueChange={value => updateParams({ project_type: value === "all" ? "" : value })}
@@ -196,7 +193,7 @@ export default function GrantsFilters({
         </label>
 
         <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Funding type</span>
+          <span className="font-medium text-soltas-text">Funding type</span>
           <Select
             value={fundingTypeValue || "all"}
             onValueChange={value => updateParams({ funding_type: value === "all" ? "" : value })}
@@ -216,9 +213,9 @@ export default function GrantsFilters({
         </label>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 @md:grid-cols-2 @3xl:grid-cols-3">
         <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Status</span>
+          <span className="font-medium text-soltas-text">Status</span>
           <Select value={statusValue} onValueChange={value => updateParams({ status: value })}>
             <SelectTrigger>
               <SelectValue placeholder="Open" />
@@ -234,7 +231,7 @@ export default function GrantsFilters({
         </label>
 
         <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Amount min</span>
+          <span className="font-medium text-soltas-text">Amount min</span>
           <Input
             type="number"
             value={amountMinValue}
@@ -243,7 +240,7 @@ export default function GrantsFilters({
         </label>
 
         <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Amount max</span>
+          <span className="font-medium text-soltas-text">Amount max</span>
           <Input
             type="number"
             value={amountMaxValue}
@@ -252,9 +249,9 @@ export default function GrantsFilters({
         </label>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 @md:grid-cols-2 @3xl:grid-cols-3">
         <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Deadline from</span>
+          <span className="font-medium text-soltas-text">Deadline from</span>
           <Input
             type="date"
             value={deadlineFromValue}
@@ -263,7 +260,7 @@ export default function GrantsFilters({
         </label>
 
         <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Deadline to</span>
+          <span className="font-medium text-soltas-text">Deadline to</span>
           <Input
             type="date"
             value={deadlineToValue}
@@ -275,7 +272,7 @@ export default function GrantsFilters({
           <label className="flex items-center gap-2 text-sm text-soltas-muted">
             <input
               type="checkbox"
-              className="h-4 w-4 rounded border-slate-300"
+              className="h-4 w-4 rounded border-soltas-line"
               checked={upcomingOnlyValue === "true" || upcomingOnlyValue === "1"}
               onChange={event => updateParams({ upcoming_only: event.target.checked ? "true" : "" })}
             />
@@ -284,9 +281,9 @@ export default function GrantsFilters({
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 @md:grid-cols-2">
         <div className="space-y-2 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Eligible countries</span>
+          <span className="font-medium text-soltas-text">Eligible countries</span>
           <MultiSelect
             options={options.countries}
             value={eligibleCountriesValue}
@@ -298,7 +295,7 @@ export default function GrantsFilters({
         </div>
 
         <div className="space-y-2 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">Themes</span>
+          <span className="font-medium text-soltas-text">Themes</span>
           <MultiSelect
             options={options.themes}
             value={themesValue}
@@ -310,9 +307,9 @@ export default function GrantsFilters({
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 @md:grid-cols-2">
         <div className="space-y-2 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-bark">SDGs</span>
+          <span className="font-medium text-soltas-text">SDGs</span>
           <MultiSelect
             options={SDG_OPTIONS}
             value={sdgsValue}
@@ -327,7 +324,7 @@ export default function GrantsFilters({
           <label className="flex items-center gap-2 text-sm text-soltas-muted">
             <input
               type="checkbox"
-              className="h-4 w-4 rounded border-slate-300"
+              className="h-4 w-4 rounded border-soltas-line"
               checked={remoteOkValue === "true" || remoteOkValue === "1"}
               onChange={event => updateParams({ remote_ok: event.target.checked ? "true" : "" })}
             />
@@ -337,9 +334,9 @@ export default function GrantsFilters({
       </div>
 
       {showSorting ? (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 @md:grid-cols-2">
           <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-bark">Sort by</span>
+            <span className="font-medium text-soltas-text">Sort by</span>
             <Select
               value={selectedSort}
               onValueChange={value => {

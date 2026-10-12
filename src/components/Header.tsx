@@ -1,58 +1,115 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import { Bell, Menu, User, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { Bell, Menu, X } from "lucide-react";
+
 import { supabase } from "@/lib/supabase";
 import UserMenu from "@/components/UserMenu";
 import CreateMenuButton from "@/components/CreateMenuButton";
+import { buttonClasses } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
 type Profile = {
   id: string;
-  kind: "individual" | "organisation";
+  kind: "individual" | "organisation" | null;
+  first_name: string | null;
+  last_name: string | null;
   full_name: string | null;
   surname: string | null;
   organisation_name: string | null;
+  avatar_url: string | null;
 };
 
-function initials(p: Profile | null) {
-  if (!p) return "•";
-  if (p.kind === "organisation")
-    return (p.organisation_name ?? "Org").slice(0, 2).toUpperCase();
-  const name = [p.full_name, p.surname].filter(Boolean).join(" ");
-  return name
-    ? name
-        .split(" ")
-        .map((s) => s[0])
-        .slice(0, 2)
-        .join("")
-        .toUpperCase()
-    : "U";
+const NAV_ITEMS = [
+  { href: "/projects", label: "Projects" },
+  { href: "/find-organisations", label: "Organisations" },
+  { href: "/funding", label: "Funding" },
+  { href: "/watchdog", label: "Watchdog" },
+  { href: "/feed", label: "Feed" },
+  { href: "/about", label: "About" },
+];
+
+function displayName(p: Profile | null) {
+  if (!p) return "";
+  if (p.kind === "organisation" && p.organisation_name) return p.organisation_name;
+  return (
+    [p.first_name, p.last_name].filter(Boolean).join(" ") ||
+    [p.full_name, p.surname].filter(Boolean).join(" ") ||
+    ""
+  );
 }
 
-type NavLinkItem = { type: "link"; href: string; label: string };
-type NavDropdownItem = {
-  type: "dropdown";
-  label: string;
-  items: Array<{ href: string; label: string }>;
-};
-type NavItem = NavLinkItem | NavDropdownItem;
+function initials(p: Profile | null) {
+  const name = displayName(p);
+  if (!name) return "";
+  return name
+    .split(/\s+/)
+    .map((s) => s[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
+
+function isActivePath(pathname: string, href: string) {
+  if (href === "/") return pathname === "/";
+  if (href === "/find-organisations") return pathname === href || pathname.startsWith("/organisations");
+  if (href === "/about") return pathname === "/about" || pathname === "/services";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function Logo() {
+  return (
+    <Link href="/" className="flex shrink-0 items-center gap-2.5 rounded-full" aria-label="Solarpunk Taskforce home">
+      <span
+        aria-hidden="true"
+        className="h-7 w-7 rounded-full bg-[radial-gradient(circle_at_30%_30%,#8FC3DA_0%,#2E6B8A_45%,#2F855A_100%)] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.35)]"
+      />
+      <span className="text-[15px] font-semibold tracking-tight text-soltas-text">
+        Solarpunk <span className="hidden sm:inline">Taskforce</span>
+      </span>
+    </Link>
+  );
+}
 
 export default function Header() {
   const [sessionUserId, setSessionUserId] = useState<string | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [profileOpen, setProfileOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  const router = useRouter();
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "/";
 
-  // Close mobile nav on route change
+  // Close menus on route change
   useEffect(() => {
-    // Use a microtask to avoid synchronous setState in effect
-    queueMicrotask(() => setMobileNavOpen(false));
+    queueMicrotask(() => {
+      setMobileNavOpen(false);
+      setAccountOpen(false);
+    });
   }, [pathname]);
+
+  // Lock page scroll while a full-screen menu is open
+  useEffect(() => {
+    const open = mobileNavOpen || accountOpen;
+    document.documentElement.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.documentElement.style.overflow = "";
+    };
+  }, [mobileNavOpen, accountOpen]);
+
+  // Escape closes menus
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMobileNavOpen(false);
+        setAccountOpen(false);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -73,30 +130,22 @@ export default function Header() {
 
   useEffect(() => {
     if (!sessionUserId) {
-      // Use a microtask to avoid synchronous setState in effect
       queueMicrotask(() => setProfile(null));
       return;
     }
 
-    // NOTE: Keep this simple + reliable: fetch by id only.
-    // The previous `.eq("id,kind", ...)` is not valid for PostgREST and can cause issues.
     supabase
       .from("profiles")
-      .select("id, kind, full_name, surname, organisation_name")
+      .select("id, kind, first_name, last_name, full_name, surname, organisation_name, avatar_url")
       .eq("id", sessionUserId)
       .maybeSingle()
       .then(({ data, error }) => {
-        if (error) {
-          setProfile(null);
-          return;
-        }
-        setProfile((data ?? null) as Profile | null);
+        setProfile(error ? null : ((data ?? null) as Profile | null));
       });
   }, [sessionUserId]);
 
   useEffect(() => {
     if (!sessionUserId) {
-      // Use a microtask to avoid synchronous setState in effect
       queueMicrotask(() => setUnreadCount(0));
       return;
     }
@@ -119,257 +168,155 @@ export default function Header() {
     };
   }, [sessionUserId]);
 
-  const navItems = useMemo<NavItem[]>(
-    () => [
-      { type: "link", href: "/", label: "Home" },
-      {
-        type: "dropdown",
-        label: "About",
-        items: [
-          { href: "/about", label: "What is Solarpunk Taskforce" },
-          { href: "/services", label: "Services" },
-        ],
-      },
-      {
-        type: "dropdown",
-        label: "Find",
-        items: [
-          { href: "/projects", label: "Find Projects" },
-          { href: "/find-organisations", label: "Find Organisations" },
-          { href: "/funding", label: "Find Funding" },
-          { href: "/watchdog", label: "Watchdog Community" },
-        ],
-      },
-      { type: "link", href: "/feed", label: "Feed" },
-    ],
-    []
-  );
-
-  const isActive = (href?: string) => {
-    if (!href) return false;
-    return pathname === href;
-  };
-
-  const isDropdownActive = (items: { href: string }[]) =>
-    items.some((item) => pathname === item.href);
-
-  const addButton = <CreateMenuButton />;
-
-  const profileControls = (
-    <div className="relative">
-      <button
-        onClick={() => setProfileOpen((o) => !o)}
-        className="grid h-9 w-9 place-items-center rounded-full bg-soltas-ocean text-white hover:bg-soltas-abyssal transition-all duration-200"
-        aria-label="Account"
-      >
-        {profile ? (
-          <span className="text-xs font-semibold">{initials(profile)}</span>
-        ) : (
-          <User className="h-4 w-4" />
-        )}
-      </button>
-
-      {profileOpen && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setProfileOpen(false)} />
-          <nav className="fixed right-0 top-0 z-50 flex h-screen w-64 max-w-[80vw] flex-col bg-soltas-white p-4 text-sm text-soltas-text">
-            <UserMenu onNavigate={() => setProfileOpen(false)} />
-          </nav>
-        </>
+  const name = displayName(profile);
+  const avatar = (
+    <span className="grid h-8 w-8 place-items-center overflow-hidden rounded-full bg-soltas-ocean text-[11px] font-semibold text-white">
+      {profile?.avatar_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
+      ) : (
+        initials(profile) || "•"
       )}
-    </div>
+    </span>
   );
 
-  const notificationsButton = (
-    <Link
-      href="/notifications"
-      className="relative grid h-9 w-9 place-items-center rounded-full hover:bg-soltas-light text-soltas-ocean transition-all duration-200"
-      aria-label="Notifications"
-    >
-      <Bell className="h-4 w-4" />
-      {unreadCount > 0 ? (
-        <span className="absolute -right-1 -top-1 min-w-4 rounded-full bg-rose-500 px-1 text-[10px] font-semibold text-white">
-          {unreadCount}
-        </span>
-      ) : null}
-    </Link>
-  );
+  const iconButton =
+    "relative grid h-10 w-10 place-items-center rounded-full text-soltas-text transition-colors duration-200 hover:bg-soltas-light";
 
   return (
-    <header className="relative z-50 soltas-header-glass">
-      <div className="flex h-16 items-center justify-between px-4 sm:px-6">
-        <div className="flex min-w-0 items-center gap-4 sm:gap-6">
-          {/* Mobile hamburger toggle */}
+    <header className="soltas-header-glass relative z-50">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+        <div className="flex min-w-0 items-center gap-6">
+          <Logo />
+
+          <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Primary">
+            {NAV_ITEMS.map((item) => {
+              const active = isActivePath(pathname, item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "rounded-full px-3 py-1.5 text-sm transition-colors duration-200",
+                    active
+                      ? "bg-soltas-light font-medium text-soltas-text"
+                      : "text-soltas-muted hover:text-soltas-text",
+                  )}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+          {sessionUserId ? (
+            <>
+              <CreateMenuButton />
+              <Link href="/notifications" className={iconButton} aria-label={`Notifications${unreadCount ? ` (${unreadCount} unread)` : ""}`}>
+                <Bell className="h-[18px] w-[18px]" />
+                {unreadCount > 0 ? (
+                  <span className="absolute right-1.5 top-1.5 grid min-w-4 place-items-center rounded-full bg-rose-500 px-1 text-[10px] font-semibold leading-4 text-white">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                ) : null}
+              </Link>
+              <button
+                type="button"
+                onClick={() => setAccountOpen(true)}
+                className="grid h-10 w-10 place-items-center rounded-full transition hover:opacity-90"
+                aria-label="Account menu"
+                aria-expanded={accountOpen}
+              >
+                {avatar}
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className={buttonClasses({ variant: "ghost", size: "sm", className: "text-soltas-text" })}>
+                Log in
+              </Link>
+              <Link href="/signup" className={buttonClasses({ size: "sm", className: "hidden sm:inline-flex" })}>
+                Join
+              </Link>
+            </>
+          )}
+
           <button
             type="button"
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-lg hover:bg-soltas-light text-soltas-text md:hidden"
+            className={cn(iconButton, "lg:hidden")}
             onClick={() => setMobileNavOpen((o) => !o)}
             aria-label={mobileNavOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileNavOpen}
           >
             {mobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
-
-          <button
-            type="button"
-            onClick={() => router.push("/")}
-            className="truncate text-base font-bold text-soltas-text sm:text-lg"
-            aria-label="Home"
-          >
-            Solarpunk Taskforce
-          </button>
-
-          <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
-            {navItems.map((item) => {
-              if (item.type === "link") {
-                const active = isActive(item.href);
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`whitespace-nowrap px-3 py-2 text-sm font-semibold transition-colors duration-200 ${
-                      active ? "text-soltas-ocean" : "text-soltas-ocean hover:text-soltas-glacial"
-                    }`}
-                    aria-current={active ? "page" : undefined}
-                  >
-                    {item.label}
-                  </Link>
-                );
-              }
-
-              const active = isDropdownActive(item.items);
-
-              return (
-                <div key={item.label} className="group flex items-center">
-                  <button
-                    type="button"
-                    className={`flex items-center gap-1 whitespace-nowrap px-3 py-2 text-sm font-semibold transition-colors duration-200 ${
-                      active ? "text-soltas-ocean" : "text-soltas-ocean hover:text-soltas-glacial"
-                    }`}
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                  >
-                    {item.label}
-                    <span aria-hidden="true" className="text-xs transition-transform duration-200 group-hover:rotate-90">
-                      ▸
-                    </span>
-                  </button>
-
-                  <div className="flex max-w-0 items-center overflow-hidden opacity-0 transition-all duration-300 group-hover:max-w-4xl group-hover:opacity-100 group-focus-within:max-w-4xl group-focus-within:opacity-100">
-                    {item.items.map((link) => {
-                      const childActive = isActive(link.href);
-                      return (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          className={`whitespace-nowrap px-3 py-2 text-sm font-semibold transition-colors duration-150 ${
-                            childActive ? "text-soltas-bark" : "text-soltas-bark hover:text-soltas-clay"
-                          }`}
-                          aria-current={childActive ? "page" : undefined}
-                        >
-                          {link.label}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </nav>
-        </div>
-
-        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-          {sessionUserId ? (
-            <>              {addButton}
-              {notificationsButton}
-              {profileControls}
-            </>
-          ) : (
-            <>
-              <Link href="/login" className="rounded-full border border-soltas-glacial px-4 py-2 text-sm text-soltas-ocean hover:bg-soltas-light transition-all duration-200">
-                Sign in
-              </Link>
-
-              {/* ✅ Resolved: keep responsive "hidden ... sm:inline-flex" version from main */}
-              <Link
-                href="/signup"
-                className="hidden rounded-full bg-soltas-ocean px-4 py-2 text-sm text-white hover:bg-soltas-abyssal transition-all duration-200 sm:inline-flex"
-              >
-                Register
-              </Link>
-            </>
-          )}
         </div>
       </div>
 
-      {/* Mobile nav - collapsible via hamburger */}
+      {/* Mobile / tablet navigation: full-screen sheet */}
       {mobileNavOpen && (
-        <nav className="border-t border-soltas-glacial/20 bg-white/95 backdrop-blur-xl px-4 pb-4 pt-2 md:hidden" aria-label="Primary">
-          <div className="flex flex-col gap-1">
-            {navItems.map((item) => {
-              if (item.type === "link") {
-                const active = isActive(item.href);
-                return (
+        <nav
+          className="fixed inset-x-0 bottom-0 top-16 z-50 overflow-y-auto bg-white/95 px-6 pb-10 pt-4 backdrop-blur-xl lg:hidden"
+          aria-label="Primary"
+        >
+          <ul className="flex flex-col">
+            {[{ href: "/", label: "Home" }, ...NAV_ITEMS, { href: "/services", label: "Services" }].map((item) => {
+              const active = item.href === "/" ? pathname === "/" : isActivePath(pathname, item.href) && !(item.href === "/about" && pathname === "/services");
+              return (
+                <li key={item.href} className="border-b border-soltas-line">
                   <Link
-                    key={item.href}
                     href={item.href}
-                    className={`rounded-lg px-3 py-2.5 text-sm font-semibold ${
-                      active ? "bg-soltas-light text-soltas-ocean" : "text-soltas-ocean hover:bg-soltas-light"
-                    }`}
                     aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "block py-4 text-2xl font-semibold tracking-tight transition-colors",
+                      active ? "text-soltas-ocean" : "text-soltas-text hover:text-soltas-ocean",
+                    )}
                   >
                     {item.label}
                   </Link>
-                );
-              }
-
-              const active = isDropdownActive(item.items);
-
-              return (
-                <details key={item.label} className="rounded-lg" open={active}>
-                  <summary className="cursor-pointer list-none rounded-lg px-3 py-2.5 text-sm font-semibold text-soltas-ocean hover:bg-slate-50">
-                    <span className="flex items-center justify-between">
-                      {item.label}
-                      <span aria-hidden="true" className="text-xs text-soltas-muted">
-                        &#9662;
-                      </span>
-                    </span>
-                  </summary>
-
-                  <div className="flex flex-col gap-1 pb-1 pl-3">
-                    {item.items.map((link) => {
-                      const childActive = isActive(link.href);
-                      return (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          className={`rounded-md px-3 py-2 text-sm font-semibold ${
-                            childActive
-                              ? "bg-soltas-light text-soltas-bark"
-                              : "text-soltas-bark hover:bg-soltas-light"
-                          }`}
-                          aria-current={childActive ? "page" : undefined}
-                        >
-                          {link.label}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </details>
+                </li>
               );
             })}
-
-            {/* Show Register link in mobile nav if not logged in */}
-            {!sessionUserId && (
-              <Link
-                href="/signup"
-                className="mt-2 rounded-lg bg-soltas-ocean px-3 py-2.5 text-center text-sm font-medium text-white hover:bg-soltas-abyssal transition-all duration-200 sm:hidden"
-              >
-                Register
+          </ul>
+          {!sessionUserId && (
+            <div className="mt-8 flex flex-col gap-3">
+              <Link href="/signup" className={buttonClasses({ size: "lg" })}>
+                Join Solarpunk Taskforce
               </Link>
-            )}
-          </div>
+              <Link href="/login" className={buttonClasses({ variant: "outline", size: "lg" })}>
+                Log in
+              </Link>
+            </div>
+          )}
         </nav>
+      )}
+
+      {/* Account panel */}
+      {accountOpen && (
+        <>
+          <div className="fixed inset-0 z-50 bg-soltas-text/20 backdrop-blur-[2px]" onClick={() => setAccountOpen(false)} />
+          <aside
+            className="fixed bottom-0 right-0 top-0 z-50 flex w-80 max-w-[88vw] flex-col overflow-y-auto bg-white p-4 shadow-2xl sm:rounded-l-3xl"
+            aria-label="Account"
+          >
+            <div className="flex items-center justify-between gap-3 px-1 pb-4">
+              <div className="flex min-w-0 items-center gap-3">
+                {avatar}
+                <div className="min-w-0">
+                  <p className="truncate text-[15px] font-semibold text-soltas-text">{name || "Your account"}</p>
+                  <p className="text-xs text-soltas-muted">Signed in</p>
+                </div>
+              </div>
+              <button type="button" onClick={() => setAccountOpen(false)} className={iconButton} aria-label="Close account menu">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <UserMenu onNavigate={() => setAccountOpen(false)} />
+          </aside>
+        </>
       )}
     </header>
   );

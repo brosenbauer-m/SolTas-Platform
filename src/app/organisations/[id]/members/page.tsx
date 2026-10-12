@@ -383,10 +383,10 @@ export default async function OrganisationMembersPage({
         />
 
         <div className="space-y-4 text-center">
-          <div className="mx-auto w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+          <div className="mx-auto w-full max-w-md rounded-2xl border border-soltas-line bg-white p-8">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-soltas-light">
               <svg
-                className="h-8 w-8 text-slate-400"
+                className="h-8 w-8 text-soltas-muted"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -399,7 +399,7 @@ export default async function OrganisationMembersPage({
                 />
               </svg>
             </div>
-            <h1 className="mb-2 text-xl font-semibold text-soltas-bark">Access Restricted</h1>
+            <h1 className="mb-2 text-xl font-semibold text-soltas-text">Access Restricted</h1>
             <p className="mb-6 text-sm text-soltas-muted">
               You don&apos;t have permission to manage members for this organisation. Only
               organisation admins and owners can access this page.
@@ -452,7 +452,7 @@ export default async function OrganisationMembersPage({
 
       <div className="flex items-center justify-between">
         <div className="space-y-2">
-          <h1 className="text-3xl font-semibold text-[#1A2B38]">Manage members</h1>
+          <h1 className="text-3xl font-semibold text-soltas-text">Manage members</h1>
           <p className="text-sm text-soltas-muted">
             Manage roles and permissions for{" "}
             <Link href={`/organisations/${id}`} className="font-medium text-soltas-ocean hover:underline">
@@ -462,7 +462,7 @@ export default async function OrganisationMembersPage({
         </div>
         <Link
           href={`/organisations/${id}`}
-          className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-soltas-bark hover:bg-slate-50"
+          className="inline-flex items-center justify-center rounded-xl border border-soltas-line bg-white px-4 py-2 text-sm font-medium text-soltas-text hover:bg-soltas-off-white"
         >
           Back to organisation
         </Link>

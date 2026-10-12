@@ -43,7 +43,7 @@ export default async function NotificationSettingsPage() {
   return (
     <main className="mx-auto max-w-2xl space-y-6 px-4 pb-16 pt-10">
       <div>
-        <h1 className="text-2xl font-semibold text-soltas-bark">Notifications</h1>
+        <h1 className="text-2xl font-semibold text-soltas-text">Notifications</h1>
         <p className="mt-1 text-sm text-soltas-muted">
           Control how Solarpunk Taskforce contacts you.
         </p>
@@ -51,17 +51,17 @@ export default async function NotificationSettingsPage() {
 
       <form
         action={updateEmailNotifications}
-        className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4"
+        className="card p-6 space-y-4"
       >
         <label className="flex items-start gap-3">
           <input
             type="checkbox"
             name="enabled"
             defaultChecked={profile.email_notifications_enabled}
-            className="mt-1 h-4 w-4 rounded border-slate-300 text-soltas-ocean focus:ring-soltas-ocean"
+            className="mt-1 h-4 w-4 rounded border-soltas-line text-soltas-ocean focus:ring-soltas-ocean"
           />
           <div>
-            <div className="text-sm font-medium text-soltas-bark">
+            <div className="text-sm font-medium text-soltas-text">
               Email notifications
             </div>
             <p className="text-sm text-soltas-muted">
@@ -74,7 +74,7 @@ export default async function NotificationSettingsPage() {
         <div className="pt-2">
           <button
             type="submit"
-            className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+            className="inline-flex items-center justify-center rounded-lg bg-soltas-ocean px-4 py-2 text-sm font-medium text-white hover:bg-soltas-abyssal"
           >
             Save preferences
           </button>

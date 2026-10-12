@@ -44,7 +44,7 @@ function renderJsonField(label: string, value: unknown): React.ReactElement {
   if (value === null || value === undefined) {
     return (
       <div key={label}>
-        <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">{label}</dt>
+        <dt className="text-xs font-medium text-soltas-muted">{label}</dt>
         <dd className="text-sm text-soltas-muted">—</dd>
       </div>
     );
@@ -55,7 +55,7 @@ function renderJsonField(label: string, value: unknown): React.ReactElement {
     if (value.startsWith("http://") || value.startsWith("https://")) {
       return (
         <div key={label}>
-          <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">{label}</dt>
+          <dt className="text-xs font-medium text-soltas-muted">{label}</dt>
           <dd className="text-sm">
             <a
               href={value}
@@ -71,8 +71,8 @@ function renderJsonField(label: string, value: unknown): React.ReactElement {
     }
     return (
       <div key={label}>
-        <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">{label}</dt>
-        <dd className="text-sm text-soltas-bark">{value}</dd>
+        <dt className="text-xs font-medium text-soltas-muted">{label}</dt>
+        <dd className="text-sm text-soltas-text">{value}</dd>
       </div>
     );
   }
@@ -80,8 +80,8 @@ function renderJsonField(label: string, value: unknown): React.ReactElement {
   if (Array.isArray(value)) {
     return (
       <div key={label}>
-        <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">{label}</dt>
-        <dd className="text-sm text-soltas-bark">
+        <dt className="text-xs font-medium text-soltas-muted">{label}</dt>
+        <dd className="text-sm text-soltas-text">
           <ul className="list-inside list-disc space-y-1">
             {value.map((item, index) => (
               <li key={index}>
@@ -109,9 +109,9 @@ function renderJsonField(label: string, value: unknown): React.ReactElement {
   if (typeof value === "object") {
     return (
       <div key={label}>
-        <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">{label}</dt>
-        <dd className="text-sm text-soltas-bark">
-          <dl className="mt-2 space-y-2 rounded bg-slate-50 p-3">
+        <dt className="text-xs font-medium text-soltas-muted">{label}</dt>
+        <dd className="text-sm text-soltas-text">
+          <dl className="mt-2 space-y-2 rounded bg-soltas-off-white p-3">
             {Object.entries(value as Record<string, unknown>).map(([key, val]) => (
               <div key={key}>
                 <dt className="text-xs font-medium text-soltas-muted">{key}:</dt>
@@ -140,8 +140,8 @@ function renderJsonField(label: string, value: unknown): React.ReactElement {
 
   return (
     <div key={label}>
-      <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">{label}</dt>
-      <dd className="text-sm text-soltas-bark">{String(value)}</dd>
+      <dt className="text-xs font-medium text-soltas-muted">{label}</dt>
+      <dd className="text-sm text-soltas-text">{String(value)}</dd>
     </div>
   );
 }
@@ -329,7 +329,7 @@ export default async function AdminSubmissionDetailPage({
 
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="space-y-1">
-          <h1 className="text-3xl font-semibold text-soltas-bark">
+          <h1 className="text-3xl font-semibold text-soltas-text">
             Verification Submission
           </h1>
           <p className="text-sm text-soltas-muted">
@@ -344,35 +344,35 @@ export default async function AdminSubmissionDetailPage({
       </div>
 
       <section className="rounded-xl border p-4">
-        <h2 className="mb-3 text-lg font-semibold text-soltas-bark">Submission Details</h2>
+        <h2 className="mb-3 text-lg font-semibold text-soltas-text">Submission Details</h2>
         <dl className="grid gap-4 sm:grid-cols-2">
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+            <dt className="text-xs font-medium text-soltas-muted">
               Submitted
             </dt>
-            <dd className="text-sm text-soltas-bark">{formatDateTime(submission.created_at)}</dd>
+            <dd className="text-sm text-soltas-text">{formatDateTime(submission.created_at)}</dd>
           </div>
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+            <dt className="text-xs font-medium text-soltas-muted">
               Submitted by
             </dt>
-            <dd className="text-sm text-soltas-bark">
+            <dd className="text-sm text-soltas-text">
               {submission.submitted_by_profile?.full_name ?? submission.submitted_by}
             </dd>
           </div>
           {submission.reviewed_at ? (
             <>
               <div>
-                <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+                <dt className="text-xs font-medium text-soltas-muted">
                   Reviewed
                 </dt>
-                <dd className="text-sm text-soltas-bark">{formatDateTime(submission.reviewed_at)}</dd>
+                <dd className="text-sm text-soltas-text">{formatDateTime(submission.reviewed_at)}</dd>
               </div>
               <div>
-                <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+                <dt className="text-xs font-medium text-soltas-muted">
                   Reviewed by
                 </dt>
-                <dd className="text-sm text-soltas-bark">
+                <dd className="text-sm text-soltas-text">
                   {submission.reviewed_by_profile?.full_name ?? submission.reviewed_by ?? "—"}
                 </dd>
               </div>
@@ -380,11 +380,11 @@ export default async function AdminSubmissionDetailPage({
           ) : null}
         </dl>
         {submission.admin_notes ? (
-          <div className="mt-4 rounded bg-slate-50 p-3">
-            <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+          <div className="mt-4 rounded bg-soltas-off-white p-3">
+            <dt className="text-xs font-medium text-soltas-muted">
               Admin Notes
             </dt>
-            <dd className="mt-1 whitespace-pre-line text-sm text-soltas-bark">
+            <dd className="mt-1 whitespace-pre-line text-sm text-soltas-text">
               {submission.admin_notes}
             </dd>
           </div>
@@ -392,42 +392,42 @@ export default async function AdminSubmissionDetailPage({
       </section>
 
       <section className="rounded-xl border p-4">
-        <h2 className="mb-3 text-lg font-semibold text-soltas-bark">Organisation Details</h2>
+        <h2 className="mb-3 text-lg font-semibold text-soltas-text">Organisation Details</h2>
         {submission.organisation ? (
           <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">Name</dt>
-              <dd className="text-sm text-soltas-bark">{submission.organisation.name}</dd>
+              <dt className="text-xs font-medium text-soltas-muted">Name</dt>
+              <dd className="text-sm text-soltas-text">{submission.organisation.name}</dd>
             </div>
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+              <dt className="text-xs font-medium text-soltas-muted">
                 Country Based
               </dt>
-              <dd className="text-sm text-soltas-bark">
+              <dd className="text-sm text-soltas-text">
                 {submission.organisation.country_based ?? "—"}
               </dd>
             </div>
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+              <dt className="text-xs font-medium text-soltas-muted">
                 Verification Status
               </dt>
-              <dd className="text-sm text-soltas-bark">
+              <dd className="text-sm text-soltas-text">
                 {submission.organisation.verification_status}
               </dd>
             </div>
             {submission.organisation.description ? (
               <div className="sm:col-span-2 lg:col-span-3">
-                <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+                <dt className="text-xs font-medium text-soltas-muted">
                   Description
                 </dt>
-                <dd className="mt-1 text-sm text-soltas-bark">
+                <dd className="mt-1 text-sm text-soltas-text">
                   {submission.organisation.description}
                 </dd>
               </div>
             ) : null}
             {submission.organisation.website ? (
               <div>
-                <dt className="text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+                <dt className="text-xs font-medium text-soltas-muted">
                   Website
                 </dt>
                 <dd className="text-sm">
@@ -449,7 +449,7 @@ export default async function AdminSubmissionDetailPage({
       </section>
 
       <section className="rounded-xl border p-4">
-        <h2 className="mb-3 text-lg font-semibold text-soltas-bark">Evidence Submitted</h2>
+        <h2 className="mb-3 text-lg font-semibold text-soltas-text">Evidence Submitted</h2>
         {evidence ? (
           <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {Object.entries(evidence).map(([key, value]) =>
@@ -468,21 +468,21 @@ export default async function AdminSubmissionDetailPage({
 
       {isPending ? (
         <section className="rounded-xl border p-4">
-          <h2 className="mb-4 text-lg font-semibold text-soltas-bark">Review Actions</h2>
+          <h2 className="mb-4 text-lg font-semibold text-soltas-text">Review Actions</h2>
           <div className="flex flex-col gap-4 sm:flex-row">
             <form action={approveSubmission} className="flex-1">
               <input type="hidden" name="id" value={submission.id} />
               <input type="hidden" name="organisation_id" value={submission.organisation_id} />
               <div className="space-y-3">
                 <div>
-                  <label htmlFor="approve-notes" className="block text-sm font-medium text-soltas-bark">
+                  <label htmlFor="approve-notes" className="block text-sm font-medium text-soltas-text">
                     Admin Notes (optional)
                   </label>
                   <textarea
                     id="approve-notes"
                     name="admin_notes"
                     rows={3}
-                    className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="mt-1 w-full rounded-md border border-soltas-line px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     placeholder="Optional notes about this approval..."
                   />
                 </div>
@@ -500,14 +500,14 @@ export default async function AdminSubmissionDetailPage({
               <input type="hidden" name="organisation_id" value={submission.organisation_id} />
               <div className="space-y-3">
                 <div>
-                  <label htmlFor="reject-notes" className="block text-sm font-medium text-soltas-bark">
+                  <label htmlFor="reject-notes" className="block text-sm font-medium text-soltas-text">
                     Admin Notes (optional)
                   </label>
                   <textarea
                     id="reject-notes"
                     name="admin_notes"
                     rows={3}
-                    className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
+                    className="mt-1 w-full rounded-md border border-soltas-line px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
                     placeholder="Optional notes about this rejection..."
                   />
                 </div>

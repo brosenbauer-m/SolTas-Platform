@@ -3,7 +3,7 @@
 import { useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
+import { segmentClass, segmentedTrack } from "@/components/ui/segmented";
 
 type WatchdogViewToggleProps = {
   view: "globe" | "table";
@@ -24,23 +24,13 @@ export default function WatchdogViewToggle({ view }: WatchdogViewToggleProps) {
   );
 
   return (
-    <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white p-1 text-sm">
-      <Button
-        type="button"
-        size="sm"
-        variant={view === "globe" ? "secondary" : "ghost"}
-        onClick={() => setView("globe")}
-      >
-        Globe view
-      </Button>
-      <Button
-        type="button"
-        size="sm"
-        variant={view === "table" ? "secondary" : "ghost"}
-        onClick={() => setView("table")}
-      >
-        Table view
-      </Button>
+    <div className={segmentedTrack} role="group" aria-label="View">
+      <button type="button" aria-pressed={view === "globe"} className={segmentClass(view === "globe")} onClick={() => setView("globe")}>
+        Globe
+      </button>
+      <button type="button" aria-pressed={view === "table"} className={segmentClass(view === "table")} onClick={() => setView("table")}>
+        List
+      </button>
     </div>
   );
 }

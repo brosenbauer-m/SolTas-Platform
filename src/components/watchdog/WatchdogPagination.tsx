@@ -66,8 +66,8 @@ export default function WatchdogPagination({
           aria-disabled={safePage === 1}
           className={`rounded border px-3 py-1 text-sm ${
             safePage === 1
-              ? "pointer-events-none border-slate-200 text-slate-400"
-              : "border-slate-300 text-soltas-text hover:border-slate-400"
+              ? "pointer-events-none border-soltas-line text-soltas-muted"
+              : "border-soltas-line text-soltas-text hover:border-soltas-ocean/40"
           }`}
         >
           Prev
@@ -79,7 +79,7 @@ export default function WatchdogPagination({
             className={`rounded border px-3 py-1 text-sm ${
               value === safePage
                 ? "border-soltas-ocean bg-soltas-glacial/15 text-soltas-ocean"
-                : "border-slate-300 text-soltas-text hover:border-slate-400"
+                : "border-soltas-line text-soltas-text hover:border-soltas-ocean/40"
             }`}
           >
             {value}
@@ -90,8 +90,8 @@ export default function WatchdogPagination({
           aria-disabled={safePage === pageCount}
           className={`rounded border px-3 py-1 text-sm ${
             safePage === pageCount
-              ? "pointer-events-none border-slate-200 text-slate-400"
-              : "border-slate-300 text-soltas-text hover:border-slate-400"
+              ? "pointer-events-none border-soltas-line text-soltas-muted"
+              : "border-soltas-line text-soltas-text hover:border-soltas-ocean/40"
           }`}
         >
           Next

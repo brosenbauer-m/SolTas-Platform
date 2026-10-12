@@ -149,15 +149,15 @@ export default async function OrganisationEditPage({
       />
 
       <div className="space-y-2">
-        <h1 className="text-3xl font-semibold text-[#1A2B38]">Edit organisation</h1>
+        <h1 className="text-3xl font-semibold text-soltas-text">Edit organisation</h1>
         <p className="text-sm text-soltas-muted">Update public organisation details.</p>
       </div>
 
       <form action={updateOrganisation} className="space-y-6">
         <input type="hidden" name="id" value={organisation.id} />
 
-        <section className="rounded-2xl border border-[#6B9FB8]/25 bg-white p-7 shadow-sm">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-[#8A9BAB]">
+        <section className="rounded-2xl border border-soltas-line bg-white p-7">
+          <h2 className="text-xs font-medium text-soltas-muted">
             Basic information
           </h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -166,7 +166,7 @@ export default async function OrganisationEditPage({
               <input
                 name="name"
                 defaultValue={organisation.name ?? ""}
-                className="rounded-xl border border-[#6B9FB8]/40 bg-white px-3 py-2 text-sm text-[#1A2B38] focus:border-[#6B9FB8] focus:outline-none focus:ring-2 focus:ring-[#6B9FB8]/60"
+                className="rounded-xl border border-soltas-line bg-white px-3 py-2 text-sm text-soltas-text focus:border-soltas-ocean/50 focus:outline-none focus:ring-2 focus:ring-soltas-ocean/15"
               />
             </label>
             <label className="grid gap-2 text-sm font-medium text-soltas-text">
@@ -174,7 +174,7 @@ export default async function OrganisationEditPage({
               <input
                 name="country_based"
                 defaultValue={organisation.country_based ?? ""}
-                className="rounded-xl border border-[#6B9FB8]/40 bg-white px-3 py-2 text-sm text-[#1A2B38] focus:border-[#6B9FB8] focus:outline-none focus:ring-2 focus:ring-[#6B9FB8]/60"
+                className="rounded-xl border border-soltas-line bg-white px-3 py-2 text-sm text-soltas-text focus:border-soltas-ocean/50 focus:outline-none focus:ring-2 focus:ring-soltas-ocean/15"
               />
             </label>
             <label className="grid gap-2 text-sm font-medium text-soltas-text">
@@ -182,7 +182,7 @@ export default async function OrganisationEditPage({
               <input
                 name="existing_since"
                 defaultValue={organisation.existing_since ?? ""}
-                className="rounded-xl border border-[#6B9FB8]/40 bg-white px-3 py-2 text-sm text-[#1A2B38] focus:border-[#6B9FB8] focus:outline-none focus:ring-2 focus:ring-[#6B9FB8]/60"
+                className="rounded-xl border border-soltas-line bg-white px-3 py-2 text-sm text-soltas-text focus:border-soltas-ocean/50 focus:outline-none focus:ring-2 focus:ring-soltas-ocean/15"
               />
             </label>
             <label className="grid gap-2 text-sm font-medium text-soltas-text">
@@ -190,7 +190,7 @@ export default async function OrganisationEditPage({
               <input
                 name="website"
                 defaultValue={organisation.website ?? ""}
-                className="rounded-xl border border-[#6B9FB8]/40 bg-white px-3 py-2 text-sm text-[#1A2B38] focus:border-[#6B9FB8] focus:outline-none focus:ring-2 focus:ring-[#6B9FB8]/60"
+                className="rounded-xl border border-soltas-line bg-white px-3 py-2 text-sm text-soltas-text focus:border-soltas-ocean/50 focus:outline-none focus:ring-2 focus:ring-soltas-ocean/15"
               />
             </label>
             <label className="grid gap-2 text-sm font-medium text-soltas-text sm:col-span-2">
@@ -198,7 +198,7 @@ export default async function OrganisationEditPage({
               <input
                 name="logo_url"
                 defaultValue={organisation.logo_url ?? ""}
-                className="rounded-xl border border-[#6B9FB8]/40 bg-white px-3 py-2 text-sm text-[#1A2B38] focus:border-[#6B9FB8] focus:outline-none focus:ring-2 focus:ring-[#6B9FB8]/60"
+                className="rounded-xl border border-soltas-line bg-white px-3 py-2 text-sm text-soltas-text focus:border-soltas-ocean/50 focus:outline-none focus:ring-2 focus:ring-soltas-ocean/15"
               />
             </label>
             {isAdmin ? (
@@ -207,7 +207,7 @@ export default async function OrganisationEditPage({
                 <select
                   name="verification_status"
                   defaultValue={organisation.verification_status ?? "pending"}
-                  className="rounded-xl border border-[#6B9FB8]/40 bg-white px-3 py-2 text-sm text-[#1A2B38] focus:border-[#6B9FB8] focus:outline-none focus:ring-2 focus:ring-[#6B9FB8]/60"
+                  className="rounded-xl border border-soltas-line bg-white px-3 py-2 text-sm text-soltas-text focus:border-soltas-ocean/50 focus:outline-none focus:ring-2 focus:ring-soltas-ocean/15"
                 >
                   <option value="pending">Pending</option>
                   <option value="verified">Verified</option>
@@ -218,20 +218,20 @@ export default async function OrganisationEditPage({
           </div>
         </section>
 
-        <section className="rounded-2xl border border-[#6B9FB8]/25 bg-white p-7 shadow-sm">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-[#8A9BAB]">
+        <section className="rounded-2xl border border-soltas-line bg-white p-7">
+          <h2 className="text-xs font-medium text-soltas-muted">
             What we do
           </h2>
           <textarea
             name="what_we_do"
             defaultValue={organisation.what_we_do ?? ""}
             rows={5}
-            className="mt-4 w-full rounded-xl border border-[#6B9FB8]/40 bg-white px-3 py-2 text-sm text-[#1A2B38] focus:border-[#6B9FB8] focus:outline-none focus:ring-2 focus:ring-[#6B9FB8]/60"
+            className="mt-4 w-full rounded-xl border border-soltas-line bg-white px-3 py-2 text-sm text-soltas-text focus:border-soltas-ocean/50 focus:outline-none focus:ring-2 focus:ring-soltas-ocean/15"
           />
         </section>
 
-        <section className="rounded-2xl border border-[#6B9FB8]/25 bg-white p-7 shadow-sm">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-[#8A9BAB]">
+        <section className="rounded-2xl border border-soltas-line bg-white p-7">
+          <h2 className="text-xs font-medium text-soltas-muted">
             Social links
           </h2>
           <div className="mt-4">
@@ -240,7 +240,7 @@ export default async function OrganisationEditPage({
         </section>
 
         <div className="flex justify-end">
-          <button className="inline-flex items-center justify-center rounded-xl bg-[#2E6B8A] px-4 py-2 text-sm font-medium text-white hover:bg-[#1A3F54] transition-all duration-200">
+          <button className="inline-flex items-center justify-center rounded-xl bg-soltas-ocean px-4 py-2 text-sm font-medium text-white hover:bg-soltas-abyssal transition-all duration-200">
             Save changes
           </button>
         </div>

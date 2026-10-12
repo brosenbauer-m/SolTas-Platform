@@ -158,8 +158,8 @@ export function NewPostComposer({ userName, organisations = [] }: NewPostCompose
   };
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-soltas-muted">
+    <form onSubmit={handleSubmit} className="card p-6">
+      <h2 className="mb-4 text-lg font-semibold tracking-tight text-soltas-text">
         New post
       </h2>
 
@@ -218,7 +218,7 @@ export function NewPostComposer({ userName, organisations = [] }: NewPostCompose
         {images.length > 0 && (
           <div className="grid grid-cols-2 gap-2">
             {images.map((image, index) => (
-              <div key={index} className="relative aspect-video overflow-hidden rounded-lg border border-slate-200">
+              <div key={index} className="relative aspect-video overflow-hidden rounded-lg border border-soltas-line">
                 <Image
                   src={image.preview}
                   alt="Preview"
@@ -252,7 +252,7 @@ export function NewPostComposer({ userName, organisations = [] }: NewPostCompose
             />
             <label
               htmlFor="image-upload"
-              className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-soltas-text transition-colors hover:bg-slate-50 ${
+              className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border border-soltas-line px-3 py-2 text-sm font-medium text-soltas-text transition-colors hover:bg-soltas-off-white ${
                 isSubmitting ? "cursor-not-allowed opacity-50" : ""
               }`}
             >

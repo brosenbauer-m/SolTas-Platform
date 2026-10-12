@@ -47,15 +47,15 @@ const formatEligibility = (grant: GrantListRow) => {
 const getGrantSlug = (grant: GrantListRow) => grant.slug ?? grant.id;
 
 const buttonClasses =
-  "inline-flex items-center justify-center gap-2 rounded-2xl font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-2xl font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-soltas-ocean disabled:pointer-events-none disabled:opacity-50";
 
 const buttonSizes = {
   sm: "h-9 px-3",
 } as const;
 
 const buttonVariants = {
-  secondary: "bg-slate-900 text-white hover:bg-slate-800",
-  outline: "border border-slate-200 text-soltas-bark hover:bg-slate-100",
+  secondary: "bg-soltas-ocean text-white hover:bg-soltas-abyssal",
+  outline: "border border-soltas-line text-soltas-text hover:bg-soltas-light",
 } as const;
 
 type GrantsTableViewProps = {
@@ -74,9 +74,9 @@ export default function GrantsTableView({ rows, count, page, pageCount, searchPa
         <GrantsPagination page={page} pageCount={pageCount} searchParams={searchParams} basePath="/funding" />
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-        <table className="min-w-[800px] divide-y divide-slate-200 text-sm">
-          <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-soltas-muted">
+      <div className="overflow-x-auto rounded-lg border border-soltas-line bg-white">
+        <table className="min-w-[800px] divide-y divide-soltas-line text-sm">
+          <thead className="bg-soltas-off-white text-left text-xs font-medium text-soltas-muted">
             <tr>
               <th className="px-4 py-3">Funding opportunity</th>
               <th className="px-4 py-3">Funding</th>
@@ -87,7 +87,7 @@ export default function GrantsTableView({ rows, count, page, pageCount, searchPa
               <th className="px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-soltas-line">
             {rows.map(grant => {
               const slugForPath = getGrantSlug(grant);
               const focusSlug = grant.slug ?? null;
@@ -114,7 +114,7 @@ export default function GrantsTableView({ rows, count, page, pageCount, searchPa
                   </td>
                   <td className="px-4 py-4 text-soltas-muted">
                     <div className="capitalize">{grant.funding_type}</div>
-                    <div className="text-xs text-slate-400">Status: {grant.status}</div>
+                    <div className="text-xs text-soltas-muted">Status: {grant.status}</div>
                   </td>
                   <td className="px-4 py-4 text-soltas-muted">
                     <Badge variant="outline" className="capitalize">
@@ -124,7 +124,7 @@ export default function GrantsTableView({ rows, count, page, pageCount, searchPa
                   <td className="px-4 py-4 text-soltas-muted">{formatEligibility(grant)}</td>
                   <td className="px-4 py-4 text-soltas-muted">
                     <div>{formatDate(grant.deadline)}</div>
-                    <div className="text-xs text-slate-400">Open: {formatDate(grant.open_date)}</div>
+                    <div className="text-xs text-soltas-muted">Open: {formatDate(grant.open_date)}</div>
                   </td>
                   <td className="px-4 py-4 text-soltas-muted">{formatAmountRange(grant)}</td>
                   <td className="px-4 py-4 text-right">
@@ -148,7 +148,7 @@ export default function GrantsTableView({ rows, count, page, pageCount, searchPa
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-slate-200 p-8 text-center text-sm text-soltas-muted">
+        <div className="rounded-lg border border-dashed border-soltas-line p-8 text-center text-sm text-soltas-muted">
           No funding opportunities match the selected filters.
         </div>
       ) : null}

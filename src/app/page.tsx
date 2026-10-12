@@ -1,138 +1,150 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { ArrowRight, Building2, Coins, FolderKanban, Megaphone } from "lucide-react";
 
 import HomeGlobeSection from "@/components/home/HomeGlobeSection";
+import SiteFooter from "@/components/SiteFooter";
+import { buttonClasses } from "@/components/ui/button";
+
+const DESTINATIONS = [
+  {
+    href: "/projects",
+    icon: FolderKanban,
+    title: "Projects",
+    text: "Humanitarian and environmental projects around the world, with their goals, progress and needs.",
+    cta: "Find projects",
+  },
+  {
+    href: "/find-organisations",
+    icon: Building2,
+    title: "Organisations",
+    text: "The verified organisations behind the work: what they do, where, and who they partner with.",
+    cta: "Find organisations",
+  },
+  {
+    href: "/funding",
+    icon: Coins,
+    title: "Funding",
+    text: "Open and upcoming grants, so the right resources reach the right projects.",
+    cta: "Find funding",
+  },
+  {
+    href: "/watchdog",
+    icon: Megaphone,
+    title: "Watchdog",
+    text: "Local issues raised by the people who live them, connected to those who can help.",
+    cta: "See issues",
+  },
+];
 
 export default function HomePage() {
   return (
     <main className="flex flex-col">
       {/* Full-viewport hero */}
       <Suspense fallback={<div className="h-[calc(100dvh-4rem)] w-full bg-soltas-light" />}>
-        {/* Let HomeGlobeSection fetch what it needs client-side */}
         <HomeGlobeSection />
       </Suspense>
 
-      {/* Below-the-fold content */}
-      <div className="flex flex-col gap-8 px-4 py-8 sm:gap-12 sm:px-6 sm:py-10">
-        <section
-          id="home-next-section"
-          className="grid gap-8 border-t border-soltas-light pt-8 sm:gap-10 sm:pt-12 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]"
-        >
-          <div className="space-y-6">
-            <header className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-soltas-ocean">
-                About Solarpunk Taskforce
-              </p>
-              <h2 className="text-2xl font-semibold text-soltas-text sm:text-3xl">
-                A unifying force in the global impact movement
-              </h2>
-            </header>
-            <p className="text-sm leading-7 text-soltas-muted">
-              Solarpunk Taskforce connects people, projects, and organisations to improve the
-              coordination and effectiveness of global humanitarian and environmental impact.
-              By bridging the gap between action and awareness through transparent communication
-              and creative media, we empower a global community to engage meaningfully with impact.
-            </p>
-            <div className="grid gap-6 md:grid-cols-2">
-              <div className="rounded-3xl border border-soltas-glacial bg-soltas-white p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-soltas-text">Mission</h3>
-                <p className="mt-3 text-sm leading-6 text-soltas-muted">
-                  For organisations: provide a transparent, living database to enable cooperation,
-                  reduce redundant resource allocation, and improve communication. For individuals:
-                  bridge action and awareness with creative, transparent content that empowers
-                  meaningful engagement.
-                </p>
-              </div>
-              <div className="rounded-3xl border border-soltas-glacial bg-soltas-white p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-soltas-text">Vision</h3>
-                <p className="mt-3 text-sm leading-6 text-soltas-muted">
-                  A world where organisations have a real-time overview of global efforts enabling
-                  synergy and cooperation, individuals can transparently see where support goes,
-                  and creative content restores trust in humanitarian work.
-                </p>
-              </div>
-            </div>
-            <Link
-              href="/about"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-soltas-ocean transition hover:underline"
-            >
-              Learn more about Solarpunk Taskforce →
+      <div id="home-next-section" className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+        {/* Statement */}
+        <section className="py-20 text-center sm:py-28">
+          <h2 className="mx-auto max-w-3xl text-4xl font-semibold tracking-tight text-soltas-text sm:text-5xl">
+            One living map of the world&apos;s humanitarian and environmental work.
+          </h2>
+          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-soltas-muted">
+            Solarpunk Taskforce connects people, projects and organisations, so efforts stop overlapping,
+            small teams find partners, and everyone can see where support makes a difference.
+          </p>
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link href="/projects" className={buttonClasses({ size: "lg" })}>
+              Explore projects
             </Link>
-          </div>
-          <div className="flex h-full flex-col justify-between gap-6 rounded-3xl bg-soltas-abyssal p-8 text-white shadow-lg">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-soltas-glacial">Donate</p>
-              <h3 className="mt-3 text-2xl font-semibold">Fuel verified work on the ground.</h3>
-              <p className="mt-3 text-sm leading-6 text-soltas-glacial/80">
-                Every contribution supports approved projects and the teams that keep the map accurate, transparent, and
-                community-driven.
-              </p>
-            </div>
-            <Link
-              href="/projects"
-              className="inline-flex h-12 items-center justify-center rounded-2xl bg-soltas-ocean px-5 text-sm font-semibold text-white transition hover:bg-soltas-glacial focus:outline-none focus-visible:ring-2 focus-visible:ring-soltas-glacial"
-            >
-              Donate to a project
+            <Link href="/about" className={buttonClasses({ variant: "link", size: "lg" })}>
+              How it works <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </section>
 
-        <section className="space-y-8">
-          <header className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-soltas-ocean">Our Services</p>
-            <h2 className="text-2xl font-semibold text-soltas-text sm:text-3xl">Supporting impact organisations</h2>
-            <p className="max-w-2xl text-sm leading-6 text-soltas-muted">
-              We offer comparative intelligence consulting and marketing services to help registered projects
-              and organisations maximize their impact, visibility, and strategic positioning in the humanitarian
-              and environmental sectors.
-            </p>
-          </header>
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {[
-              {
-                title: "Comparative Intelligence",
-                description:
-                  "Data-driven insights leveraging our global database to identify collaboration opportunities, proven solutions, and strategic positioning.",
-              },
-              {
-                title: "Project Marketing",
-                description:
-                  "Creative storytelling and strategic marketing to increase visibility, build trust, and drive engagement for your initiatives.",
-              },
-              {
-                title: "Verified Profiles",
-                description: "Publish trusted organisation and project profiles with clear verification signals.",
-              },
-              {
-                title: "Impact Discovery",
-                description: "Find projects, funding opportunities, and watchdog issues through a global map view.",
-              },
-              {
-                title: "Progress Updates",
-                description: "Share updates, metrics, and media to keep donors and partners informed.",
-              },
-              {
-                title: "Community Intelligence",
-                description: "Surface local issues and ensure they reach the right partners for action.",
-              },
-            ].map((service) => (
-              <div
-                key={service.title}
-                className="flex flex-col gap-3 rounded-3xl border border-soltas-glacial bg-soltas-white p-6 shadow-sm"
+        {/* Destinations */}
+        <section aria-labelledby="explore-heading" className="pb-20 sm:pb-28">
+          <h2 id="explore-heading" className="sr-only">
+            Explore
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {DESTINATIONS.map(({ href, icon: Icon, title, text, cta }) => (
+              <Link
+                key={href}
+                href={href}
+                className="group card flex flex-col gap-4 p-7 hover:shadow-md sm:p-8"
               >
-                <h3 className="text-lg font-semibold text-soltas-text">{service.title}</h3>
-                <p className="text-sm leading-6 text-soltas-muted">{service.description}</p>
-              </div>
+                <span className="grid h-11 w-11 place-items-center rounded-2xl bg-soltas-ocean/10 text-soltas-ocean">
+                  <Icon className="h-5 w-5" />
+                </span>
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-semibold tracking-tight text-soltas-text">{title}</h3>
+                  <p className="text-[15px] leading-6 text-soltas-muted">{text}</p>
+                </div>
+                <span className="mt-auto inline-flex items-center gap-1 text-[15px] font-medium text-soltas-ocean">
+                  {cta}
+                  <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+                </span>
+              </Link>
             ))}
           </div>
-          <Link
-            href="/services"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-soltas-ocean transition hover:underline"
-          >
-            Explore all services →
-          </Link>
+        </section>
+
+        {/* Mission */}
+        <section className="grid gap-4 pb-20 sm:pb-28 md:grid-cols-2">
+          <div className="card p-7 sm:p-8">
+            <p className="text-sm font-medium text-soltas-ocean">For organisations</p>
+            <h3 className="mt-2 text-2xl font-semibold tracking-tight text-soltas-text">See the whole field.</h3>
+            <p className="mt-3 text-[15px] leading-7 text-soltas-muted">
+              A transparent, living database of who is doing what, and where. Find partners, avoid duplicate
+              work, learn from proven solutions and show funders the impact you create.
+            </p>
+          </div>
+          <div className="card p-7 sm:p-8">
+            <p className="text-sm font-medium text-soltas-ocean">For everyone</p>
+            <h3 className="mt-2 text-2xl font-semibold tracking-tight text-soltas-text">See where help goes.</h3>
+            <p className="mt-3 text-[15px] leading-7 text-soltas-muted">
+              Follow projects you care about, get their updates, and raise the issues in your own community
+              so the people with the right resources can act on them.
+            </p>
+          </div>
+        </section>
+
+        {/* Get involved */}
+        <section className="mb-20 overflow-hidden rounded-3xl bg-soltas-abyssal px-7 py-12 text-white sm:mb-28 sm:px-12 sm:py-16">
+          <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-xl">
+              <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Put your work on the map.</h2>
+              <p className="mt-3 text-[15px] leading-7 text-white/75">
+                Register your organisation and its projects, share updates with your followers, or report an
+                issue in your area. It&apos;s free.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row md:flex-col lg:flex-row">
+              <Link
+                href="/signup"
+                className={buttonClasses({ size: "lg", className: "bg-white text-soltas-abyssal hover:bg-white/90" })}
+              >
+                Join Solarpunk Taskforce
+              </Link>
+              <Link
+                href="/services"
+                className={buttonClasses({
+                  variant: "ghost",
+                  size: "lg",
+                  className: "text-white hover:bg-white/10",
+                })}
+              >
+                Our services
+              </Link>
+            </div>
+          </div>
         </section>
       </div>
+      <SiteFooter />
     </main>
   );
 }
