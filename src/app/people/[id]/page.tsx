@@ -1,3 +1,4 @@
+import { buttonClasses } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -87,12 +88,20 @@ export default async function ProfilePage({
               className="h-20 w-20 rounded-full border border-soltas-line object-cover"
             />
           ) : (
-            <div className="flex h-20 w-20 items-center justify-center rounded-full border border-dashed border-soltas-line bg-soltas-off-white text-sm text-soltas-muted">
-              —
+            <div
+              aria-hidden="true"
+              className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-soltas-ocean/10 text-2xl font-semibold text-soltas-ocean"
+            >
+              {(name || "?")
+                .split(/\s+/)
+                .map((part) => part[0])
+                .slice(0, 2)
+                .join("")
+                .toUpperCase()}
             </div>
           )}
           <div className="min-w-0">
-            <h1 className="truncate text-2xl font-semibold tracking-tight text-soltas-text">
+            <h1 className="text-3xl font-semibold tracking-tight text-soltas-text sm:text-4xl">
               {name || "Unnamed profile"}
             </h1>
             <p className="mt-1 text-sm text-soltas-muted">
@@ -109,7 +118,7 @@ export default async function ProfilePage({
                 </Link>
               </p>
             ) : (
-              <p className="mt-1 text-sm text-soltas-muted">Organisation: Independent</p>
+              <p className="mt-1 text-sm text-soltas-muted">Independent</p>
             )}
           </div>
         </div>
@@ -118,9 +127,9 @@ export default async function ProfilePage({
           {isOwner ? (
             <Link
               href={`/people/${profile.id}/edit`}
-              className="inline-flex items-center justify-center rounded-lg bg-soltas-ocean px-3 py-2 text-sm font-medium text-white hover:bg-soltas-abyssal"
+              className={buttonClasses({ variant: "outline", size: "sm" })}
             >
-              Edit Profile
+              Edit profile
             </Link>
           ) : (
             <FollowButton
