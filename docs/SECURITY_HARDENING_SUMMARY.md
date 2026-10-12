@@ -1,5 +1,7 @@
 # Security Hardening Deployment Summary
 
+> **Historical document.** Kept for reference. Do not run `supabase db push` or change the database by hand: migrations are applied automatically when merged to `main` (see `AGENT_RULES.md`).
+
 ## Migration Details
 
 **Migration File:** `20260322000000_security_hardening_rls_functions.sql`  

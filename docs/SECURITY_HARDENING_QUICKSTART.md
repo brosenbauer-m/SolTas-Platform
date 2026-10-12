@@ -1,5 +1,7 @@
 # Security Hardening - Quick Start Guide
 
+> **Historical document.** Kept for reference. Do not run `supabase db push` or change the database by hand: migrations are applied automatically when merged to `main` (see `AGENT_RULES.md`).
+
 ## 🚀 Deployment Commands (Copy-Paste Ready)
 
 ```bash

@@ -1,5 +1,7 @@
 # Phase 1 Social Components - Implementation
 
+> **Historical document.** Kept for reference. Do not run `supabase db push` or change the database by hand: migrations are applied automatically when merged to `main` (see `AGENT_RULES.md`).
+
 This document describes the implementation of social features (likes and comments) for project updates.
 
 ## Overview

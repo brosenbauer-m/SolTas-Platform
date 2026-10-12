@@ -20,7 +20,8 @@
     "sb:sync": "bash scripts/sb-sync.sh",
     "check:migrations": "node scripts/check-migration-order.mjs",
     "sb:migration": "node scripts/sb-migration.mjs",
-    "test:rls": "tsx scripts/rls-smoke.ts"
+    "test:rls": "tsx scripts/rls-smoke.ts",
+    "db:test": "bash scripts/db-test/run.sh"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

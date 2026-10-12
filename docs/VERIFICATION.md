@@ -1,5 +1,7 @@
 # Notifications for Reactions and Comments - Verification Guide
 
+> **Historical document.** Kept for reference. Do not run `supabase db push` or change the database by hand: migrations are applied automatically when merged to `main` (see `AGENT_RULES.md`).
+
 ## Overview
 This implementation adds automatic notifications for post authors when users like or comment on their posts.
 
