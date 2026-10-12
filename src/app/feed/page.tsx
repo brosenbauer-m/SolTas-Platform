@@ -315,6 +315,7 @@ export default async function FeedPage({
   const { data: discoverProjects } = await supabase
     .from("projects")
     .select("id,name,slug")
+    .eq("visibility", "public")
     .order("created_at", { ascending: false })
     .limit(5);
 
