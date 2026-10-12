@@ -15,7 +15,11 @@ function formatMoney(amount: number | null, currency: string | null) {
   if (typeof amount !== "number") return null;
   const code = typeof currency === "string" && currency.trim().length > 0 ? currency : "USD";
   try {
-    return new Intl.NumberFormat(undefined, { style: "currency", currency: code }).format(amount);
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: code,
+      maximumFractionDigits: Number.isInteger(amount) ? 0 : 2,
+    }).format(amount);
   } catch {
     return `${amount.toLocaleString()} ${code}`;
   }
