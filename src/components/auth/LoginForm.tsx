@@ -1,11 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 
+import { AuthField, FormMessage } from "@/components/auth/AuthShell";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { MissingSupabaseEnvError } from "@/lib/supabaseConfig";
 import { supabaseClient } from "@/lib/supabaseClient";
+import { cn } from "@/lib/utils";
 
 let supabaseInitializationError: MissingSupabaseEnvError | null = null;
 let supabase: ReturnType<typeof supabaseClient> | null = null;
@@ -23,11 +27,7 @@ try {
 
 export default function LoginForm() {
   if (!supabase) {
-    return (
-      <div className="rounded-2xl border border-soltas-line bg-white p-6 text-sm text-soltas-muted">
-        {supabaseInitializationError?.message}
-      </div>
-    );
+    return <p className="text-sm text-soltas-muted">{supabaseInitializationError?.message}</p>;
   }
 
   return <LoginFormContent client={supabase} />;
@@ -35,13 +35,20 @@ export default function LoginForm() {
 
 type SupabaseClient = NonNullable<ReturnType<typeof supabaseClient>>;
 
+const LINK_ERRORS: Record<string, string> = {
+  link: "That link has expired or was already used. Please sign in, or request a new link.",
+};
+
 function LoginFormContent({ client }: { client: SupabaseClient }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ text: string; tone: "error" | "success" } | null>(null);
+  const [message, setMessage] = useState<{ text: string; tone: "error" | "success" } | null>(() => {
+    const code = searchParams.get("error");
+    return code && LINK_ERRORS[code] ? { text: LINK_ERRORS[code], tone: "error" } : null;
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   async function handleSubmit(event: React.FormEvent) {
@@ -49,8 +56,8 @@ function LoginFormContent({ client }: { client: SupabaseClient }) {
     setMessage(null);
 
     const nextErrors: Record<string, string> = {};
-    if (!email.trim()) nextErrors.email = "Email is required.";
-    if (!password.trim()) nextErrors.password = "Password is required.";
+    if (!email.trim()) nextErrors.email = "Enter your email address.";
+    if (!password) nextErrors.password = "Enter your password.";
 
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
@@ -60,91 +67,68 @@ function LoginFormContent({ client }: { client: SupabaseClient }) {
     setErrors({});
     setLoading(true);
 
-    try {
-      const { error } = await client.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) throw error;
-
-      setMessage({ text: "Signed in! Redirecting...", tone: "success" });
-      const returnTo = searchParams.get("returnTo");
-      const safeReturnTo = returnTo?.startsWith("/") ? returnTo : "/projects";
-      setTimeout(() => {
-        router.replace(safeReturnTo);
-        router.refresh();
-      }, 400);
-    } catch (err: unknown) {
+    const { error } = await client.auth.signInWithPassword({ email: email.trim(), password });
+    if (error) {
+      setLoading(false);
       setMessage({
-        text: err instanceof Error ? err.message : "Unable to sign in.",
+        text:
+          error.message === "Invalid login credentials"
+            ? "That email and password don't match. Try again, or reset your password."
+            : error.message,
         tone: "error",
       });
-    } finally {
-      setLoading(false);
+      return;
     }
+
+    const returnTo = searchParams.get("returnTo");
+    const safeReturnTo = returnTo?.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/projects";
+    router.replace(safeReturnTo);
+    router.refresh();
   }
 
+  const invalid = (key: string) => cn(errors[key] && "border-rose-400 focus:border-rose-400 focus-visible:ring-rose-100");
+
   return (
-    <div className="rounded-2xl border border-soltas-line bg-white p-6">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <label className="space-y-1 text-sm text-soltas-text">
-          <span className="font-medium">Email *</span>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className={`w-full rounded-xl border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
-              errors.email
-                ? "border-red-400 focus:ring-red-200"
-                : "border-soltas-line focus:ring-soltas-ocean/15"
-            }`}
-          />
-          {errors.email && <p className="text-xs font-semibold text-red-600">{errors.email}</p>}
-        </label>
+    <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+      {message ? <FormMessage tone={message.tone}>{message.text}</FormMessage> : null}
 
-        <label className="space-y-1 text-sm text-soltas-text">
-          <span className="font-medium">Password *</span>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={`w-full rounded-xl border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
-              errors.password
-                ? "border-red-400 focus:ring-red-200"
-                : "border-soltas-line focus:ring-soltas-ocean/15"
-            }`}
-          />
-          {errors.password && (
-            <p className="text-xs font-semibold text-red-600">{errors.password}</p>
-          )}
-        </label>
+      <AuthField label="Email" error={errors.email}>
+        <Input
+          type="email"
+          name="email"
+          autoComplete="email"
+          inputMode="email"
+          autoFocus
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          aria-invalid={Boolean(errors.email)}
+          className={invalid("email")}
+        />
+      </AuthField>
 
-        <div className="space-y-3">
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-xl bg-soltas-ocean px-4 py-2 text-sm font-semibold text-white transition hover:bg-soltas-abyssal disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            {loading ? "Signing in..." : "Sign in"}
-          </button>
-          {message && (
-            <p
-              className={`text-sm font-medium ${
-                message.tone === "success" ? "text-soltas-ocean" : "text-red-600"
-              }`}
-            >
-              {message.text}
-            </p>
-          )}
-        </div>
-      </form>
+      <AuthField
+        label="Password"
+        error={errors.password}
+        aside={
+          <Link href="/forgot-password" className="text-[13px] font-normal text-soltas-ocean hover:underline">
+            Forgot password?
+          </Link>
+        }
+      >
+        <Input
+          type="password"
+          name="password"
+          autoComplete="current-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          aria-invalid={Boolean(errors.password)}
+          className={invalid("password")}
+        />
+      </AuthField>
 
-      <p className="mt-4 text-center text-sm text-soltas-muted">
-        Don&apos;t have an account?{" "}
-        <Link href="/signup" className="font-medium text-soltas-abyssal hover:underline">
-          Create one
-        </Link>
-      </p>
-    </div>
+      <Button type="submit" disabled={loading} className="w-full">
+        {loading ? "Signing in…" : "Sign in"}
+      </Button>
+    </form>
   );
 }
