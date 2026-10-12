@@ -62,7 +62,7 @@ const initialIndividual = {
 export default function SignupTabs() {
   if (!supabase) {
     return (
-      <div className="rounded-2xl border border-[#6B9FB8]/25 bg-white p-6 text-sm text-soltas-muted">
+      <div className="rounded-2xl border border-soltas-line bg-white p-6 text-sm text-soltas-muted">
         {supabaseInitializationError?.message}
       </div>
     );
@@ -266,7 +266,7 @@ function SignupTabsContent({ client }: { client: SupabaseClient }) {
   }
 
   return (
-    <div className="rounded-2xl border border-[#6B9FB8]/25 bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-soltas-line bg-white p-6 shadow-sm">
       <form onSubmit={handleIndividualSubmit} className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <Field
@@ -405,7 +405,7 @@ function Field({
         className={`w-full rounded-xl border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
           error
             ? "border-red-400 focus:ring-red-200"
-            : "border-[#6B9FB8]/40 focus:border-[#6B9FB8] focus:ring-[#6B9FB8]/60"
+            : "border-soltas-line focus:border-soltas-ocean/50 focus:ring-soltas-ocean/15"
         }`}
       />
       {helperText && <p className="text-xs text-soltas-muted">{helperText}</p>}
@@ -443,7 +443,7 @@ function SelectField({
         className={`w-full rounded-xl border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
           error
             ? "border-red-400 focus:ring-red-200"
-            : "border-[#6B9FB8]/40 focus:border-[#6B9FB8] focus:ring-[#6B9FB8]/60"
+            : "border-soltas-line focus:border-soltas-ocean/50 focus:ring-soltas-ocean/15"
         }`}
       >
         {options.map((option) => (
@@ -484,7 +484,7 @@ function TextAreaField({
         className={`w-full rounded-xl border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
           error
             ? "border-red-400 focus:ring-red-200"
-            : "border-[#6B9FB8]/40 focus:border-[#6B9FB8] focus:ring-[#6B9FB8]/60"
+            : "border-soltas-line focus:border-soltas-ocean/50 focus:ring-soltas-ocean/15"
         }`}
       />
       {error && <p className="text-xs font-semibold text-red-600">{error}</p>}
@@ -512,7 +512,7 @@ function SocialLinksField({
         <button
           type="button"
           onClick={onAdd}
-          className="rounded-full border border-[#6B9FB8]/40 px-3 py-1 text-xs font-medium text-[#2E6B8A] hover:bg-[#EEF2F5] transition-colors duration-150"
+          className="rounded-full border border-soltas-line px-3 py-1 text-xs font-medium text-soltas-ocean hover:bg-soltas-light transition-colors duration-150"
         >
           Add link
         </button>
@@ -523,7 +523,7 @@ function SocialLinksField({
             <select
               value={link.type}
               onChange={(event) => onChange(index, "type", event.target.value)}
-              className="w-full rounded-xl border border-[#6B9FB8]/40 bg-white px-3 py-2 text-sm focus:border-[#6B9FB8] focus:outline-none focus:ring-2 focus:ring-[#6B9FB8]/60"
+              className="w-full rounded-xl border border-soltas-line bg-white px-3 py-2 text-sm focus:border-soltas-ocean/50 focus:outline-none focus:ring-2 focus:ring-soltas-ocean/15"
             >
               {socialLinkTypes.map((type) => (
                 <option key={type} value={type}>
@@ -536,12 +536,12 @@ function SocialLinksField({
               placeholder="https://"
               value={link.url}
               onChange={(event) => onChange(index, "url", event.target.value)}
-              className="w-full rounded-xl border border-[#6B9FB8]/40 px-3 py-2 text-sm focus:border-[#6B9FB8] focus:outline-none focus:ring-2 focus:ring-[#6B9FB8]/60"
+              className="w-full rounded-xl border border-soltas-line px-3 py-2 text-sm focus:border-soltas-ocean/50 focus:outline-none focus:ring-2 focus:ring-soltas-ocean/15"
             />
             <button
               type="button"
               onClick={() => onRemove(index)}
-              className="rounded-full border border-[#6B9FB8]/40 px-3 py-1 text-xs text-[#8A9BAB] hover:bg-[#EEF2F5] transition-colors duration-150"
+              className="rounded-full border border-soltas-line px-3 py-1 text-xs text-soltas-muted hover:bg-soltas-light transition-colors duration-150"
             >
               Remove
             </button>
@@ -564,7 +564,7 @@ function SubmitRow({
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-xl bg-[#2E6B8A] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#1A3F54] disabled:cursor-not-allowed disabled:opacity-70"
+        className="w-full rounded-xl bg-soltas-ocean px-4 py-2 text-sm font-semibold text-white transition hover:bg-soltas-abyssal disabled:cursor-not-allowed disabled:opacity-70"
       >
         {loading ? "Creating account..." : "Create account"}
       </button>
@@ -572,7 +572,7 @@ function SubmitRow({
         <p
           className={`text-sm font-medium ${
             message.tone === "success"
-              ? "text-[#2E6B8A]"
+              ? "text-soltas-ocean"
               : message.tone === "info"
                 ? "text-soltas-muted"
                 : "text-red-600"

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, BarChart3, Megaphone } from "lucide-react";
+import { BarChart3, Check, Megaphone } from "lucide-react";
+
+import SiteFooter from "@/components/SiteFooter";
+import { buttonClasses } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Services | Solarpunk Taskforce",
@@ -8,234 +11,137 @@ export const metadata: Metadata = {
     "Comparative intelligence consulting and marketing services for impact-driven projects and organisations.",
 };
 
-function ServiceCard({
-  icon,
-  title,
-  description,
-  features,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  features: string[];
-}) {
-  return (
-    <div className="rounded-2xl border border-soltas-ocean/20 bg-white p-8 shadow-sm">
-      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-soltas-ocean/10 text-soltas-ocean">
-        {icon}
-      </div>
-      <h3 className="mb-3 text-xl font-bold text-soltas-abyssal">{title}</h3>
-      <p className="mb-6 text-sm leading-6 text-soltas-text">{description}</p>
-      <ul className="space-y-2">
-        {features.map((feature, idx) => (
-          <li key={idx} className="flex items-start gap-2 text-sm text-soltas-text">
-            <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-soltas-ocean" />
-            <span>{feature}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
+const CONTACT_EMAIL = "contact@solarpunktaskforce.org";
+const CONSULTATION_HREF = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Consultation request")}`;
+
+const SERVICES = [
+  {
+    icon: BarChart3,
+    title: "Comparative intelligence",
+    text: "Data-driven insight into your field: who else works on your issue, what has worked elsewhere, and where the gaps and funding opportunities are.",
+    features: [
+      "Benchmarking against similar projects",
+      "Potential partners and collaborations",
+      "Proven solutions from related initiatives",
+      "Gap analysis: underserved areas and funding",
+      "Recommendations for resource allocation",
+    ],
+  },
+  {
+    icon: Megaphone,
+    title: "Storytelling and marketing",
+    text: "Modern, honest communication that makes your work visible, builds trust and brings in support, beyond crisis-driven narratives.",
+    features: [
+      "Project narrative and storytelling",
+      "Articles, video, podcasts and visual media",
+      "Social media strategy",
+      "Donor engagement campaigns",
+      "Community and awareness campaigns",
+    ],
+  },
+];
+
+const AUDIENCES = [
+  { title: "NGOs and non-profits", text: "Optimise operations and extend your reach." },
+  { title: "New projects", text: "Get strategic guidance and visibility from day one." },
+  { title: "Funders", text: "Make informed decisions with data on the whole field." },
+  { title: "Social enterprises", text: "Understand your market and position your impact." },
+];
+
+const STEPS = [
+  { title: "Conversation", text: "We talk about your goals, challenges and needs." },
+  { title: "Strategy", text: "We build a plan using platform data and sector expertise." },
+  { title: "Delivery", text: "We put it into practice with you and support you afterwards." },
+];
 
 export default function ServicesPage() {
   return (
-    <main className="relative bg-white">
-      <div className="mx-auto max-w-6xl px-4 py-14 sm:py-20">
-        {/* Header */}
-        <header className="mb-12 sm:mb-16">
-          <div className="mb-4">
-            <span className="inline-flex items-center rounded-full border border-soltas-ocean/30 bg-soltas-ocean/10 px-3 py-1 text-xs font-medium tracking-wide text-soltas-ocean">
-              Professional Services
-            </span>
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight text-soltas-abyssal sm:text-5xl">
-            Services for Impact Organisations
+    <main className="flex flex-col">
+      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
+        <section className="py-20 sm:py-28">
+          <p className="text-sm font-medium text-soltas-ocean">Services</p>
+          <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-tight text-soltas-text sm:text-6xl">
+            Help for the people doing the work.
           </h1>
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-soltas-text sm:text-base">
-            Solarpunk Taskforce offers specialized services to help projects and organisations
-            registered on our platform maximize their impact, visibility, and strategic positioning
-            in the humanitarian and environmental sectors.
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-soltas-muted">
+            For projects and organisations registered on Solarpunk Taskforce: insight from the whole field, and
+            storytelling that shows what you achieve.
           </p>
-        </header>
-
-        {/* Services Grid */}
-        <div className="mb-16 grid gap-8 md:grid-cols-2">
-          <ServiceCard
-            icon={<BarChart3 size={24} />}
-            title="Comparative Intelligence Consulting"
-            description="Data-driven insights to help your organisation understand the competitive landscape, identify opportunities for collaboration, and apply proven solutions from similar initiatives worldwide."
-            features={[
-              "Comprehensive sector analysis and benchmarking against similar projects",
-              "Identification of potential partners and collaboration opportunities",
-              "Insights on proven solutions and best practices from related initiatives",
-              "Gap analysis to identify underserved areas and funding opportunities",
-              "Strategic recommendations for resource allocation and impact optimization",
-              "Access to platform data and analytics on global humanitarian and environmental efforts",
-            ]}
-          />
-
-          <ServiceCard
-            icon={<Megaphone size={24} />}
-            title="Project-Centered Marketing Services"
-            description="Strategic marketing and storytelling services designed to increase visibility, build trust, and drive engagement for your projects through modern, creative communication."
-            features={[
-              "Project narrative development and compelling storytelling",
-              "Content creation: articles, videos, podcasts, and visual media",
-              "Social media strategy and management for your initiatives",
-              "Donor engagement campaigns to increase funding and support",
-              "Brand positioning within the impact sector",
-              "Community building and awareness campaigns tailored to your mission",
-            ]}
-          />
-        </div>
-
-        {/* Why Choose ST Services Section */}
-        <section className="mb-16 rounded-2xl border border-soltas-ocean/20 bg-soltas-ocean/5 p-8">
-          <h2 className="mb-6 text-2xl font-bold text-soltas-abyssal">
-            Why Choose ST Services?
-          </h2>
-          <div className="grid gap-6 md:grid-cols-3">
-            <div>
-              <h3 className="mb-2 font-semibold text-soltas-abyssal">
-                Platform Integration
-              </h3>
-              <p className="text-sm text-soltas-text">
-                Leverage our comprehensive database of global humanitarian and environmental
-                projects for unparalleled strategic insights.
-              </p>
-            </div>
-            <div>
-              <h3 className="mb-2 font-semibold text-soltas-abyssal">
-                Impact-Focused Expertise
-              </h3>
-              <p className="text-sm text-soltas-text">
-                Our team specializes in the humanitarian and environmental sectors, understanding
-                the unique challenges and opportunities you face.
-              </p>
-            </div>
-            <div>
-              <h3 className="mb-2 font-semibold text-soltas-abyssal">
-                Creative Storytelling
-              </h3>
-              <p className="text-sm text-soltas-text">
-                Move beyond crisis-driven narratives with modern, inspiring content that builds
-                trust and deepens engagement with your mission.
-              </p>
-            </div>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <a href={CONSULTATION_HREF} className={buttonClasses({ size: "lg" })}>
+              Request a consultation
+            </a>
+            <Link href="/organisations/create" className={buttonClasses({ variant: "outline", size: "lg" })}>
+              Register your organisation
+            </Link>
           </div>
         </section>
 
-        {/* Who Benefits Section */}
-        <section className="mb-16">
-          <h2 className="mb-6 text-2xl font-bold text-soltas-abyssal">
-            Who Can Benefit from Our Services?
+        <section aria-label="Services" className="grid gap-4 pb-20 sm:pb-28 md:grid-cols-2">
+          {SERVICES.map(({ icon: Icon, title, text, features }) => (
+            <div key={title} className="card flex flex-col p-7 sm:p-8">
+              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-soltas-ocean/10 text-soltas-ocean">
+                <Icon className="h-5 w-5" />
+              </span>
+              <h2 className="mt-5 text-2xl font-semibold tracking-tight text-soltas-text">{title}</h2>
+              <p className="mt-2 text-[15px] leading-7 text-soltas-muted">{text}</p>
+              <ul className="mt-6 space-y-3 border-t border-soltas-line pt-6">
+                {features.map((f) => (
+                  <li key={f} className="flex items-start gap-3 text-[15px] text-soltas-text">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-soltas-green" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </section>
+
+        <section aria-labelledby="who-heading" className="pb-20 sm:pb-28">
+          <h2 id="who-heading" className="text-3xl font-semibold tracking-tight text-soltas-text sm:text-4xl">
+            Who it&apos;s for
           </h2>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              {
-                title: "NGOs & NPOs",
-                description:
-                  "Established organisations seeking to optimize operations and expand their reach.",
-              },
-              {
-                title: "New Projects",
-                description:
-                  "Emerging initiatives looking for strategic guidance and visibility in a crowded sector.",
-              },
-              {
-                title: "Funding Bodies",
-                description:
-                  "Donors and grantmakers seeking data-driven insights for informed investment decisions.",
-              },
-              {
-                title: "Social Enterprises",
-                description:
-                  "Impact-driven businesses needing market intelligence and strategic positioning.",
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className="rounded-xl border border-soltas-ocean/20 bg-white p-6"
-              >
-                <h3 className="mb-2 font-semibold text-soltas-abyssal">{item.title}</h3>
-                <p className="text-sm text-soltas-text">{item.description}</p>
+          <div className="mt-8 grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
+            {AUDIENCES.map((a) => (
+              <div key={a.title} className="border-t border-soltas-line pt-5">
+                <h3 className="text-lg font-semibold text-soltas-text">{a.title}</h3>
+                <p className="mt-1 text-[15px] leading-6 text-soltas-muted">{a.text}</p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Process Section */}
-        <section className="mb-16">
-          <h2 className="mb-6 text-2xl font-bold text-soltas-abyssal">Our Process</h2>
-          <div className="grid gap-6 md:grid-cols-3">
-            {[
-              {
-                step: "1",
-                title: "Initial Consultation",
-                description:
-                  "We discuss your goals, challenges, and needs to determine the best service approach.",
-              },
-              {
-                step: "2",
-                title: "Custom Strategy",
-                description:
-                  "Our team develops a tailored plan leveraging platform data and industry expertise.",
-              },
-              {
-                step: "3",
-                title: "Implementation & Support",
-                description:
-                  "We work with you to execute the strategy and provide ongoing support for sustained impact.",
-              },
-            ].map((item) => (
-              <div key={item.step} className="relative">
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-soltas-ocean text-lg font-bold text-white">
-                  {item.step}
-                </div>
-                <h3 className="mb-2 font-semibold text-soltas-abyssal">{item.title}</h3>
-                <p className="text-sm text-soltas-text">{item.description}</p>
-              </div>
+        <section aria-labelledby="how-heading" className="pb-20 sm:pb-28">
+          <h2 id="how-heading" className="text-3xl font-semibold tracking-tight text-soltas-text sm:text-4xl">
+            How it works
+          </h2>
+          <ol className="mt-8 grid gap-4 md:grid-cols-3">
+            {STEPS.map((s, i) => (
+              <li key={s.title} className="card p-7">
+                <span className="grid h-8 w-8 place-items-center rounded-full bg-soltas-ocean text-sm font-semibold text-white">
+                  {i + 1}
+                </span>
+                <h3 className="mt-4 text-lg font-semibold text-soltas-text">{s.title}</h3>
+                <p className="mt-1 text-[15px] leading-6 text-soltas-muted">{s.text}</p>
+              </li>
             ))}
-          </div>
+          </ol>
         </section>
 
-        {/* CTA Section */}
-        <div className="rounded-2xl border border-soltas-ocean/30 bg-gradient-to-r from-soltas-ocean/10 to-soltas-ocean/5 p-8">
-          <div className="mb-6">
-            <h2 className="mb-3 text-2xl font-bold text-soltas-abyssal">
-              Ready to Amplify Your Impact?
-            </h2>
-            <p className="text-sm text-soltas-text">
-              Whether you need strategic insights or want to elevate your project&apos;s
-              visibility, our services are designed to help you achieve your mission more
-              effectively. Get in touch to discuss how we can support your work.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-4">
-            <Link
-              href="/contact"
-              className="inline-flex items-center gap-2 rounded-xl bg-soltas-ocean px-6 py-3 text-sm font-semibold text-white transition hover:bg-soltas-ocean/90"
-            >
-              Request a Consultation <ArrowRight size={16} />
-            </Link>
-            <Link
-              href="/about"
-              className="inline-flex items-center gap-2 rounded-xl border border-soltas-ocean/30 bg-white px-6 py-3 text-sm font-semibold text-soltas-ocean transition hover:bg-soltas-ocean/10"
-            >
-              Learn More About ST
-            </Link>
-          </div>
-        </div>
-
-        {/* Footnote */}
-        <p className="mt-6 text-xs text-soltas-muted">
-          Services are available exclusively to registered organisations and projects on the
-          Solarpunk Taskforce platform. Registration is free and open to all verified
-          humanitarian and environmental initiatives.
-        </p>
+        <section className="mb-20 rounded-3xl bg-soltas-abyssal px-7 py-12 text-center text-white sm:mb-28 sm:px-12 sm:py-16">
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Let&apos;s talk about your work.</h2>
+          <p className="mx-auto mt-3 max-w-xl text-[15px] leading-7 text-white/75">
+            Services are available to organisations and projects registered on the platform. Registration is free.
+          </p>
+          <a
+            href={CONSULTATION_HREF}
+            className={buttonClasses({ size: "lg", className: "mt-8 bg-white text-soltas-abyssal hover:bg-white/90" })}
+          >
+            Email {CONTACT_EMAIL}
+          </a>
+        </section>
       </div>
+      <SiteFooter />
     </main>
   );
 }
-

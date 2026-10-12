@@ -83,7 +83,7 @@ export function MemberRow({
               defaultValue={member.role}
               onChange={handleRoleChange}
               disabled={isPending}
-              className="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-xs font-medium text-soltas-bark focus:border-[#6B9FB8] focus:outline-none focus:ring-2 focus:ring-[#6B9FB8]/60 disabled:opacity-50"
+              className="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-xs font-medium text-soltas-bark focus:border-soltas-ocean/50 focus:outline-none focus:ring-2 focus:ring-soltas-ocean/15 disabled:opacity-50"
             >
               <option value="member">Member</option>
               <option value="admin">Admin</option>
@@ -100,7 +100,7 @@ export function MemberRow({
             checked={member.can_create_projects}
             onChange={(e) => handlePermissionChange(e, "can_create_projects")}
             disabled={isPending}
-            className="h-4 w-4 rounded border-slate-300 text-[#6B9FB8] focus:ring-[#6B9FB8] disabled:opacity-50"
+            className="h-4 w-4 rounded border-slate-300 text-soltas-muted focus:ring-soltas-ocean/15 disabled:opacity-50"
           />
         )}
       </td>
@@ -113,7 +113,7 @@ export function MemberRow({
             checked={member.can_create_funding}
             onChange={(e) => handlePermissionChange(e, "can_create_funding")}
             disabled={isPending}
-            className="h-4 w-4 rounded border-slate-300 text-[#6B9FB8] focus:ring-[#6B9FB8] disabled:opacity-50"
+            className="h-4 w-4 rounded border-slate-300 text-soltas-muted focus:ring-soltas-ocean/15 disabled:opacity-50"
           />
         )}
       </td>

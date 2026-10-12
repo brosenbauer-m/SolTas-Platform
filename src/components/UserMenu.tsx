@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { isAdmin as rpcIsAdmin, isSuperadmin as rpcIsSuper } from "@/lib/admin";
@@ -17,8 +18,8 @@ export default function UserMenu({ onNavigate }: { onNavigate?: () => void }) {
   const [isSuper, setIsSuper] = useState(false);
 
   const [orgs, setOrgs] = useState<OrganisationContext[]>([]);
-  const [orgsOpen, setOrgsOpen] = useState(false);
   const [registrationsOpen, setRegistrationsOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     let mounted = true;
@@ -100,131 +101,82 @@ export default function UserMenu({ onNavigate }: { onNavigate?: () => void }) {
     };
   }, []);
 
-  const orgSectionLabel = useMemo(() => {
-    // Always show the label as requested
-    return "My Organisation(s)";
-  }, []);
+  const itemClass =
+    "flex items-center justify-between rounded-xl px-3 py-2.5 text-[15px] text-soltas-text transition-colors duration-150 hover:bg-soltas-light";
+  const sectionLabel = "px-3 pb-1 pt-4 text-xs font-medium text-soltas-muted";
 
   return (
-    <>
-      <Link
-        href="/profile"
-        className="rounded-lg px-3 py-2 text-[#1A2B38] hover:bg-[#EEF2F5] transition-colors duration-150"
-        onClick={onNavigate}
-      >
+    <div className="flex flex-col">
+      <Link href="/profile" className={itemClass} onClick={onNavigate}>
         My profile
       </Link>
-
-      <div className="mt-1">
-        <button
-          type="button"
-          onClick={() => setOrgsOpen((o) => !o)}
-          className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-[#1A2B38] hover:bg-[#EEF2F5] transition-colors duration-150"
-        >
-          <span>{orgSectionLabel}</span>
-          {orgsOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-        </button>
-
-        {orgsOpen && (
-          <div className="mt-1 space-y-1 pl-2">
-            {orgs.length > 0 &&
-              orgs.map((org) => (
-                <Link
-                  key={org.id}
-                  href={`/organisations/${org.id}`}
-                  className="block rounded-lg px-3 py-2 text-[#1A2B38] hover:bg-[#EEF2F5] transition-colors duration-150"
-                  onClick={onNavigate}
-                >
-                  {org.name}
-                </Link>
-              ))}
-
-            <Link
-              href="/organisations/create"
-              className="block rounded-lg px-3 py-2 text-[#1A2B38] hover:bg-[#EEF2F5] transition-colors duration-150"
-              onClick={onNavigate}
-            >
-              Create New Organisation
-            </Link>
-          </div>
-        )}
-      </div>
-
-      <div className="my-2 border-t border-slate-200" />
-
-      <Link
-        href="/settings"
-        className="rounded-lg px-3 py-2 text-[#1A2B38] hover:bg-[#EEF2F5] transition-colors duration-150"
-        onClick={onNavigate}
-      >
+      <Link href="/notifications" className={itemClass} onClick={onNavigate}>
+        Notifications
+      </Link>
+      <Link href="/settings" className={itemClass} onClick={onNavigate}>
         Settings
       </Link>
 
+      <p className={sectionLabel}>My organisations</p>
+      {orgs.map((org) => (
+        <Link key={org.id} href={`/organisations/${org.id}`} className={itemClass} onClick={onNavigate}>
+          <span className="truncate">{org.name}</span>
+          <span className="ml-2 shrink-0 text-xs text-soltas-muted">{org.role === "admin" ? "Admin" : "Member"}</span>
+        </Link>
+      ))}
+      <Link href="/organisations/create" className={`${itemClass} text-soltas-ocean`} onClick={onNavigate}>
+        Create an organisation
+      </Link>
+
       {isAdmin && (
-        <div className="mt-1">
+        <>
           <button
             type="button"
             onClick={() => setRegistrationsOpen((o) => !o)}
-            className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-[#1A2B38] hover:bg-[#EEF2F5] transition-colors duration-150"
+            className={`${sectionLabel} flex w-full items-center justify-between text-left`}
+            aria-expanded={registrationsOpen}
           >
-            <span>Registrations</span>
+            <span>Review submissions</span>
             {registrationsOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
           </button>
-
           {registrationsOpen && (
-            <div className="mt-1 space-y-1 pl-2">
-              <Link
-                href="/admin/registrations"
-                className="block rounded-lg px-3 py-2 text-[#1A2B38] hover:bg-[#EEF2F5] transition-colors duration-150"
-                onClick={onNavigate}
-              >
-                Project registrations
+            <>
+              <Link href="/admin/registrations" className={itemClass} onClick={onNavigate}>
+                Projects
               </Link>
-              <Link
-                href="/admin/funding-registrations"
-                className="block rounded-lg px-3 py-2 text-[#1A2B38] hover:bg-[#EEF2F5] transition-colors duration-150"
-                onClick={onNavigate}
-              >
-                Funding registrations
+              <Link href="/admin/funding-registrations" className={itemClass} onClick={onNavigate}>
+                Funding
               </Link>
-              <Link
-                href="/admin/issue-registrations"
-                className="block rounded-lg px-3 py-2 text-[#1A2B38] hover:bg-[#EEF2F5] transition-colors duration-150"
-                onClick={onNavigate}
-              >
-                Issue registrations
+              <Link href="/admin/issue-registrations" className={itemClass} onClick={onNavigate}>
+                Watchdog issues
               </Link>
-              <Link
-                href="/admin/organisation-registrations"
-                className="block rounded-lg px-3 py-2 text-[#1A2B38] hover:bg-[#EEF2F5] transition-colors duration-150"
-                onClick={onNavigate}
-              >
-                Organisation registrations
+              <Link href="/admin/organisation-registrations" className={itemClass} onClick={onNavigate}>
+                Organisations
               </Link>
-            </div>
+            </>
           )}
-        </div>
+        </>
       )}
 
       {isSuper && (
-        <Link
-          href="/admin/manage"
-          className="rounded-lg px-3 py-2 text-[#1A2B38] hover:bg-[#EEF2F5] transition-colors duration-150"
-          onClick={onNavigate}
-        >
-          Manage Admins
+        <Link href="/admin/manage" className={itemClass} onClick={onNavigate}>
+          Manage admins
         </Link>
       )}
 
+      <div className="my-3 border-t border-soltas-line" />
       <button
-        onClick={() => {
-          supabase.auth.signOut();
+        type="button"
+        onClick={async () => {
+          await supabase.auth.signOut();
           onNavigate?.();
+          router.push("/");
+          router.refresh();
         }}
-        className="w-full rounded-lg px-3 py-2 text-left text-rose-600 hover:bg-rose-50 transition-colors duration-150"
+        className={`${itemClass} w-full text-left text-rose-600 hover:bg-rose-50`}
       >
         Sign out
       </button>
-    </>
+    </div>
   );
 }

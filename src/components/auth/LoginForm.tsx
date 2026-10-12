@@ -141,7 +141,7 @@ function LoginFormContent({ client }: { client: SupabaseClient }) {
 
       <p className="mt-4 text-center text-sm text-soltas-muted">
         Don&apos;t have an account?{" "}
-        <Link href="/signup" className="font-medium text-[#11526D] hover:underline">
+        <Link href="/signup" className="font-medium text-soltas-abyssal hover:underline">
           Create one
         </Link>
       </p>

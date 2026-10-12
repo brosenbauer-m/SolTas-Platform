@@ -15,14 +15,14 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex h-11 w-full items-center justify-between gap-2 rounded-xl border border-[#6B9FB8]/40 bg-white px-4 text-base text-[#1A2B38] transition focus:border-[#6B9FB8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#6B9FB8]/60 disabled:cursor-not-allowed disabled:opacity-50",
+      "flex h-11 w-full items-center justify-between gap-2 rounded-xl border border-soltas-line bg-white px-4 text-base text-soltas-text transition focus:border-soltas-ocean/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-soltas-ocean/15 disabled:cursor-not-allowed disabled:opacity-50",
       className,
     )}
     {...props}
   >
     {children}
     <SelectPrimitive.Icon asChild>
-      <ChevronDown className="h-4 w-4 text-[#8A9BAB]" />
+      <ChevronDown className="h-4 w-4 text-soltas-muted" />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 ));
@@ -36,19 +36,19 @@ const SelectContent = React.forwardRef<
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        "z-50 max-h-72 min-w-[8rem] overflow-hidden rounded-2xl border border-[#6B9FB8]/25 bg-white shadow-lg",
+        "z-50 max-h-72 min-w-[8rem] overflow-hidden rounded-2xl border border-soltas-line bg-white shadow-lg",
         className,
       )}
       position={position}
       {...props}
     >
-      <SelectPrimitive.ScrollUpButton className="flex h-8 items-center justify-center text-[#8A9BAB]">
+      <SelectPrimitive.ScrollUpButton className="flex h-8 items-center justify-center text-soltas-muted">
         <ChevronUp className="h-4 w-4" />
       </SelectPrimitive.ScrollUpButton>
       <SelectPrimitive.Viewport className="p-2">
         {children}
       </SelectPrimitive.Viewport>
-      <SelectPrimitive.ScrollDownButton className="flex h-8 items-center justify-center text-[#8A9BAB]">
+      <SelectPrimitive.ScrollDownButton className="flex h-8 items-center justify-center text-soltas-muted">
         <ChevronDown className="h-4 w-4" />
       </SelectPrimitive.ScrollDownButton>
     </SelectPrimitive.Content>
@@ -60,7 +60,7 @@ const SelectLabel = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Label>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>
 >(({ className, ...props }, ref) => (
-  <SelectPrimitive.Label ref={ref} className={cn("px-2 py-1.5 text-sm font-medium text-[#8A9BAB]", className)} {...props} />
+  <SelectPrimitive.Label ref={ref} className={cn("px-2 py-1.5 text-sm font-medium text-soltas-muted", className)} {...props} />
 ));
 SelectLabel.displayName = SelectPrimitive.Label.displayName;
 
@@ -71,14 +71,14 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full cursor-pointer select-none items-center rounded-lg px-3 py-2 text-sm text-[#1A2B38] outline-none transition-colors hover:bg-[#EEF2F5] focus:bg-[#EEF2F5] data-[state=checked]:bg-[#EEF2F5]",
+      "relative flex w-full cursor-pointer select-none items-center rounded-lg px-3 py-2 text-sm text-soltas-text outline-none transition-colors hover:bg-soltas-light focus:bg-soltas-light data-[state=checked]:bg-soltas-light",
       className,
     )}
     {...props}
   >
     <span className="absolute left-2 flex h-4 w-4 items-center justify-center">
       <SelectPrimitive.ItemIndicator>
-        <Check className="h-4 w-4 text-[#2E6B8A]" />
+        <Check className="h-4 w-4 text-soltas-ocean" />
       </SelectPrimitive.ItemIndicator>
     </span>
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
@@ -90,7 +90,7 @@ const SelectSeparator = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Separator>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator>
 >(({ className, ...props }, ref) => (
-  <SelectPrimitive.Separator ref={ref} className={cn("my-1 h-px bg-[#6B9FB8]/15", className)} {...props} />
+  <SelectPrimitive.Separator ref={ref} className={cn("my-1 h-px bg-soltas-ocean/10", className)} {...props} />
 ));
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 

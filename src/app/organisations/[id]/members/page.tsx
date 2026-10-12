@@ -452,7 +452,7 @@ export default async function OrganisationMembersPage({
 
       <div className="flex items-center justify-between">
         <div className="space-y-2">
-          <h1 className="text-3xl font-semibold text-[#1A2B38]">Manage members</h1>
+          <h1 className="text-3xl font-semibold text-soltas-text">Manage members</h1>
           <p className="text-sm text-soltas-muted">
             Manage roles and permissions for{" "}
             <Link href={`/organisations/${id}`} className="font-medium text-soltas-ocean hover:underline">

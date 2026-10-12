@@ -12,12 +12,12 @@ export default function SignupPage() {
         </p>
         <p className="text-sm text-soltas-muted">
           Already have an account?{" "}
-          <Link href="/login" className="font-medium text-[#11526D] hover:underline">
+          <Link href="/login" className="font-medium text-soltas-abyssal hover:underline">
             Sign in
           </Link>
         </p>
       </div>
-      <Suspense fallback={<div className="rounded-2xl border border-[#6B9FB8]/25 bg-white p-6 text-sm text-soltas-muted">Loading...</div>}>
+      <Suspense fallback={<div className="rounded-2xl border border-soltas-line bg-white p-6 text-sm text-soltas-muted">Loading...</div>}>
         <SignupTabs />
       </Suspense>
     </div>

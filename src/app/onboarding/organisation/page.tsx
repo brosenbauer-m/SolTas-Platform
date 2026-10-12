@@ -125,9 +125,9 @@ export default function OrganisationOnboardingPage() {
 
   if (loading || creating) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#EEF2F5]">
-        <div className="rounded-2xl border border-[#6B9FB8]/25 bg-white p-8 text-center shadow-sm">
-          <div className="mb-4 text-lg font-medium text-[#2E6B8A]">
+      <div className="flex min-h-screen items-center justify-center bg-soltas-light">
+        <div className="rounded-2xl border border-soltas-line bg-white p-8 text-center shadow-sm">
+          <div className="mb-4 text-lg font-medium text-soltas-ocean">
             {creating ? "Creating your organisation..." : "Setting up..."}
           </div>
           <div className="text-sm text-soltas-muted">Please wait</div>
@@ -138,13 +138,13 @@ export default function OrganisationOnboardingPage() {
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#EEF2F5]">
+      <div className="flex min-h-screen items-center justify-center bg-soltas-light">
         <div className="rounded-2xl border border-red-400/25 bg-white p-8 text-center shadow-sm">
           <div className="mb-4 text-lg font-semibold text-red-600">Setup Error</div>
           <div className="mb-6 text-sm text-soltas-text">{error}</div>
           <button
             onClick={() => router.replace("/signup")}
-            className="rounded-xl bg-[#2E6B8A] px-6 py-2 text-sm font-semibold text-white transition hover:bg-[#1A3F54]"
+            className="rounded-xl bg-soltas-ocean px-6 py-2 text-sm font-semibold text-white transition hover:bg-soltas-abyssal"
           >
             Back to Signup
           </button>
@@ -155,9 +155,9 @@ export default function OrganisationOnboardingPage() {
 
   if (message) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#EEF2F5]">
-        <div className="rounded-2xl border border-[#6B9FB8]/25 bg-white p-8 text-center shadow-sm">
-          <div className="text-lg font-medium text-[#2E6B8A]">{message}</div>
+      <div className="flex min-h-screen items-center justify-center bg-soltas-light">
+        <div className="rounded-2xl border border-soltas-line bg-white p-8 text-center shadow-sm">
+          <div className="text-lg font-medium text-soltas-ocean">{message}</div>
         </div>
       </div>
     );

@@ -141,7 +141,7 @@ export default function CreateOrganisationPage() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="rounded-2xl border border-[#6B9FB8]/25 bg-white p-6 shadow-sm">
+      <form onSubmit={handleSubmit} className="rounded-2xl border border-soltas-line bg-white p-6 shadow-sm">
         <div className="space-y-4">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-soltas-bark mb-1">
@@ -152,7 +152,7 @@ export default function CreateOrganisationPage() {
               type="text"
               value={organisation.name}
               onChange={(e) => updateField("name", e.target.value)}
-              className="w-full rounded-lg border border-[#6B9FB8]/40 px-3 py-2 focus:border-[#2E6B8A] focus:outline-none"
+              className="w-full rounded-lg border border-soltas-line px-3 py-2 focus:border-soltas-ocean focus:outline-none"
               placeholder="Your Organisation"
             />
             {errors.name && <p className="mt-1 text-sm text-rose-600">{errors.name}</p>}
@@ -167,7 +167,7 @@ export default function CreateOrganisationPage() {
               type="text"
               value={organisation.country_based}
               onChange={(e) => updateField("country_based", e.target.value)}
-              className="w-full rounded-lg border border-[#6B9FB8]/40 px-3 py-2 focus:border-[#2E6B8A] focus:outline-none"
+              className="w-full rounded-lg border border-soltas-line px-3 py-2 focus:border-soltas-ocean focus:outline-none"
               placeholder="e.g. United States"
             />
             {errors.country_based && <p className="mt-1 text-sm text-rose-600">{errors.country_based}</p>}
@@ -181,7 +181,7 @@ export default function CreateOrganisationPage() {
               id="what_we_do"
               value={organisation.what_we_do}
               onChange={(e) => updateField("what_we_do", e.target.value)}
-              className="w-full rounded-lg border border-[#6B9FB8]/40 px-3 py-2 focus:border-[#2E6B8A] focus:outline-none"
+              className="w-full rounded-lg border border-soltas-line px-3 py-2 focus:border-soltas-ocean focus:outline-none"
               rows={4}
               placeholder="Describe your organisation's mission and activities"
             />
@@ -197,7 +197,7 @@ export default function CreateOrganisationPage() {
               type="text"
               value={organisation.existing_since}
               onChange={(e) => updateField("existing_since", e.target.value)}
-              className="w-full rounded-lg border border-[#6B9FB8]/40 px-3 py-2 focus:border-[#2E6B8A] focus:outline-none"
+              className="w-full rounded-lg border border-soltas-line px-3 py-2 focus:border-soltas-ocean focus:outline-none"
               placeholder="e.g. 2020"
             />
           </div>
@@ -211,7 +211,7 @@ export default function CreateOrganisationPage() {
               type="url"
               value={organisation.website}
               onChange={(e) => updateField("website", e.target.value)}
-              className="w-full rounded-lg border border-[#6B9FB8]/40 px-3 py-2 focus:border-[#2E6B8A] focus:outline-none"
+              className="w-full rounded-lg border border-soltas-line px-3 py-2 focus:border-soltas-ocean focus:outline-none"
               placeholder="https://example.com"
             />
           </div>
@@ -225,7 +225,7 @@ export default function CreateOrganisationPage() {
               type="url"
               value={organisation.logo_url}
               onChange={(e) => updateField("logo_url", e.target.value)}
-              className="w-full rounded-lg border border-[#6B9FB8]/40 px-3 py-2 focus:border-[#2E6B8A] focus:outline-none"
+              className="w-full rounded-lg border border-soltas-line px-3 py-2 focus:border-soltas-ocean focus:outline-none"
               placeholder="https://example.com/logo.png"
             />
           </div>
@@ -237,7 +237,7 @@ export default function CreateOrganisationPage() {
                 <select
                   value={link.type}
                   onChange={(e) => updateSocialLink(index, "type", e.target.value)}
-                  className="rounded-lg border border-[#6B9FB8]/40 px-3 py-2 focus:border-[#2E6B8A] focus:outline-none"
+                  className="rounded-lg border border-soltas-line px-3 py-2 focus:border-soltas-ocean focus:outline-none"
                 >
                   {socialLinkTypes.map((type) => (
                     <option key={type} value={type}>
@@ -249,7 +249,7 @@ export default function CreateOrganisationPage() {
                   type="url"
                   value={link.url}
                   onChange={(e) => updateSocialLink(index, "url", e.target.value)}
-                  className="flex-1 rounded-lg border border-[#6B9FB8]/40 px-3 py-2 focus:border-[#2E6B8A] focus:outline-none"
+                  className="flex-1 rounded-lg border border-soltas-line px-3 py-2 focus:border-soltas-ocean focus:outline-none"
                   placeholder="https://..."
                 />
                 {socialLinks.length > 1 && (
@@ -266,7 +266,7 @@ export default function CreateOrganisationPage() {
             <button
               type="button"
               onClick={addSocialLink}
-              className="mt-2 rounded-lg border border-[#6B9FB8]/40 bg-[#EEF2F5] px-3 py-2 text-sm text-[#2E6B8A] hover:bg-[#6B9FB8]/10"
+              className="mt-2 rounded-lg border border-soltas-line bg-soltas-light px-3 py-2 text-sm text-soltas-ocean hover:bg-soltas-light"
             >
               Add Social Link
             </button>
@@ -282,13 +282,13 @@ export default function CreateOrganisationPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 rounded-xl bg-[#2E6B8A] px-6 py-2 text-sm font-semibold text-white transition hover:bg-[#1A3F54] disabled:opacity-50"
+              className="flex-1 rounded-xl bg-soltas-ocean px-6 py-2 text-sm font-semibold text-white transition hover:bg-soltas-abyssal disabled:opacity-50"
             >
               {loading ? "Creating..." : "Create Organisation"}
             </button>
             <Link
               href="/profile"
-              className="rounded-xl border border-[#6B9FB8]/40 px-6 py-2 text-sm font-semibold text-[#2E6B8A] transition hover:bg-[#EEF2F5]"
+              className="rounded-xl border border-soltas-line px-6 py-2 text-sm font-semibold text-soltas-ocean transition hover:bg-soltas-light"
             >
               Cancel
             </Link>
