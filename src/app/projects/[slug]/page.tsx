@@ -137,14 +137,25 @@ export default async function ProjectDetailPage({
         .maybeSingle()
     : { data: null, error: null };
 
+  // RLS returns "project"-visibility updates only to project members (owner, collaborators, shares).
   const { data: projectUpdates, error: updatesError } = await supabase
     .from("project_updates")
     .select("id,project_id,author_user_id,title,body,visibility,published_at,created_at")
     .eq("project_id", project.id)
-    .eq("visibility", "public")
     .order("published_at", { ascending: false });
 
   if (updatesError) throw new Error(updatesError.message);
+
+  const authorIds = Array.from(new Set((projectUpdates ?? []).map((u) => u.author_user_id)));
+  const { data: authorProfiles } = authorIds.length
+    ? await supabase.from("profiles").select("id,first_name,last_name,full_name").in("id", authorIds)
+    : { data: [] as Array<{ id: string; first_name: string | null; last_name: string | null; full_name: string | null }> };
+  const authorNames = new Map(
+    (authorProfiles ?? []).map((p) => [
+      p.id,
+      [p.first_name, p.last_name].filter(Boolean).join(" ") || p.full_name || undefined,
+    ]),
+  );
 
   const resolvedFollowerCount = followerCountError ? null : followerCount ?? 0;
   const isFollowing = Boolean(followEdge && !followEdgeError);
@@ -174,6 +185,8 @@ export default async function ProjectDetailPage({
     title: update.title,
     summary: update.body,
     created_at: update.published_at,
+    author_name: authorNames.get(update.author_user_id),
+    visibility: update.visibility === "project" ? "project" : "public",
   }));
 
   return (
@@ -257,6 +270,7 @@ export default async function ProjectDetailPage({
         updates={updates}
         isAuthenticated={Boolean(user)}
         canPost={Boolean(canEdit)}
+        projectId={project.id}
       />
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
