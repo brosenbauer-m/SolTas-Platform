@@ -1,45 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createServerClient } from "@supabase/ssr";
 
 import { ensureSupabaseConfig } from "@/lib/supabaseConfig";
 
+/**
+ * Landing point for links in Supabase emails (sign-up confirmation, password reset).
+ * Exchanges the one-time code for a session and stores the session cookies on the redirect.
+ */
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/";
+  const nextParam = searchParams.get("next") ?? "/";
+  const next = nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "/";
 
-  if (code) {
-    const { url, anonKey } = ensureSupabaseConfig();
-    const supabase = createServerClient(url, anonKey, {
-      cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value;
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          });
-        },
-        remove(name: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value: "",
-            ...options,
-          });
-        },
-      },
-    });
-
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-    if (!error) {
-      const safeNext = next.startsWith("/") ? next : "/";
-      return NextResponse.redirect(`${origin}${safeNext}`);
-    }
+  if (!code) {
+    return NextResponse.redirect(`${origin}${next}`);
   }
 
-  // If no code or error, redirect to next or home
-  return NextResponse.redirect(`${origin}${next}`);
+  const response = NextResponse.redirect(`${origin}${next}`);
+  const { url, anonKey } = ensureSupabaseConfig();
+  const supabase = createServerClient(url, anonKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+      },
+    },
+  });
+
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  if (error) {
+    return NextResponse.redirect(`${origin}/login?error=link`);
+  }
+  return response;
 }

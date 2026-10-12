@@ -1,18 +1,28 @@
 import { Suspense } from "react";
+import Link from "next/link";
+
+import { AuthShell } from "@/components/auth/AuthShell";
 import LoginForm from "@/components/auth/LoginForm";
+
+export const metadata = { title: "Sign in" };
 
 export default function LoginPage() {
   return (
-    <div className="mx-auto flex w-full max-w-md flex-col gap-6 p-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-semibold text-soltas-text">Sign in</h1>
-        <p className="text-sm text-soltas-muted">
-          Sign in to your account to continue.
-        </p>
-      </div>
-      <Suspense fallback={<div className="rounded-2xl border border-soltas-line bg-white p-6 text-sm text-soltas-muted">Loading...</div>}>
+    <AuthShell
+      title="Welcome back"
+      subtitle="Sign in to follow projects, post updates and connect with others."
+      footer={
+        <>
+          New here?{" "}
+          <Link href="/signup" className="font-medium text-soltas-ocean hover:underline">
+            Create an account
+          </Link>
+        </>
+      }
+    >
+      <Suspense fallback={<div className="h-[232px]" />}>
         <LoginForm />
       </Suspense>
-    </div>
+    </AuthShell>
   );
 }

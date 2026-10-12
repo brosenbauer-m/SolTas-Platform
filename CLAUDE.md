@@ -7,7 +7,7 @@
 - `src/app/` routes (App Router): `page.tsx` home (globe + stats), `about`, `services`, `projects` (find,
   `[slug]` profile, `[slug]/edit`, `new`), `find-organisations` + `organisations/[id]` (profile, `edit`,
   `members`, `create`), `funding`, `watchdog` (`new`, `[id]`), `feed`, `people/[id]`, `notifications`,
-  `settings`, `me/organisations`, `admin/*` (moderation), `login` / `signup` / `auth` / `onboarding`
+  `settings`, `me/organisations`, `admin/*` (moderation), `login` / `signup` / `forgot-password` / `reset-password` / `auth/callback` (email links) / `onboarding`
 - `src/app/api/` route handlers (projects, updates, feed-posts, comments, follow, grants, watchdog,
   home-stats, home-markers, admin/*)
 - `src/components/` UI: `ui/` (shared primitives), `Header.tsx` + `UserMenu.tsx` (nav), `home/`, `projects/`,
