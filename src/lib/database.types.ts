@@ -2837,60 +2837,6 @@ export type Database = {
         }
         Relationships: []
       }
-      watchdog_cases: {
-        Row: {
-          country: string | null
-          created_at: string | null
-          created_by: string | null
-          description: string | null
-          id: string
-          ifrc_global_challenges: string[] | null
-          lat: number | null
-          links: Json | null
-          lng: number | null
-          location: string | null
-          region: string | null
-          review_status: string
-          sdgs: string[] | null
-          target_demographics: string[] | null
-          title: string
-        }
-        Insert: {
-          country?: string | null
-          created_at?: string | null
-          created_by?: string | null
-          description?: string | null
-          id?: string
-          ifrc_global_challenges?: string[] | null
-          lat?: number | null
-          links?: Json | null
-          lng?: number | null
-          location?: string | null
-          region?: string | null
-          review_status?: string
-          sdgs?: string[] | null
-          target_demographics?: string[] | null
-          title: string
-        }
-        Update: {
-          country?: string | null
-          created_at?: string | null
-          created_by?: string | null
-          description?: string | null
-          id?: string
-          ifrc_global_challenges?: string[] | null
-          lat?: number | null
-          links?: Json | null
-          lng?: number | null
-          location?: string | null
-          region?: string | null
-          review_status?: string
-          sdgs?: string[] | null
-          target_demographics?: string[] | null
-          title?: string
-        }
-        Relationships: []
-      }
       watchdog_issue_updates: {
         Row: {
           author_user_id: string
@@ -3267,7 +3213,6 @@ export type Database = {
         Args: { email: string; pid: string; role: string }
         Returns: string
       }
-      approve_project: { Args: { p_project_id: string }; Returns: undefined }
       can_admin_projects: { Args: never; Returns: boolean }
       create_notification: {
         Args: {
@@ -3363,7 +3308,6 @@ export type Database = {
         }[]
       }
       get_unread_notification_count: { Args: never; Returns: number }
-      grant_admin: { Args: { p_email: string }; Returns: undefined }
       is_admin:
         | { Args: never; Returns: boolean }
         | { Args: { uid: string }; Returns: boolean }
@@ -3378,12 +3322,10 @@ export type Database = {
       is_superadmin_email: { Args: { e: string }; Returns: boolean }
       mark_all_notifications_read: { Args: never; Returns: undefined }
       mark_notification_read: { Args: { nid: string }; Returns: undefined }
-      reject_project: { Args: { p_project_id: string }; Returns: undefined }
       remove_project_collaborator: {
         Args: { pid: string; target_id: string }
         Returns: string
       }
-      revoke_admin: { Args: { p_email: string }; Returns: undefined }
       slugify_project_name: { Args: { project_name: string }; Returns: string }
       user_can_edit_project: { Args: { pid: string }; Returns: boolean }
       user_can_view_project: { Args: { pid: string }; Returns: boolean }
