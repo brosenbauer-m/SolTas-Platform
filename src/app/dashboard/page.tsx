@@ -30,7 +30,7 @@ export default function DashboardPage() {
       }
       const { data } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id,kind,full_name,surname,nationality,organisation_name,organisation_id")
         .eq("id", userData.user.id)
         .single();
       setProfile(data as Profile);

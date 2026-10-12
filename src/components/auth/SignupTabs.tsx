@@ -223,8 +223,7 @@ function SignupTabsContent({ client }: { client: SupabaseClient }) {
       const organisationId =
         individual.organisation_id === "independent" ? null : individual.organisation_id;
 
-      const { error: profileError } = await client.from("profiles").upsert({
-        id: data.user.id,
+      const profileFields = {
         first_name: individual.first_name.trim(),
         last_name: individual.last_name.trim(),
         date_of_birth: individual.date_of_birth,
@@ -235,8 +234,22 @@ function SignupTabsContent({ client }: { client: SupabaseClient }) {
         bio: individual.bio.trim() || null,
         social_links: normalizeLinks(individualLinks),
         avatar_url: individual.avatar_url.trim() || null,
-      });
-      if (profileError) throw profileError;
+      };
+
+      // Update the row created at sign-up, or insert it if it doesn't exist yet.
+      // (No upsert: date_of_birth is write-only for API roles, and an upsert would need to read it.)
+      const { data: updatedProfile, error: updateError } = await client
+        .from("profiles")
+        .update(profileFields)
+        .eq("id", data.user.id)
+        .select("id");
+      if (updateError) throw updateError;
+      if (!updatedProfile || updatedProfile.length === 0) {
+        const { error: insertError } = await client
+          .from("profiles")
+          .insert({ id: data.user.id, ...profileFields });
+        if (insertError) throw insertError;
+      }
 
       setMessage({ text: "Signup successful! Redirecting...", tone: "success" });
       const returnTo = searchParams.get("returnTo");
