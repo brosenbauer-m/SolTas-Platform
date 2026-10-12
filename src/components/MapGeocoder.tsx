@@ -84,14 +84,16 @@ export default function MapGeocoder({ onSelect }: MapGeocoderProps) {
       initializedRef.current = true;
 
       return () => {
-        if (geocoder) {
-          geocoder.off("result", handleResult);
-          geocoder.off("error", handleError);
-          geocoder.clear();
-        }
-        if (map) {
-          map.remove();
-        }
+        // clear()/remove() can throw if the geocoder never finished mounting; never let cleanup crash the page.
+        try {
+          geocoder?.off("result", handleResult);
+          geocoder?.off("error", handleError);
+          geocoder?.clear();
+        } catch {}
+        try {
+          map?.remove();
+        } catch {}
+        container.innerHTML = "";
         geocoderRef.current = null;
         mapRef.current = null;
         initializedRef.current = false;
@@ -100,12 +102,12 @@ export default function MapGeocoder({ onSelect }: MapGeocoderProps) {
       console.error("Failed to initialise Mapbox geocoder", error);
       container.innerHTML =
         '<p class="text-sm text-rose-600">Map search unavailable: failed to initialise Mapbox geocoder.</p>';
-      if (geocoder) {
-        geocoder.clear();
-      }
-      if (map) {
-        map.remove();
-      }
+      try {
+        geocoder?.clear();
+      } catch {}
+      try {
+        map?.remove();
+      } catch {}
       geocoderRef.current = null;
       mapRef.current = null;
       initializedRef.current = false;
