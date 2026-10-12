@@ -9,8 +9,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
     "sb:version": "supabase --version",
     "sb:login": "supabase login --token $SUPABASE_ACCESS_TOKEN",
@@ -38,7 +38,7 @@
     "date-fns": "^4.1.0",
     "lucide-react": "^0.542.0",
     "mapbox-gl": "^3.14.0",
-    "next": "15.4.10",
+    "next": "15.5.27",
     "react": "19.1.0",
     "react-day-picker": "^9.11.0",
     "react-dom": "19.1.0",
@@ -54,7 +54,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "15.4.10",
+    "eslint-config-next": "15.5.27",
     "eslint-plugin-react-hooks": "^7.0.1",
     "supabase": "^2.76.8",
     "tailwindcss": "^4",
@@ -68,7 +68,8 @@
     "overrides": {
       "react-hook-form": "^7.62.0",
       "@hookform/resolvers": "^3.10.0",
-      "zod": "^3.23.8"
+      "zod": "^3.23.8",
+      "next>postcss": "^8.5.23"
     }
   }
 }
