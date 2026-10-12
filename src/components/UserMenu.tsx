@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown, ChevronRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { isAdmin as rpcIsAdmin, isSuperadmin as rpcIsSuper } from "@/lib/admin";
 
@@ -18,7 +17,6 @@ export default function UserMenu({ onNavigate }: { onNavigate?: () => void }) {
   const [isSuper, setIsSuper] = useState(false);
 
   const [orgs, setOrgs] = useState<OrganisationContext[]>([]);
-  const [registrationsOpen, setRegistrationsOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -129,33 +127,9 @@ export default function UserMenu({ onNavigate }: { onNavigate?: () => void }) {
       </Link>
 
       {isAdmin && (
-        <>
-          <button
-            type="button"
-            onClick={() => setRegistrationsOpen((o) => !o)}
-            className={`${sectionLabel} flex w-full items-center justify-between text-left`}
-            aria-expanded={registrationsOpen}
-          >
-            <span>Review submissions</span>
-            {registrationsOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-          </button>
-          {registrationsOpen && (
-            <>
-              <Link href="/admin/registrations" className={itemClass} onClick={onNavigate}>
-                Projects
-              </Link>
-              <Link href="/admin/funding-registrations" className={itemClass} onClick={onNavigate}>
-                Funding
-              </Link>
-              <Link href="/admin/issue-registrations" className={itemClass} onClick={onNavigate}>
-                Watchdog issues
-              </Link>
-              <Link href="/admin/organisation-registrations" className={itemClass} onClick={onNavigate}>
-                Organisations
-              </Link>
-            </>
-          )}
-        </>
+        <Link href="/admin" className={itemClass} onClick={onNavigate}>
+          Admin
+        </Link>
       )}
 
       {isSuper && (
