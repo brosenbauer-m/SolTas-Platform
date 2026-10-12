@@ -114,11 +114,11 @@ export default function WatchdogFilters({
 
   const containerClassName =
     variant === "panel"
-      ? "space-y-4 rounded-lg border border-soltas-line bg-white p-4 shadow-sm"
+      ? "space-y-4 rounded-2xl border border-soltas-line bg-white p-5"
       : "space-y-4";
 
   return (
-    <section className={containerClassName}>
+    <section className={`@container ${containerClassName}`}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-soltas-text">Filters</h2>
@@ -131,7 +131,7 @@ export default function WatchdogFilters({
         </Button>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 @md:grid-cols-2 @3xl:grid-cols-3">
         <label className="space-y-1 text-sm text-soltas-muted">
           <span className="font-medium text-soltas-text">Search</span>
           <Input
@@ -166,7 +166,7 @@ export default function WatchdogFilters({
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 @md:grid-cols-2 @3xl:grid-cols-3">
         <div className="space-y-2 text-sm text-soltas-muted">
           <span className="font-medium text-soltas-text">UN SDGs</span>
           <MultiSelect
@@ -204,7 +204,7 @@ export default function WatchdogFilters({
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 @md:grid-cols-2 @3xl:grid-cols-3">
         <label className="space-y-1 text-sm text-soltas-muted">
           <span className="font-medium text-soltas-text">Urgency min</span>
           <Input

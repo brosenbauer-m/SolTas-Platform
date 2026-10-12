@@ -386,8 +386,9 @@ export default function HomeGlobe({
         width: "14px",
         height: "14px",
         borderRadius: "9999px",
-        backgroundColor: marker.markerColor ?? "#10b981",
-        boxShadow: "0 4px 12px rgba(15, 23, 42, 0.35)",
+        backgroundColor: marker.markerColor ?? "#2E6B8A",
+        border: "2px solid #ffffff",
+        boxShadow: "0 2px 8px rgba(15, 23, 42, 0.35)",
         transform: "translate(-50%, -50%)",
       });
 

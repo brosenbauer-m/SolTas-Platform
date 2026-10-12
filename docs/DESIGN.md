@@ -34,8 +34,9 @@ Goal: **elegant, simple, intuitive, modern and friendly**, in the spirit of Appl
 | `soltas-clay` | `#B07848` | decorative only |
 | `border-soltas-line` | `rgba(26,43,56,0.08)` | hairline borders |
 
-Category colours on maps and badges: **humanitarian = ocean blue**, **environmental = green (#2F855A)**;
-always paired with a text label (never colour alone).
+Map markers (`src/lib/markerColors.ts`): **humanitarian = warm orange `#E07A3F`**, **environmental = green
+`#2F9E6B`**, other = ocean; white 2px ring for contrast on any map style. Watchdog urgency uses a green→red scale.
+Badges: humanitarian `ocean`, environmental `green`. Always pair colour with a text label (never colour alone).
 
 Radius: inputs/buttons `rounded-full` (pills) or `rounded-xl` for fields; cards `rounded-2xl`; dialogs
 `rounded-3xl`. Shadows: `shadow-sm` for cards on hover, `shadow-lg` for floating layers only.

@@ -1,5 +1,7 @@
 "use client";
 
+import { categoryMarkerColor } from "@/lib/markerColors";
+
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import type { FocusEvent } from "react";
@@ -138,7 +140,7 @@ export default function HomeGlobeSection({
         title: marker.name ?? "Untitled project",
         placeName: marker.place_name,
         description: marker.description,
-        markerColor: marker.category === "humanitarian" ? "#7f1d1d" : "#064e3b",
+        markerColor: categoryMarkerColor(marker.category),
         ctaHref: `/projects/${marker.slug ?? marker.id}`,
         ctaLabel: MODE_CONFIG.projects.ctaLabel,
         eyebrow: "Project",
@@ -151,14 +153,7 @@ export default function HomeGlobeSection({
         title: marker.title ?? "Untitled funding",
         placeName: marker.location_name,
         description: marker.summary,
-        markerColor:
-          marker.project_type === "humanitarian"
-            ? "#7f1d1d"
-            : marker.project_type === "environmental"
-              ? "#064e3b"
-              : marker.project_type === "both"
-                ? "#1e3a8a"
-                : "#10b981",
+        markerColor: categoryMarkerColor(marker.project_type),
         ctaHref: `/funding/${encodeURIComponent(marker.slug ?? marker.id)}`,
         ctaLabel: MODE_CONFIG.funding.ctaLabel,
         eyebrow: "Funding",

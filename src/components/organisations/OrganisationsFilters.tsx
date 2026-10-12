@@ -113,11 +113,11 @@ export default function OrganisationsFilters({
 
   const containerClassName =
     variant === "panel"
-      ? "space-y-4 rounded-lg border border-soltas-line bg-white p-4 shadow-sm"
+      ? "space-y-4 rounded-2xl border border-soltas-line bg-white p-5"
       : "space-y-4";
 
   return (
-    <section className={containerClassName}>
+    <section className={`@container ${containerClassName}`}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-soltas-text">Filters</h2>
@@ -128,7 +128,7 @@ export default function OrganisationsFilters({
         </Button>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 @md:grid-cols-2">
         <label className="space-y-1 text-sm text-soltas-muted">
           <span className="font-medium text-soltas-text">AI Search (beta)</span>
           <Input
@@ -138,7 +138,7 @@ export default function OrganisationsFilters({
           />
         </label>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 @md:grid-cols-2">
           <div className="space-y-2 text-sm text-soltas-muted">
             <span className="font-medium text-soltas-text">Countries</span>
             <MultiSelect
@@ -165,7 +165,7 @@ export default function OrganisationsFilters({
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 @md:grid-cols-2 @3xl:grid-cols-3">
         <div className="space-y-2 text-sm text-soltas-muted">
           <span className="font-medium text-soltas-text">Thematic areas</span>
           <MultiSelect
@@ -203,7 +203,7 @@ export default function OrganisationsFilters({
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 @md:grid-cols-2 @3xl:grid-cols-3">
         <label className="space-y-1 text-sm text-soltas-muted">
           <span className="font-medium text-soltas-text">Age (years) min</span>
           <Input
@@ -260,7 +260,7 @@ export default function OrganisationsFilters({
       </div>
 
       {showSorting ? (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 @md:grid-cols-2">
           <label className="space-y-1 text-sm text-soltas-muted">
             <span className="font-medium text-soltas-text">Sort by</span>
             <Select value={sortValue} onValueChange={value => updateParams({ sort: value })}>

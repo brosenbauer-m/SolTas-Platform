@@ -54,7 +54,7 @@ const getMarkerScale = (zoom: number) => {
 
 export default function Map({
   markers = [],
-  markerColor = "#22c55e",
+  markerColor = "#2E6B8A",
   focusSlug = null,
   ctaLabel = "View",
   recenterNonce,
@@ -228,7 +228,8 @@ export default function Map({
         height: "20px",
         borderRadius: "9999px",
         backgroundColor: m.markerColor ?? markerColor,
-        boxShadow: "0 4px 12px rgba(15, 23, 42, 0.35)",
+        border: "2px solid #ffffff",
+        boxShadow: "0 2px 8px rgba(15, 23, 42, 0.35)",
         transform: `translate(-50%, -50%) scale(${scale})`,
       })
 

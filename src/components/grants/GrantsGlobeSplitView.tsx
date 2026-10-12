@@ -1,5 +1,7 @@
 "use client";
 
+import { MARKER_COLORS } from "@/lib/markerColors";
+
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 
@@ -18,10 +20,10 @@ const MOBILE_BREAKPOINT = 768;
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
 const resolveMarkerColor = (projectType: string | null) => {
-  if (projectType === "humanitarian") return "#7f1d1d";
-  if (projectType === "environmental") return "#064e3b";
+  if (projectType === "humanitarian") return MARKER_COLORS.humanitarian;
+  if (projectType === "environmental") return MARKER_COLORS.environmental;
   if (projectType === "both") return "#1e3a8a";
-  return "#10b981";
+  return MARKER_COLORS.default;
 };
 
 export default function GrantsGlobeSplitView({ options, markers, totalCount, focusSlug }: Props) {
@@ -242,7 +244,7 @@ export default function GrantsGlobeSplitView({ options, markers, totalCount, foc
         <div className="h-full w-full">
           <Map
             markers={mapMarkers}
-            markerColor="#10b981"
+            markerColor={MARKER_COLORS.default}
             focusSlug={focusSlug}
             ctaLabel="See details"
             recenterNonce={recenterNonce}
@@ -308,18 +310,16 @@ export default function GrantsGlobeSplitView({ options, markers, totalCount, foc
           </div>
         </div>
 
-        <div className="relative h-full w-full bg-soltas-light">
+        <div className="relative h-full w-full bg-soltas-off-white">
           <button
             type="button"
             aria-label="Resize panel"
             onPointerDown={startDrag}
-            className="absolute inset-0 h-full w-full hover:bg-slate-200/60 active:bg-slate-200/80 focus:outline-none"
+            className="group absolute inset-0 h-full w-full cursor-col-resize focus:outline-none"
           >
-            <div className="absolute left-1/2 top-0 h-full w-[3px] -translate-x-1/2 bg-slate-300" />
+            <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-soltas-line transition-colors group-hover:bg-soltas-ocean/40" />
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none">
-              <div className="rounded-lg bg-soltas-ocean px-2.5 py-1.5 text-sm font-bold text-white shadow-lg ring-1 ring-black/10">
-                {"<>"}
-              </div>
+              <div className="h-8 w-1.5 rounded-full bg-soltas-muted/40 transition-colors group-hover:bg-soltas-ocean/60" />
             </div>
           </button>
 
@@ -327,16 +327,16 @@ export default function GrantsGlobeSplitView({ options, markers, totalCount, foc
             type="button"
             aria-label={collapsed ? "Open filters panel" : "Close filters panel"}
             onClick={toggleCollapsed}
-            className="absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded-full bg-soltas-ocean px-3 py-2 text-xs font-semibold text-white shadow-lg ring-1 ring-black/10 hover:bg-soltas-abyssal focus:outline-none focus:ring-2 focus:ring-soltas-glacial"
+            className="absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded-full border border-soltas-line bg-white px-3 py-1.5 text-xs font-medium text-soltas-text shadow-sm hover:bg-soltas-off-white focus:outline-none focus-visible:ring-2 focus-visible:ring-soltas-ocean"
           >
-            {collapsed ? "Show" : "Hide"}
+            {collapsed ? "Filters" : "Hide"}
           </button>
         </div>
 
         <div className="min-w-0 h-full">
           <Map
             markers={mapMarkers}
-            markerColor="#10b981"
+            markerColor={MARKER_COLORS.default}
             focusSlug={focusSlug}
             ctaLabel="See details"
             recenterNonce={recenterNonce}
