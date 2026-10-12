@@ -1,21 +1,18 @@
+import { PageHeader } from "@/components/ui/page-header";
+
 import ClientGrantForm from "./ClientGrantForm";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+export const metadata = { title: "Add funding" };
 
 export default function NewGrantPage() {
   return (
-    <main className="mx-auto max-w-4xl space-y-6 px-4 pb-16 pt-10 sm:px-6 lg:px-8">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-semibold text-soltas-text">
-          Register a funding opportunity
-        </h1>
-        <p className="text-sm text-soltas-muted">
-          Provide as much detail as you can. Your submission will be reviewed by
-          an administrator before it goes live.
-        </p>
-      </div>
-
+    <main className="mx-auto w-full max-w-3xl space-y-8 px-5 pb-20 pt-10 sm:pt-14">
+      <PageHeader
+        title="Add a funding opportunity"
+        description="Share a grant, prize or programme with the community. Add as much detail as you can; our team reviews it before it goes live."
+      />
       <ClientGrantForm />
     </main>
   );
