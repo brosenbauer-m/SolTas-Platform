@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import type { Database } from "@/lib/database.types";
+import { fetchProfilesByIds, one, profileDisplayName } from "@/lib/profiles/byIds";
 import { getServerSupabase } from "@/lib/supabaseServer";
 import { cn } from "@/lib/utils";
 
@@ -21,8 +22,7 @@ type RawSubmissionListItem = Omit<
   SubmissionListItem,
   "organisation" | "submitted_by_profile"
 > & {
-  organisation: Pick<OrganisationRow, "name">[] | null;
-  submitted_by_profile: Pick<ProfileRow, "full_name">[] | null;
+  organisation: Pick<OrganisationRow, "name"> | Pick<OrganisationRow, "name">[] | null;
 };
 
 type SubmissionStatus = "pending" | "approved" | "rejected";
@@ -97,8 +97,7 @@ export default async function AdminOrganisationSubmissionsPage({
     .from("organisation_verification_submissions")
     .select(
       `id,organisation_id,submitted_by,status,created_at,reviewed_at,reviewed_by,
-       organisation:organisations(name),
-       submitted_by_profile:profiles!organisation_verification_submissions_submitted_by_fkey(full_name)
+       organisation:organisations(name)
       `
     )
     .order("created_at", { ascending: false });
@@ -110,13 +109,16 @@ export default async function AdminOrganisationSubmissionsPage({
   const { data, error } = await query;
   if (error) throw error;
 
-  const submissions: SubmissionListItem[] = (data as RawSubmissionListItem[] | null)?.map(
-    submission => ({
+  const rows = (data as RawSubmissionListItem[] | null) ?? [];
+  const profiles = await fetchProfilesByIds(supabase, rows.map(submission => submission.submitted_by));
+  const submissions: SubmissionListItem[] = rows.map(submission => {
+    const profile = submission.submitted_by ? profiles.get(submission.submitted_by) : undefined;
+    return {
       ...submission,
-      organisation: submission.organisation?.[0] ?? null,
-      submitted_by_profile: submission.submitted_by_profile?.[0] ?? null,
-    })
-  ) ?? [];
+      organisation: one(submission.organisation),
+      submitted_by_profile: profile ? { full_name: profileDisplayName(profile) } : null,
+    };
+  });
 
   const currentViewConfig = VIEWS.find(view => view.id === currentView) ?? VIEWS[0];
 

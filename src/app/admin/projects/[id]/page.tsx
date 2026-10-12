@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ProjectApprovalActions } from "@/components/admin/ProjectApprovalActions";
 import Map from "@/components/Map";
 import type { Database } from "@/lib/database.types";
+import { fetchProfilesByIds } from "@/lib/profiles/byIds";
 import { getServerSupabase } from "@/lib/supabaseServer";
 
 type ProjectRow = Database["public"]["Tables"]["projects"]["Row"];
@@ -36,9 +37,7 @@ type ProjectDetail = ProjectRow & {
   })[];
 };
 
-type RawProjectDetail = Omit<ProjectDetail, "created_by_profile"> & {
-  created_by_profile: Pick<ProfileRow, "full_name" | "organisation_name" | "role">[] | null;
-};
+type RawProjectDetail = Omit<ProjectDetail, "created_by_profile">;
 
 function formatDate(value: string | null | undefined) {
   if (!value) return "—";
@@ -116,8 +115,7 @@ export default async function AdminProjectDetail({
        project_media:project_media(id,path,caption,mime_type,created_at),
        project_partners:project_partners(organisation_id,organisation:organisations(id,name)),
        project_sdgs:project_sdgs(sdg_id,sdg:sdgs(id,name)),
-       project_ifrc_challenges:project_ifrc_challenges(challenge_id,challenge:ifrc_challenges(id,name,code)),
-       created_by_profile:profiles(full_name,organisation_name,role)
+       project_ifrc_challenges:project_ifrc_challenges(challenge_id,challenge:ifrc_challenges(id,name,code))
       `
     )
     .eq("id", id)
@@ -135,7 +133,9 @@ export default async function AdminProjectDetail({
 
   const project: ProjectDetail = {
     ...rawProject,
-    created_by_profile: rawProject.created_by_profile?.[0] ?? null,
+    created_by_profile: rawProject.created_by
+      ? (await fetchProfilesByIds(supabase, [rawProject.created_by])).get(rawProject.created_by) ?? null
+      : null,
     project_links: rawProject.project_links ?? [],
     project_media: rawProject.project_media ?? [],
     project_partners: rawProject.project_partners ?? [],

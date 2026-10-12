@@ -27,21 +27,11 @@ export async function GET(
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Fetch comments with author profile information
+  // Fetch comments. author_user_id references auth.users (not profiles), so PostgREST
+  // cannot embed profiles here; load author names in a second query instead.
   const { data: comments, error } = await supabase
     .from("update_comments")
-    .select(
-      `
-      id,
-      body,
-      created_at,
-      author_user_id,
-      profiles:author_user_id (
-        first_name,
-        last_name
-      )
-    `
-    )
+    .select("id, body, created_at, author_user_id")
     .eq("update_id", updateId)
     .order("created_at", { ascending: true });
 
@@ -49,25 +39,22 @@ export async function GET(
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
+  const authorIds = Array.from(new Set((comments ?? []).map((c) => c.author_user_id).filter(Boolean)));
+  const { data: authors } = authorIds.length
+    ? await supabase.from("profiles").select("id, first_name, last_name").in("id", authorIds)
+    : { data: [] as Array<{ id: string; first_name: string | null; last_name: string | null }> };
+  const authorNames = new Map(
+    (authors ?? []).map((a) => [a.id, [a.first_name, a.last_name].filter(Boolean).join(" ").trim()]),
+  );
+
   // Transform to match the Comment interface expected by the UI component
-  const formattedComments = (comments ?? []).map((comment) => {
-    const profile = Array.isArray(comment.profiles)
-      ? comment.profiles[0]
-      : comment.profiles;
-
-    const firstName = profile?.first_name ?? "";
-    const lastName = profile?.last_name ?? "";
-    const authorName =
-      [firstName, lastName].filter(Boolean).join(" ").trim() || "Anonymous";
-
-    return {
-      id: comment.id,
-      authorName,
-      body: comment.body,
-      createdAt: comment.created_at,
-      canDelete: user?.id === comment.author_user_id,
-    };
-  });
+  const formattedComments = (comments ?? []).map((comment) => ({
+    id: comment.id,
+    authorName: authorNames.get(comment.author_user_id) || "Anonymous",
+    body: comment.body,
+    createdAt: comment.created_at,
+    canDelete: user?.id === comment.author_user_id,
+  }));
 
   return NextResponse.json({ comments: formattedComments });
 }
