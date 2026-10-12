@@ -3,30 +3,20 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+
+import {
+  SocialLinksFields,
+  emptySocialLink,
+  normalizeSocialLinks,
+  type SocialLink,
+} from "@/components/profiles/SocialLinksFields";
+import { Button, buttonClasses } from "@/components/ui/button";
+import { Field, FormMessage, FormSection } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { PageHeader } from "@/components/ui/page-header";
+import { Textarea } from "@/components/ui/textarea";
 import { supabaseClient } from "@/lib/supabaseClient";
-
-type SocialLinkType =
-  | "LinkedIn"
-  | "YouTube"
-  | "Instagram"
-  | "Facebook"
-  | "Website"
-  | "X"
-  | "Threads";
-
-type SocialLink = { type: SocialLinkType; url: string };
-
-const socialLinkTypes: SocialLinkType[] = [
-  "LinkedIn",
-  "YouTube",
-  "Instagram",
-  "Facebook",
-  "Website",
-  "X",
-  "Threads",
-];
-
-const emptySocialLink: SocialLink = { type: "LinkedIn", url: "" };
+import { cn } from "@/lib/utils";
 
 export default function CreateOrganisationPage() {
   const router = useRouter();
@@ -41,7 +31,7 @@ export default function CreateOrganisationPage() {
     website: "",
     logo_url: "",
   });
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([emptySocialLink]);
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   function updateField(field: keyof typeof organisation, value: string) {
@@ -62,19 +52,13 @@ export default function CreateOrganisationPage() {
     setSocialLinks((prev) => prev.filter((_, idx) => idx !== index));
   }
 
-  function normalizeLinks(links: SocialLink[]) {
-    return links
-      .map((link) => ({ ...link, url: link.url.trim() }))
-      .filter((link) => link.url.length > 0);
-  }
-
   function validate() {
     const nextErrors: Record<string, string> = {};
-    if (!organisation.name.trim()) nextErrors.name = "Organisation name is required.";
+    if (!organisation.name.trim()) nextErrors.name = "Enter the organisation’s name.";
     if (!organisation.country_based.trim()) {
-      nextErrors.country_based = "Country based is required.";
+      nextErrors.country_based = "Enter the country it’s based in.";
     }
-    if (!organisation.what_we_do.trim()) nextErrors.what_we_do = "What we do is required.";
+    if (!organisation.what_we_do.trim()) nextErrors.what_we_do = "Describe what the organisation does.";
     return nextErrors;
   }
 
@@ -106,7 +90,7 @@ export default function CreateOrganisationPage() {
         existing_since: organisation.existing_since || undefined,
         website: organisation.website.trim() || undefined,
         logo_url: organisation.logo_url.trim() || undefined,
-        social_links: normalizeLinks(socialLinks),
+        social_links: normalizeSocialLinks(socialLinks),
       };
 
       // Call Edge Function to create organisation
@@ -132,169 +116,93 @@ export default function CreateOrganisationPage() {
     }
   }
 
-  return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 p-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-semibold text-soltas-text">Create Organisation</h1>
-        <p className="text-sm text-soltas-muted">
-          Set up your organisation profile. It will be submitted for verification.
-        </p>
-      </div>
+  const invalid = (key: string) =>
+    cn(errors[key] && "border-rose-400 focus:border-rose-400 focus-visible:ring-rose-100");
 
-      <form onSubmit={handleSubmit} className="rounded-2xl border border-soltas-line bg-white p-6">
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-soltas-text mb-1">
-              Organisation Name <span className="text-rose-500">*</span>
-            </label>
-            <input
-              id="name"
-              type="text"
+  return (
+    <main className="mx-auto w-full max-w-2xl space-y-8 px-5 pb-20 pt-10 sm:pt-14">
+      <PageHeader
+        title="Create an organisation"
+        description="Set up a page for your organisation. We’ll review it before it’s verified; you can edit everything later."
+      />
+
+      <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+        {error ? <FormMessage tone="error">{error}</FormMessage> : null}
+
+        <FormSection title="Basics">
+          <Field label="Name" error={errors.name}>
+            <Input
+              autoComplete="organization"
               value={organisation.name}
               onChange={(e) => updateField("name", e.target.value)}
-              className="w-full rounded-lg border border-soltas-line px-3 py-2 focus:border-soltas-ocean focus:outline-none"
-              placeholder="Your Organisation"
+              className={invalid("name")}
             />
-            {errors.name && <p className="mt-1 text-sm text-rose-600">{errors.name}</p>}
+          </Field>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Country" error={errors.country_based}>
+              <Input
+                value={organisation.country_based}
+                onChange={(e) => updateField("country_based", e.target.value)}
+                placeholder="e.g. Kenya"
+                className={invalid("country_based")}
+              />
+            </Field>
+            <Field label="Founded" optional>
+              <Input
+                inputMode="numeric"
+                value={organisation.existing_since}
+                onChange={(e) => updateField("existing_since", e.target.value)}
+                placeholder="e.g. 2020"
+              />
+            </Field>
           </div>
-
-          <div>
-            <label htmlFor="country_based" className="block text-sm font-medium text-soltas-text mb-1">
-              Country Based <span className="text-rose-500">*</span>
-            </label>
-            <input
-              id="country_based"
-              type="text"
-              value={organisation.country_based}
-              onChange={(e) => updateField("country_based", e.target.value)}
-              className="w-full rounded-lg border border-soltas-line px-3 py-2 focus:border-soltas-ocean focus:outline-none"
-              placeholder="e.g. United States"
-            />
-            {errors.country_based && <p className="mt-1 text-sm text-rose-600">{errors.country_based}</p>}
-          </div>
-
-          <div>
-            <label htmlFor="what_we_do" className="block text-sm font-medium text-soltas-text mb-1">
-              What We Do <span className="text-rose-500">*</span>
-            </label>
-            <textarea
-              id="what_we_do"
+          <Field label="What you do" error={errors.what_we_do} hint="Your mission and main activities, in a few sentences.">
+            <Textarea
+              rows={5}
               value={organisation.what_we_do}
               onChange={(e) => updateField("what_we_do", e.target.value)}
-              className="w-full rounded-lg border border-soltas-line px-3 py-2 focus:border-soltas-ocean focus:outline-none"
-              rows={4}
-              placeholder="Describe your organisation's mission and activities"
+              className={invalid("what_we_do")}
             />
-            {errors.what_we_do && <p className="mt-1 text-sm text-rose-600">{errors.what_we_do}</p>}
-          </div>
+          </Field>
+        </FormSection>
 
-          <div>
-            <label htmlFor="existing_since" className="block text-sm font-medium text-soltas-text mb-1">
-              Existing Since
-            </label>
-            <input
-              id="existing_since"
-              type="text"
-              value={organisation.existing_since}
-              onChange={(e) => updateField("existing_since", e.target.value)}
-              className="w-full rounded-lg border border-soltas-line px-3 py-2 focus:border-soltas-ocean focus:outline-none"
-              placeholder="e.g. 2020"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="website" className="block text-sm font-medium text-soltas-text mb-1">
-              Website
-            </label>
-            <input
-              id="website"
+        <FormSection title="Online" description="Help people find and recognise you.">
+          <Field label="Website" optional>
+            <Input
               type="url"
+              inputMode="url"
               value={organisation.website}
               onChange={(e) => updateField("website", e.target.value)}
-              className="w-full rounded-lg border border-soltas-line px-3 py-2 focus:border-soltas-ocean focus:outline-none"
-              placeholder="https://example.com"
+              placeholder="https://"
             />
-          </div>
-
-          <div>
-            <label htmlFor="logo_url" className="block text-sm font-medium text-soltas-text mb-1">
-              Logo URL
-            </label>
-            <input
-              id="logo_url"
+          </Field>
+          <Field label="Logo URL" optional hint="A link to a square image works best.">
+            <Input
               type="url"
+              inputMode="url"
               value={organisation.logo_url}
               onChange={(e) => updateField("logo_url", e.target.value)}
-              className="w-full rounded-lg border border-soltas-line px-3 py-2 focus:border-soltas-ocean focus:outline-none"
-              placeholder="https://example.com/logo.png"
+              placeholder="https://"
             />
-          </div>
+          </Field>
+          <SocialLinksFields
+            label="Social links"
+            links={socialLinks}
+            onChange={updateSocialLink}
+            onAdd={addSocialLink}
+            onRemove={removeSocialLink}
+          />
+        </FormSection>
 
-          <div>
-            <label className="block text-sm font-medium text-soltas-text mb-2">Social Links</label>
-            {socialLinks.map((link, index) => (
-              <div key={index} className="mb-2 flex gap-2">
-                <select
-                  value={link.type}
-                  onChange={(e) => updateSocialLink(index, "type", e.target.value)}
-                  className="rounded-lg border border-soltas-line px-3 py-2 focus:border-soltas-ocean focus:outline-none"
-                >
-                  {socialLinkTypes.map((type) => (
-                    <option key={type} value={type}>
-                      {type}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="url"
-                  value={link.url}
-                  onChange={(e) => updateSocialLink(index, "url", e.target.value)}
-                  className="flex-1 rounded-lg border border-soltas-line px-3 py-2 focus:border-soltas-ocean focus:outline-none"
-                  placeholder="https://..."
-                />
-                {socialLinks.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeSocialLink(index)}
-                    className="rounded-lg border border-rose-400 bg-rose-50 px-3 py-2 text-sm text-rose-600 hover:bg-rose-100"
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={addSocialLink}
-              className="mt-2 rounded-lg border border-soltas-line bg-soltas-light px-3 py-2 text-sm text-soltas-ocean hover:bg-soltas-light"
-            >
-              Add Social Link
-            </button>
-          </div>
-
-          {error && (
-            <div className="rounded-lg border border-rose-400/25 bg-rose-50 p-3 text-sm text-rose-600">
-              {error}
-            </div>
-          )}
-
-          <div className="flex gap-3 pt-4">
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 rounded-xl bg-soltas-ocean px-6 py-2 text-sm font-semibold text-white transition hover:bg-soltas-abyssal disabled:opacity-50"
-            >
-              {loading ? "Creating..." : "Create Organisation"}
-            </button>
-            <Link
-              href="/profile"
-              className="rounded-xl border border-soltas-line px-6 py-2 text-sm font-semibold text-soltas-ocean transition hover:bg-soltas-light"
-            >
-              Cancel
-            </Link>
-          </div>
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <Link href="/me/organisations" className={buttonClasses({ variant: "outline" })}>
+            Cancel
+          </Link>
+          <Button type="submit" disabled={loading}>
+            {loading ? "Creating…" : "Create organisation"}
+          </Button>
         </div>
       </form>
-    </div>
+    </main>
   );
 }

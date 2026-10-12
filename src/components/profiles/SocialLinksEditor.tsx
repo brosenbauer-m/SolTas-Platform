@@ -1,6 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Plus, X } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { fieldClasses, Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 import type { NormalizedSocialLink } from "@/components/profiles/SocialLinks";
 
@@ -51,12 +56,13 @@ export default function SocialLinksEditor({
   return (
     <div className="space-y-3">
       {links.map((link, index) => (
-        <div key={`social-link-${index}`} className="grid gap-3 md:grid-cols-[160px_1fr_auto]">
+        <div key={`social-link-${index}`} className="flex gap-2">
           <select
             name={typeName}
+            aria-label="Link type"
             value={link.type}
             onChange={(event) => updateLink(index, "type", event.target.value)}
-            className="rounded-lg border border-soltas-line bg-white px-3 py-2 text-sm text-soltas-text shadow-sm"
+            className={cn("h-11", fieldClasses, "w-[7.5rem] shrink-0 px-3 sm:w-[8.5rem]")}
           >
             <option value="">Platform</option>
             {SOCIAL_LINK_TYPES.map((type) => (
@@ -65,31 +71,30 @@ export default function SocialLinksEditor({
               </option>
             ))}
           </select>
-          <input
+          <Input
             name={urlName}
+            type="url"
+            inputMode="url"
+            aria-label="Link address"
             value={link.url}
             onChange={(event) => updateLink(index, "url", event.target.value)}
             placeholder="https://"
-            className="w-full rounded-lg border border-soltas-line bg-white px-3 py-2 text-sm text-soltas-text shadow-sm"
+            className="min-w-0"
           />
           <button
             type="button"
             onClick={() => removeLink(index)}
-            className="rounded-lg border border-soltas-line px-3 py-2 text-sm text-soltas-muted hover:bg-soltas-off-white"
-            aria-label="Remove social link"
+            aria-label="Remove link"
             disabled={links.length === 1}
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-soltas-muted transition-colors hover:bg-soltas-light hover:text-soltas-text disabled:opacity-30"
           >
-            Remove
+            <X className="h-4 w-4" />
           </button>
         </div>
       ))}
-      <button
-        type="button"
-        onClick={addLink}
-        className="inline-flex items-center justify-center rounded-lg border border-soltas-line px-3 py-2 text-sm font-medium text-soltas-text hover:bg-soltas-off-white"
-      >
-        Add social link
-      </button>
+      <Button variant="ghost" size="sm" onClick={addLink} className="-ml-2">
+        <Plus className="h-4 w-4" /> Add a link
+      </Button>
     </div>
   );
 }
