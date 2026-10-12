@@ -107,4 +107,25 @@ select string_agg(slug, ',' order by slug) as admin_sees from public.projects wh
 -- expect: rls-p1,rls-p2,rls-p3,rls-p4,rls-p5,rls-p6
 reset role;
 
+-- ---------------------------------------------------------------------------
+-- Writes (20260324120005): no "infinite recursion", submissions work
+-- ---------------------------------------------------------------------------
+set local role authenticated;
+set local request.jwt.claims = '{"role":"authenticated","sub":"00000000-0000-0000-0000-0000000000a1"}';
+update public.projects set description = 'owner edit' where slug = 'rls-p1' returning slug;  -- expect: rls-p1
+insert into public.projects (name, slug, status, owner_type, owner_id)
+values ('RLS new', 'rls-new', 'pending', 'user', '00000000-0000-0000-0000-0000000000a1')
+returning slug;                                                                              -- expect: rls-new
+reset role;
+
+set local role authenticated;
+set local request.jwt.claims = '{"role":"authenticated","sub":"00000000-0000-0000-0000-0000000000a2"}';
+update public.projects set description = 'not mine' where slug = 'rls-p1' returning slug;   -- expect: 0 rows, no error
+reset role;
+
+set local role authenticated;
+set local request.jwt.claims = '{"role":"authenticated","sub":"00000000-0000-0000-0000-0000000000a3"}';
+update public.projects set status = 'approved' where slug = 'rls-p4' returning slug, status; -- expect: rls-p4 | approved
+reset role;
+
 rollback;
