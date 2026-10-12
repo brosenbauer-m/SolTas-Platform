@@ -38,7 +38,11 @@ proposed tightened versions are below.
 | #178 | `20260324120006` | Every `profiles` UPDATE failed (trigger set `updated_at`, but the column was missing). Changing `role` / `is_admin` is now limited to superadmins |
 | #179 | `20260324120007` | Any user could add themselves to any organisation, and approving join requests failed. Organisations can no longer be created as already verified |
 
-## Proposals (not applied; behaviour changes, please decide)
+## Proposals
+
+Status: 1 and 3–7 were applied in `20260324120009_tighten_rls_and_retire_legacy.sql` (#3 keeps a narrow
+"creator may edit their pending submission" rule so org members can still finish their own submission;
+#7 drops `watchdog_cases` only if it is empty). 2 is handled in its own migration (private profile fields).
 
 ### 1. `organisations.orgs_public_read` — `USING (true)`
 Everyone, including logged-out visitors, can read every organisation, pending and rejected
