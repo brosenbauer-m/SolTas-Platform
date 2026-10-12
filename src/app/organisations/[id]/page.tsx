@@ -1,3 +1,5 @@
+import { BadgeCheck, Clock, XCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -129,9 +131,7 @@ export default async function OrganisationPage({
       {isPending && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
           <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-amber-100">
-              <span className="text-sm">⏳</span>
-            </div>
+            <Clock className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" aria-hidden="true" />
             <div className="flex-1">
               <strong className="block text-sm font-semibold text-amber-900">Pending verification</strong>
               <p className="mt-1 text-sm text-amber-800">
@@ -145,9 +145,7 @@ export default async function OrganisationPage({
       {isRejected && (
         <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
           <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-100">
-              <span className="text-sm">✕</span>
-            </div>
+            <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-700" aria-hidden="true" />
             <div className="flex-1">
               <strong className="block text-sm font-semibold text-red-900">Verification rejected</strong>
               <p className="mt-1 text-sm text-red-800">
@@ -176,19 +174,22 @@ export default async function OrganisationPage({
               className="h-14 w-14 rounded-2xl border border-soltas-line object-cover sm:h-20 sm:w-20"
             />
           ) : (
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-dashed border-soltas-line bg-soltas-off-white text-sm text-soltas-muted sm:h-20 sm:w-20">
-              —
+            <div
+              aria-hidden="true"
+              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-soltas-ocean/10 text-xl font-semibold text-soltas-ocean sm:h-20 sm:w-20 sm:text-2xl"
+            >
+              {organisation.name.trim().charAt(0).toUpperCase()}
             </div>
           )}
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="truncate text-2xl font-semibold tracking-tight text-soltas-text">
+              <h1 className="text-3xl font-semibold tracking-tight text-soltas-text sm:text-4xl">
                 {organisation.name}
               </h1>
               {isVerified ? (
-                <span className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
-                  <span aria-hidden>✓</span> Verified
-                </span>
+                <Badge variant="ocean">
+                  <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" /> Verified
+                </Badge>
               ) : null}
             </div>
             <p className="mt-1 text-sm text-soltas-muted">

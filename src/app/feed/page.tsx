@@ -1,3 +1,7 @@
+import { EmptyState } from "@/components/ui/empty-state";
+import { buttonClasses } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/page-header";
+import { segmentClass, segmentedTrack } from "@/components/ui/segmented";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -55,6 +59,13 @@ function getProfileName(profile: ProfileSummary | null) {
   const fullName = [profile.first_name, profile.last_name].filter(Boolean).join(" ");
   return fullName || "Someone";
 }
+
+const FEED_TABS = [
+  { key: "popular", label: "Popular" },
+  { key: "following", label: "Following" },
+  { key: "watchdog", label: "Watchdog" },
+  { key: "funding", label: "Funding" },
+] as const;
 
 export default async function FeedPage({
   searchParams,
@@ -320,57 +331,20 @@ export default async function FeedPage({
     .limit(5);
 
   return (
-    <main className="mx-auto w-full max-w-5xl space-y-6 px-4 py-6 sm:space-y-8 sm:py-10">
-      <header className="space-y-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-soltas-text">Activity feed</h1>
-          <p className="text-sm text-soltas-muted">
-            Calm, chronological updates from projects and people you follow.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
+    <main className="mx-auto w-full max-w-2xl space-y-6 px-4 py-8 sm:space-y-8 sm:py-10">
+      <PageHeader title="Feed" description="Updates and stories from the projects, organisations and people you follow." />
+      <nav aria-label="Feed views" className={`${segmentedTrack} flex w-full sm:w-auto`}>
+        {FEED_TABS.map((tab) => (
           <Link
-            href="/feed?tab=popular"
-            className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-              activeTab === "popular"
-                ? "bg-soltas-ocean text-white"
-                : "border border-soltas-line bg-white text-soltas-text hover:bg-soltas-off-white"
-            }`}
+            key={tab.key}
+            href={`/feed?tab=${tab.key}`}
+            aria-current={activeTab === tab.key ? "page" : undefined}
+            className={`${segmentClass(activeTab === tab.key)} flex-1 sm:flex-none`}
           >
-            Popular
+            {tab.label}
           </Link>
-          <Link
-            href="/feed?tab=following"
-            className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-              activeTab === "following"
-                ? "bg-soltas-ocean text-white"
-                : "border border-soltas-line bg-white text-soltas-text hover:bg-soltas-off-white"
-            }`}
-          >
-            Following
-          </Link>
-          <Link
-            href="/feed?tab=watchdog"
-            className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-              activeTab === "watchdog"
-                ? "bg-soltas-ocean text-white"
-                : "border border-soltas-line bg-white text-soltas-text hover:bg-soltas-off-white"
-            }`}
-          >
-            Watchdog
-          </Link>
-          <Link
-            href="/feed?tab=funding"
-            className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-              activeTab === "funding"
-                ? "bg-soltas-ocean text-white"
-                : "border border-soltas-line bg-white text-soltas-text hover:bg-soltas-off-white"
-            }`}
-          >
-            Funding
-          </Link>
-        </div>
-      </header>
+        ))}
+      </nav>
 
       {user && userProfile && (
         <NewPostComposer
@@ -439,9 +413,15 @@ export default async function FeedPage({
       )}
 
       {activeTab === "following" && !user ? (
-        <div className="rounded-2xl border border-soltas-line bg-white p-6 text-sm text-soltas-muted">
-          Sign in to see updates from the people, organisations, and projects you follow.
-        </div>
+        <EmptyState
+          title="See what the people and projects you follow are up to"
+          description="Log in to see updates from the projects, organisations and people you follow."
+          action={
+            <Link href="/login?returnTo=/feed?tab=following" className={buttonClasses()}>
+              Log in
+            </Link>
+          }
+        />
       ) : items.length ? (
         <section className="space-y-4">
           <h2 className="text-lg font-semibold tracking-tight text-soltas-text">
