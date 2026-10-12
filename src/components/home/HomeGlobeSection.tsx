@@ -13,6 +13,7 @@ import type { HomeStats } from "@/lib/homeStats";
 import type { ProjectMarker } from "@/lib/projects/findProjectsQuery";
 import { cn } from "@/lib/utils";
 import type { WatchdogIssueMarker } from "@/lib/watchdog/findWatchdogIssuesQuery";
+import { urgencyLabel } from "@/lib/watchdog/urgency";
 
 const DEFAULT_MODE: HomeGlobeMode = "projects";
 const MODE_CONFIG: Record<HomeGlobeMode, { label: string; href: string; ctaLabel: string; mobileLabel: string }> = {
@@ -42,8 +43,8 @@ const formatPlace = (parts: Array<string | null | undefined>) => {
 };
 
 const formatUrgency = (urgency: number | null | undefined) => {
-  if (!urgency) return null;
-  return `Urgency ${urgency}`;
+  const label = urgencyLabel(urgency);
+  return label ? `${label} urgency` : null;
 };
 
 type StatItem = {

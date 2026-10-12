@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import type { WatchdogIssueListRow } from "@/lib/watchdog/findWatchdogIssuesQuery";
 import WatchdogPagination from "@/components/watchdog/WatchdogPagination";
+import { urgencyLabel } from "@/lib/watchdog/urgency";
 
 const formatDate = (value: string | null) => {
   if (!value) return "—";
@@ -18,14 +19,7 @@ const formatLocation = (issue: WatchdogIssueListRow) => {
   return parts.length ? parts.join(", ") : "—";
 };
 
-const formatUrgency = (value: number | null) => {
-  if (!value) return "—";
-  if (value <= 1) return "Low";
-  if (value === 2) return "Guarded";
-  if (value === 3) return "Elevated";
-  if (value === 4) return "High";
-  return "Critical";
-};
+const formatUrgency = (value: number | null) => urgencyLabel(value) ?? "—";
 
 type WatchdogTableViewProps = {
   rows: WatchdogIssueListRow[];
