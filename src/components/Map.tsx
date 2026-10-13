@@ -14,7 +14,7 @@ mapboxgl.accessToken = MAPBOX_TOKEN || ""
 const truncate = (value: string, length = 160) =>
   value.length > length ? `${value.slice(0, length).trimEnd()}…` : value
 
-type Marker = {
+export type MapMarker = {
   id: string
   slug: string
   lng: number
@@ -27,7 +27,7 @@ type Marker = {
 }
 
 type MapProps = {
-  markers?: Marker[]
+  markers?: MapMarker[]
   markerColor?: string
   focusSlug?: string | null
   ctaLabel?: string
@@ -95,7 +95,7 @@ export default function Map({
         map.jumpTo({ center: [lng, lat], zoom: 3 })
       }
     } else {
-      map.fitBounds(bounds, { padding: 60, duration: animate ? 350 : 0 })
+      map.fitBounds(bounds, { padding: 48, maxZoom: 5, duration: animate ? 350 : 0 })
     }
   }
 
@@ -133,7 +133,20 @@ export default function Map({
 
     mapRef.current = map
 
+    // Follow the container's size (e.g. while the filter/globe divider is dragged), not only the window's.
+    let resizeFrame: number | null = null
+    const resizeObserver = new ResizeObserver(() => {
+      if (resizeFrame != null) return
+      resizeFrame = window.requestAnimationFrame(() => {
+        resizeFrame = null
+        map.resize()
+      })
+    })
+    resizeObserver.observe(containerRef.current)
+
     return () => {
+      resizeObserver.disconnect()
+      if (resizeFrame != null) window.cancelAnimationFrame(resizeFrame)
       if (userInteractTimerRef.current != null) window.clearTimeout(userInteractTimerRef.current)
       map.remove()
       mapRef.current = null
