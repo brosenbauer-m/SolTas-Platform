@@ -48,7 +48,7 @@ const SECTIONS = [
   { href: "/projects", title: "Find projects", text: "An interactive globe and table of projects, filterable by place, theme and need." },
   { href: "/find-organisations", title: "Find organisations", text: "Verified organisations, their projects, partners and impact." },
   { href: "/funding", title: "Find funding", text: "Open and upcoming grants for humanitarian and environmental action." },
-  { href: "/watchdog", title: "Watchdog network", text: "Issues raised by local advocates, connected to those who can act." },
+  { href: "/issues", title: "Issues", text: "Issues raised by local advocates, connected to those who can act." },
   { href: "/feed", title: "Feed", text: "Updates, stories and media from projects and organisations." },
   { href: "/services", title: "Services", text: "Comparative intelligence and storytelling for registered organisations." },
 ];

@@ -75,8 +75,8 @@ function getEntityLink(
 
   if (entityType === "issue") {
     return {
-      href: `/watchdog/${entityId}`,
-      label: "Re: watchdog issue",
+      href: `/issues/${entityId}`,
+      label: "Re: issue",
     };
   }
 

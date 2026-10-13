@@ -8,6 +8,13 @@ const nextConfig = {
       },
     ],
   },
+  // "Watchdog" was renamed to "Issues"; keep old links working.
+  async redirects() {
+    return [
+      { source: "/watchdog", destination: "/issues", permanent: true },
+      { source: "/watchdog/:path*", destination: "/issues/:path*", permanent: true },
+    ];
+  },
   experimental: {
     // keep existing experimental flags here (currently empty)
   },

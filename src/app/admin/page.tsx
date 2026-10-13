@@ -39,7 +39,7 @@ export default async function AdminIndexPage() {
     { href: "/admin/organisations", title: "Organisations", description: "Organisations waiting to be verified", pending: organisations, icon: Building2 },
     { href: "/admin/organisations/submissions", title: "Verification documents", description: "Evidence sent in by organisations", pending: submissions, icon: BadgeCheck },
     { href: "/admin/funding-registrations", title: "Funding", description: "Funding opportunities to review", pending: funding, icon: Coins },
-    { href: "/admin/issue-registrations", title: "Watchdog issues", description: "Reported issues to review", pending: issues, icon: AlertTriangle },
+    { href: "/admin/issue-registrations", title: "Issues", description: "Reported issues to review", pending: issues, icon: AlertTriangle },
   ];
   const totalPending = queues.reduce((sum, queue) => sum + queue.pending, 0);
 

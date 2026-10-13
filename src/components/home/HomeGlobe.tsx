@@ -504,7 +504,7 @@ export default function HomeGlobe({
     <div
       className="relative h-full w-full overflow-hidden"
       role="region"
-      aria-label="Rotating globe showing approved projects, funding opportunities, and watchdog issues."
+      aria-label="Rotating globe showing approved projects, funding opportunities, and reported issues."
     >
       {/* ✅ Back to normal sizing (fixes grey map cases) */}
       <div ref={containerRef} className="h-full w-full" />

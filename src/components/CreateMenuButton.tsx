@@ -27,7 +27,7 @@ export default function CreateMenuButton() {
           <Link href="/funding/new">New funding opportunity</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/watchdog/new">Report an issue</Link>
+          <Link href="/issues/new">Report an issue</Link>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

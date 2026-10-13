@@ -26,7 +26,7 @@ const NAV_ITEMS = [
   { href: "/projects", label: "Projects" },
   { href: "/find-organisations", label: "Organisations" },
   { href: "/funding", label: "Funding" },
-  { href: "/watchdog", label: "Watchdog" },
+  { href: "/issues", label: "Issues" },
   { href: "/feed", label: "Feed" },
   { href: "/about", label: "About" },
 ];

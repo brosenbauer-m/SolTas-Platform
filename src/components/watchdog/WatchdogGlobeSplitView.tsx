@@ -43,7 +43,7 @@ export default function WatchdogGlobeSplitView({ markers, totalCount, focusId, o
         title: marker.title ?? "Untitled issue",
         placeName: formatPlaceName(marker),
         description: marker.description,
-        ctaHref: `/watchdog/${marker.id}`,
+        ctaHref: `/issues/${marker.id}`,
         markerColor: resolveMarkerColor(marker.urgency ?? null),
       })),
     [markers],

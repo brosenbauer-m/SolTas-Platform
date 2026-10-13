@@ -5,13 +5,13 @@ import { useMemo } from "react";
 /**
  * Circular + button that on hover slides left to reveal text.
  * Org → "Add Project" → /projects/new
- * Individual → "Add Watchdog Case" → /watchdog/new
+ * Individual → "Report an issue" → /issues/new
  */
 export default function AddAction({ accountKind }: { accountKind: "individual" | "organisation" }) {
   const conf = useMemo(() => {
     return accountKind === "organisation"
       ? { href: "/projects/new", label: "Add Project" }
-      : { href: "/watchdog/new", label: "Add Watchdog Case" };
+      : { href: "/issues/new", label: "Report an issue" };
   }, [accountKind]);
 
   return (
