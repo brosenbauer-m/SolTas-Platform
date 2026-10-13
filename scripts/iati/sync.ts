@@ -247,8 +247,10 @@ async function runIncremental(sql: Sql, runId: number) {
     select high_water_mark from public.iati_sync_runs
     where mode in ('incremental', 'full') and ok and high_water_mark is not null
     order by high_water_mark desc limit 1`;
+  // Only visible activities count towards the cap, so withdrawn ones free their place for new ones.
   const [{ stored, oldest }] = await sql<{ stored: number; oldest: Date | null }[]>`
-    select count(*)::int as stored, min(last_updated_at) as oldest from public.iati_activities`;
+    select count(*) filter (where withdrawn_at is null)::int as stored, min(last_updated_at) as oldest
+    from public.iati_activities`;
 
   // Solr wants UTC with "Z"
   const mark = last ? new Date(last.high_water_mark).toISOString() : null;
@@ -360,6 +362,18 @@ async function runFull(sql: Sql) {
   return { withdrawn: stale.length, in_scope: inScope.size };
 }
 
+/** Supabase Free allows 500 MB in total; print how much we use so the cap can be tuned. */
+async function logDatabaseSize(sql: Sql) {
+  const [size] = await sql<{ database: string; iati: string; rows: number; visible: number }[]>`
+    select pg_size_pretty(pg_database_size(current_database())) as database,
+           pg_size_pretty(pg_total_relation_size('public.iati_activities')) as iati,
+           (select count(*)::int from public.iati_activities) as rows,
+           (select count(*)::int from public.iati_activities where withdrawn_at is null) as visible`;
+  console.log(
+    `Database: ${size.database} in total; IATI table ${size.iati} (${size.rows} rows, ${size.visible} visible, cap ${MAX_ACTIVITIES}).`,
+  );
+}
+
 // ---------- main ----------
 
 async function main() {
@@ -389,6 +403,7 @@ async function main() {
           where id = ${runId}`;
       }
       console.log(`Done after ${calls} API calls.`, JSON.stringify(result));
+      await logDatabaseSize(sql);
     } catch (err) {
       const message = err instanceof Error ? err.message : JSON.stringify(err);
       await sql`update public.iati_sync_runs set finished_at = now(), ok = false, error = ${message.slice(0, 1000)}
