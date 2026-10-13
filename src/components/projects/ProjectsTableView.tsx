@@ -90,7 +90,7 @@ export default function ProjectsTableView({
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-soltas-line bg-white">
-        <table className="min-w-[800px] divide-y divide-soltas-line text-sm">
+        <table className="w-full min-w-[800px] divide-y divide-soltas-line text-sm">
           <thead className="bg-soltas-off-white text-left text-xs font-medium text-soltas-muted">
             <tr>
               <th className="px-4 py-3">Project</th>

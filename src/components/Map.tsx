@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import mapboxgl from "mapbox-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
@@ -26,8 +26,36 @@ export type MapMarker = {
   markerColor?: string
 }
 
+/**
+ * A large point set drawn as clustered circles (numbers that split as you zoom in) instead of DOM markers.
+ * The GeoJSON at `url` has Point features with properties.id and optionally properties.a = 1 (approximate,
+ * drawn hollow). Clicking a point loads a short summary from `detailsUrl(id)` for the popup.
+ */
+export type MapClusterLayer = {
+  url: string
+  color: string
+  /** Small label above the popup title, e.g. "Published to IATI" */
+  badge: string
+  ctaLabel: string
+  detailsUrl: (id: string) => string
+}
+
+type ClusterDetails = {
+  title: string
+  organisation?: string | null
+  place?: string | null
+  description?: string | null
+  approximate?: boolean
+  href: string
+}
+
+const CLUSTER_SOURCE = "cluster-points"
+const CLUSTER_LAYERS = ["cluster-circles", "cluster-counts", "cluster-points"] as const
+
 type MapProps = {
   markers?: MapMarker[]
+  /** Optional clustered layer for large point sets (e.g. IATI activities). */
+  clusters?: MapClusterLayer | null
   markerColor?: string
   focusSlug?: string | null
   ctaLabel?: string
@@ -54,6 +82,7 @@ const getMarkerScale = (zoom: number) => {
 
 export default function Map({
   markers = [],
+  clusters = null,
   markerColor = "#2E6B8A",
   focusSlug = null,
   ctaLabel = "View",
@@ -65,6 +94,12 @@ export default function Map({
   const containerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<mapboxgl.Map | null>(null)
   const markerObjs = useRef<MarkerObject[]>([])
+  const [styleReady, setStyleReady] = useState(false)
+  const clustersRef = useRef<MapClusterLayer | null>(clusters)
+  useEffect(() => {
+    clustersRef.current = clusters
+  }, [clusters])
+  const hasDomMarkersRef = useRef(false)
 
   const userInteractedRef = useRef(false)
   const userInteractTimerRef = useRef<number | null>(null)
@@ -114,6 +149,7 @@ export default function Map({
     })
 
     map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), "top-right")
+    map.on("load", () => setStyleReady(true))
 
     const markInteracted = () => {
       userInteractedRef.current = true
@@ -150,8 +186,181 @@ export default function Map({
       if (userInteractTimerRef.current != null) window.clearTimeout(userInteractTimerRef.current)
       map.remove()
       mapRef.current = null
+      setStyleReady(false)
     }
   }, [])
+
+  // Clustered layer: added once the style has loaded; rebuilt (cleanup + add) when the URL changes.
+  const clusterUrl = clusters?.url ?? null
+  const clusterColor = clusters?.color ?? null
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !styleReady) return
+
+    const removeLayer = () => {
+      CLUSTER_LAYERS.forEach((id) => map.getLayer(id) && map.removeLayer(id))
+      if (map.getSource(CLUSTER_SOURCE)) map.removeSource(CLUSTER_SOURCE)
+    }
+
+    if (!clusterUrl || !clusterColor) {
+      removeLayer()
+      return
+    }
+
+    // We fetch the GeoJSON ourselves so we can frame the points when they are all the map shows.
+    const controller = new AbortController()
+    const loadData = () =>
+      fetch(clusterUrl, { signal: controller.signal })
+        .then((res) => (res.ok ? (res.json() as Promise<GeoJSON.FeatureCollection<GeoJSON.Point>>) : Promise.reject(res.status)))
+        .then((data) => {
+          const source = map.getSource(CLUSTER_SOURCE) as mapboxgl.GeoJSONSource | undefined
+          source?.setData(data)
+          if (hasDomMarkersRef.current || !data.features.length) return
+          const bounds = new mapboxgl.LngLatBounds()
+          data.features.forEach((f) => bounds.extend(f.geometry.coordinates as [number, number]))
+          map.fitBounds(bounds, { padding: 48, maxZoom: 6, duration: 350 })
+        })
+        .catch(() => {
+          // aborted or failed: the layer stays as it was
+        })
+
+    map.addSource(CLUSTER_SOURCE, {
+      type: "geojson",
+      data: { type: "FeatureCollection", features: [] },
+      cluster: true,
+      clusterRadius: 44,
+      clusterMaxZoom: 9,
+    })
+    loadData()
+    map.addLayer({
+      id: "cluster-circles",
+      type: "circle",
+      source: CLUSTER_SOURCE,
+      filter: ["has", "point_count"],
+      paint: {
+        "circle-color": clusterColor,
+        "circle-opacity": 0.85,
+        "circle-radius": ["step", ["get", "point_count"], 13, 25, 16, 250, 20, 2500, 25],
+        "circle-stroke-color": "#ffffff",
+        "circle-stroke-width": 2,
+      },
+    })
+    map.addLayer({
+      id: "cluster-counts",
+      type: "symbol",
+      source: CLUSTER_SOURCE,
+      filter: ["has", "point_count"],
+      layout: {
+        "text-field": ["get", "point_count_abbreviated"],
+        "text-size": 12,
+        "text-font": ["DIN Pro Medium", "Arial Unicode MS Bold"],
+        "text-allow-overlap": true,
+      },
+      paint: { "text-color": "#ffffff" },
+    })
+    map.addLayer({
+      id: "cluster-points",
+      type: "circle",
+      source: CLUSTER_SOURCE,
+      filter: ["!", ["has", "point_count"]],
+      paint: {
+        // approximate (country centre) points are hollow
+        "circle-color": ["case", ["==", ["get", "a"], 1], "#ffffff", clusterColor],
+        "circle-radius": 6,
+        "circle-stroke-color": ["case", ["==", ["get", "a"], 1], clusterColor, "#ffffff"],
+        "circle-stroke-width": 2,
+      },
+    })
+
+    const zoomIntoCluster = (event: mapboxgl.MapMouseEvent) => {
+      const feature = map.queryRenderedFeatures(event.point, { layers: ["cluster-circles"] })[0]
+      const clusterId = feature?.properties?.cluster_id
+      const source = map.getSource(CLUSTER_SOURCE) as mapboxgl.GeoJSONSource | undefined
+      if (clusterId == null || !source || feature.geometry.type !== "Point") return
+      const center = feature.geometry.coordinates as [number, number]
+      source.getClusterExpansionZoom(clusterId, (error, zoom) => {
+        if (error || zoom == null) return
+        map.easeTo({ center, zoom })
+      })
+    }
+
+    const openPoint = (event: mapboxgl.MapMouseEvent) => {
+      const feature = map.queryRenderedFeatures(event.point, { layers: ["cluster-points"] })[0]
+      const layer = clustersRef.current
+      const id = feature?.properties?.id
+      if (!layer || typeof id !== "string" || feature.geometry.type !== "Point") return
+
+      const popupNode = document.createElement("div")
+      popupNode.className = "space-y-2 text-sm text-soltas-text"
+      const badge = document.createElement("p")
+      badge.className = "text-[11px] font-semibold uppercase tracking-wide text-soltas-muted"
+      badge.textContent = layer.badge
+      const loading = document.createElement("p")
+      loading.className = "text-sm text-soltas-muted"
+      loading.textContent = "Loading…"
+      popupNode.append(badge, loading)
+
+      new mapboxgl.Popup({ offset: 10, maxWidth: "320px" })
+        .setLngLat(feature.geometry.coordinates as [number, number])
+        .setDOMContent(popupNode)
+        .addTo(map)
+
+      fetch(layer.detailsUrl(id))
+        .then((res) => (res.ok ? (res.json() as Promise<ClusterDetails>) : Promise.reject(res.status)))
+        .then((details) => {
+          loading.remove()
+          const titleEl = document.createElement("h3")
+          titleEl.className = "text-base font-semibold text-soltas-text"
+          titleEl.textContent = details.title
+          popupNode.appendChild(titleEl)
+
+          const meta = [details.organisation, details.place].filter(Boolean).join(" · ")
+          if (meta) {
+            const metaEl = document.createElement("p")
+            metaEl.className = "text-xs font-medium text-soltas-muted"
+            metaEl.textContent = details.approximate ? `${meta} (approximate location)` : meta
+            popupNode.appendChild(metaEl)
+          }
+          if (details.description) {
+            const descriptionEl = document.createElement("p")
+            descriptionEl.className = "text-sm leading-snug text-soltas-muted"
+            descriptionEl.textContent = truncate(details.description)
+            popupNode.appendChild(descriptionEl)
+          }
+          const cta = document.createElement("button")
+          cta.type = "button"
+          cta.className =
+            "mt-2 inline-flex w-full items-center justify-center rounded-md bg-soltas-ocean px-3 py-2 text-xs font-medium text-white hover:bg-soltas-abyssal"
+          cta.textContent = layer.ctaLabel
+          cta.addEventListener("click", () => router.push(details.href))
+          popupNode.appendChild(cta)
+        })
+        .catch(() => {
+          loading.textContent = "Couldn’t load this activity."
+        })
+    }
+
+    const pointer = () => (map.getCanvas().style.cursor = "pointer")
+    const noPointer = () => (map.getCanvas().style.cursor = "")
+    map.on("click", "cluster-circles", zoomIntoCluster)
+    map.on("click", "cluster-points", openPoint)
+    for (const id of ["cluster-circles", "cluster-points"] as const) {
+      map.on("mouseenter", id, pointer)
+      map.on("mouseleave", id, noPointer)
+    }
+
+    return () => {
+      controller.abort()
+      map.off("click", "cluster-circles", zoomIntoCluster)
+      map.off("click", "cluster-points", openPoint)
+      for (const id of ["cluster-circles", "cluster-points"] as const) {
+        map.off("mouseenter", id, pointer)
+        map.off("mouseleave", id, noPointer)
+      }
+      // the map may already be gone (unmount)
+      if (mapRef.current === map && map.getStyle()) removeLayer()
+    }
+  }, [styleReady, clusterUrl, clusterColor, router])
 
   // IMPORTANT: when freeze is enabled, we intentionally do NOT resize continuously.
   // We'll do a single resize once freeze is turned off.
@@ -194,6 +403,7 @@ export default function Map({
 
     markerObjs.current.forEach((obj) => obj.marker.remove())
     markerObjs.current = []
+    hasDomMarkersRef.current = validMarkers.length > 0
 
     const scale = getMarkerScale(map.getZoom())
 
