@@ -37,6 +37,12 @@ Header: Ocp-Apim-Subscription-Key: <key>      (verify the header name when we ha
 
 `cursorMark` pages through large results. `last_updated_datetime:[<last run> TO *]` returns only what changed.
 
+**Call limits.** The free **Exploratory** key allows **5 calls per minute and 100 calls per week**. The free
+**Full Access** subscription has no limit, but the IATI Secretariat has to approve it (request it on the developer
+portal). The sync is built for the free limits: up to 1,000 activities per call, at least 13 s between calls, and at
+most 40 calls per run (`IATI_MAX_CALLS`). A 25,000-activity backfill takes about 25 calls, and a nightly update
+takes 1–3 calls.
+
 Field names below were checked against the Datastore's Solr schema
 (`IATI/datastore-solr-configs/configsets/activity/conf/managed-schema`). "Many" means a list.
 
@@ -83,7 +89,13 @@ AND ( humanitarian:true
    OR (policy_marker_code:(5 OR 6 OR 7 OR 8) AND policy_marker_significance:(1 OR 2)) )   Rio markers
 ```
 
-- We first run it with `rows=0` to see how many activities match. We tune the scope before importing anything.
+- `--mode count` shows how many activities match, how many have exact points, and how many change per week
+  (3 calls). We tune the scope before importing anything.
+- Activities that **only name a region** (no country, no point) are left out: we can't place them on the map.
+- Solr can't pair a policy marker with its significance, so the sync re-checks after the transform. A Rio marker
+  only counts when its significance is at least 1.
+- **Cap:** `IATI_MAX_ACTIVITIES` (default 25,000, for Supabase Free). The backfill takes the most recently updated
+  activities first. Activities we already store are always updated; new ones beyond the cap are skipped.
 - Ended activities (status 3–6) that we already hold are updated, not deleted, so their pages keep working.
 - Activities that leave the scope or disappear from IATI get `withdrawn_at` set and drop off the map. We don't
   delete them; deleting data needs the owner's OK (AGENT_RULES).

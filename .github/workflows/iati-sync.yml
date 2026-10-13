@@ -1,0 +1,47 @@
+name: iati-sync
+
+# Copies humanitarian/environmental activities from the IATI Datastore into public.iati_activities.
+# Plan: docs/architecture/iati-integration.md. Manual runs only for now (Actions → iati-sync → Run workflow);
+# the nightly schedule is switched on in a later PR once the first backfill looks right.
+#
+# Secrets: IATI_API_KEY (all modes); SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY (incremental, full).
+# The free IATI key allows 5 calls/minute and 100 calls/week: count = 3 calls, dry-run = 1 call.
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "count = how many match · dry-run = preview, no writes · incremental = import/update · full = withdraw stale"
+        type: choice
+        options: [count, dry-run, incremental, full]
+        default: count
+      limit:
+        description: "dry-run only: how many activities to preview (max 1000)"
+        default: "200"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: iati-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Sync
+        env:
+          IATI_API_KEY: ${{ secrets.IATI_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          MODE: ${{ inputs.mode }}
+          LIMIT: ${{ inputs.limit }}
+        run: pnpm sync:iati --mode "$MODE" --limit "$LIMIT"
