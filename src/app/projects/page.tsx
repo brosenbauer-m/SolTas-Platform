@@ -7,6 +7,7 @@ import ProjectsTableView from "@/components/projects/ProjectsTableView";
 import ProjectsViewToggle from "@/components/projects/ProjectsViewToggle";
 import {
   fetchFindProjects,
+  fetchProjectFilterOptions,
   fetchProjectMarkers,
   type ProjectListRow,
 } from "@/lib/projects/findProjectsQuery";
@@ -39,6 +40,11 @@ export default async function FindProjectsPage({
     console.error("Find projects: list query failed", error);
   }
 
+  const filterOptions = await fetchProjectFilterOptions().catch((error) => {
+    console.error("Find projects: filter options failed", error);
+    return { countries: [], regions: [], thematic: [], interventions: [], demographics: [], organisations: [] };
+  });
+
   let markers: Awaited<ReturnType<typeof fetchProjectMarkers>> = [];
   if (view === "globe") {
     try {
@@ -49,8 +55,9 @@ export default async function FindProjectsPage({
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-7xl flex-1 min-h-0 flex-col gap-5 px-4 py-8 sm:gap-6 sm:px-6 sm:py-10">
+    <main className="flex w-full flex-1 min-h-0 flex-col gap-4 px-4 py-5 sm:px-6 lg:px-8">
       <PageHeader
+        compact
         title="Projects"
         description={
           <>
@@ -70,11 +77,13 @@ export default async function FindProjectsPage({
 
       {view === "globe" ? (
         <div className="flex-1 min-h-0">
-          <ProjectsGlobeSplitView markers={markers} totalCount={count} focusSlug={focus} />
+          <ProjectsGlobeSplitView options={filterOptions} markers={markers} totalCount={count} focusSlug={focus} />
         </div>
       ) : (
         <>
-          <ProjectsFilters basePath="/projects" showSorting variant="panel" />
+          <div className="card p-5 lg:p-6">
+            <ProjectsFilters options={filterOptions} />
+          </div>
           <ProjectsTableView rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />
         </>
       )}

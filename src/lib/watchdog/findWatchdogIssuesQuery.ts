@@ -172,17 +172,11 @@ export async function fetchWatchdogIssues({
   if (params.country.length) query = query.in("country", params.country);
   if (params.region.length) query = query.in("region", params.region);
 
-  params.sdgs.forEach(value => {
-    query = query.contains("sdgs", [value]);
-  });
+  if (params.sdgs.length) query = query.overlaps("sdgs", params.sdgs);
 
-  params.global_challenges.forEach(value => {
-    query = query.contains("global_challenges", [value]);
-  });
+  if (params.global_challenges.length) query = query.overlaps("global_challenges", params.global_challenges);
 
-  params.affected_demographics.forEach(value => {
-    query = query.contains("affected_demographics", [value]);
-  });
+  if (params.affected_demographics.length) query = query.overlaps("affected_demographics", params.affected_demographics);
 
   if (typeof params.urgency_min === "number") {
     query = query.gte("urgency", params.urgency_min);
@@ -233,17 +227,11 @@ export async function fetchWatchdogMarkers({
   if (params.country.length) query = query.in("country", params.country);
   if (params.region.length) query = query.in("region", params.region);
 
-  params.sdgs.forEach(value => {
-    query = query.contains("sdgs", [value]);
-  });
+  if (params.sdgs.length) query = query.overlaps("sdgs", params.sdgs);
 
-  params.global_challenges.forEach(value => {
-    query = query.contains("global_challenges", [value]);
-  });
+  if (params.global_challenges.length) query = query.overlaps("global_challenges", params.global_challenges);
 
-  params.affected_demographics.forEach(value => {
-    query = query.contains("affected_demographics", [value]);
-  });
+  if (params.affected_demographics.length) query = query.overlaps("affected_demographics", params.affected_demographics);
 
   if (typeof params.urgency_min === "number") {
     query = query.gte("urgency", params.urgency_min);

@@ -60,7 +60,7 @@ export default function WatchdogTableView({
               const mapParams = new URLSearchParams();
               mapParams.set("view", "globe");
               mapParams.set("focus", issue.id);
-              const mapHref = `/watchdog?${mapParams.toString()}`;
+              const mapHref = `/issues?${mapParams.toString()}`;
 
               const sdgTags = issue.sdgs ?? [];
               const challengeTags = issue.global_challenges ?? [];

@@ -29,9 +29,9 @@ const DESTINATIONS = [
     cta: "Find funding",
   },
   {
-    href: "/watchdog",
+    href: "/issues",
     icon: Megaphone,
-    title: "Watchdog",
+    title: "Issues",
     text: "Local issues raised by the people who live them, connected to those who can help.",
     cta: "See issues",
   },

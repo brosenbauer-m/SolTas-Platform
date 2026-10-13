@@ -48,7 +48,8 @@ export type FindGrantsParams = {
   q?: string;
   project_type: string[];
   funding_type: string[];
-  status?: string;
+  status: string[];
+  closing_within?: number;
   eligible_countries: string[];
   themes: string[];
   sdgs: number[];
@@ -143,7 +144,8 @@ export function parseFindGrantsSearchParams(searchParams: RawSearchParams): Find
     q: parseString(searchParams.q),
     project_type: parseStringList(searchParams.project_type),
     funding_type: parseStringList(searchParams.funding_type),
-    status: parseString(searchParams.status),
+    status: parseStringList(searchParams.status),
+    closing_within: parseNumber(searchParams.closing_within),
     eligible_countries: parseStringList(searchParams.eligible_countries),
     themes: parseStringList(searchParams.themes),
     sdgs: parseNumberList(searchParams.sdgs),
@@ -202,28 +204,27 @@ export async function fetchFindGrants({
   if (params.project_type.length) query = query.in("project_type", params.project_type);
   if (params.funding_type.length) query = query.in("funding_type", params.funding_type);
 
-  if (params.status) {
-    if (params.status !== "all") query = query.eq("status", params.status);
-  } else {
-    query = query.eq("status", "open");
+  // Several statuses at once; nothing selected = still open (open + rolling). "all" kept for old links.
+  if (!params.status.includes("all")) {
+    query = query.in("status", params.status.length ? params.status : ["open", "rolling"]);
+  }
+
+  if (params.closing_within && params.closing_within > 0) {
+    const today = new Date();
+    const until = new Date(today.getTime() + params.closing_within * 86_400_000);
+    query = query.gte("deadline", today.toISOString().slice(0, 10)).lte("deadline", until.toISOString().slice(0, 10));
   }
 
   if (params.eligible_countries.length) {
-    params.eligible_countries.forEach((value) => {
-      query = query.contains("eligible_countries", [value]);
-    });
+    query = query.overlaps("eligible_countries", params.eligible_countries);
   }
 
   if (params.themes.length) {
-    params.themes.forEach((value) => {
-      query = query.contains("themes", [value]);
-    });
+    query = query.overlaps("themes", params.themes);
   }
 
   if (params.sdgs.length) {
-    params.sdgs.forEach((value) => {
-      query = query.contains("sdgs", [value]);
-    });
+    query = query.overlaps("sdgs", params.sdgs);
   }
 
   if (params.remote_only) query = query.eq("remote_ok", true);
@@ -303,28 +304,27 @@ export async function fetchGrantMarkers({
   if (params.project_type.length) query = query.in("project_type", params.project_type);
   if (params.funding_type.length) query = query.in("funding_type", params.funding_type);
 
-  if (params.status) {
-    if (params.status !== "all") query = query.eq("status", params.status);
-  } else {
-    query = query.eq("status", "open");
+  // Several statuses at once; nothing selected = still open (open + rolling). "all" kept for old links.
+  if (!params.status.includes("all")) {
+    query = query.in("status", params.status.length ? params.status : ["open", "rolling"]);
+  }
+
+  if (params.closing_within && params.closing_within > 0) {
+    const today = new Date();
+    const until = new Date(today.getTime() + params.closing_within * 86_400_000);
+    query = query.gte("deadline", today.toISOString().slice(0, 10)).lte("deadline", until.toISOString().slice(0, 10));
   }
 
   if (params.eligible_countries.length) {
-    params.eligible_countries.forEach((value) => {
-      query = query.contains("eligible_countries", [value]);
-    });
+    query = query.overlaps("eligible_countries", params.eligible_countries);
   }
 
   if (params.themes.length) {
-    params.themes.forEach((value) => {
-      query = query.contains("themes", [value]);
-    });
+    query = query.overlaps("themes", params.themes);
   }
 
   if (params.sdgs.length) {
-    params.sdgs.forEach((value) => {
-      query = query.contains("sdgs", [value]);
-    });
+    query = query.overlaps("sdgs", params.sdgs);
   }
 
   if (params.remote_only) query = query.eq("remote_ok", true);

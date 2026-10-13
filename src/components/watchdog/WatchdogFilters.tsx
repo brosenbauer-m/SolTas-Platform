@@ -1,270 +1,93 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import {
+  ComboboxFilter,
+  DateRangeFilter,
+  FilterPanel,
+  SearchFilter,
+  SelectFilter,
+  SortSelect,
+  type FilterDef,
+} from "@/components/find/filters";
+import type { WatchdogFilterOptions } from "@/lib/watchdog/findWatchdogIssuesQuery";
+import { URGENCY_LEVELS } from "@/lib/watchdog/urgency";
 
-import MultiSelect from "@/components/ui/MultiSelect";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+const URGENCY_OPTIONS = URGENCY_LEVELS.map((level) => ({ value: String(level.value), label: `${level.label} or higher` }));
 
-const FILTER_KEYS = [
-  "q",
-  "sdgs",
-  "global_challenges",
-  "demographics",
-  "country",
-  "region",
-  "urgency_min",
-  "urgency_max",
-  "date_from",
-  "date_to",
-  "sort",
-  "dir",
-  "page",
-  "view",
-] as const;
-
-const getParamValue = (searchParams: URLSearchParams, key: string) => searchParams.get(key) ?? "";
-
-const parseListParam = (value: string | null) =>
-  value ? value.split(",").map(item => item.trim()).filter(Boolean) : [];
-
-type Option = { value: string; label: string };
+const SORT_OPTIONS = [
+  { value: "created_at:desc", label: "Newest" },
+  { value: "urgency:desc", label: "Most urgent" },
+  { value: "created_at:asc", label: "Oldest" },
+  { value: "title:asc", label: "Title A–Z" },
+];
 
 type WatchdogFiltersProps = {
-  options: {
-    countries: Option[];
-    regions: Option[];
-    demographics: Option[];
-    sdgs: Option[];
-    globalChallenges: Option[];
-  };
-  basePath?: string;
+  options: WatchdogFilterOptions;
   showSorting?: boolean;
-  variant?: "panel" | "inline";
 };
 
-export default function WatchdogFilters({
-  options,
-  basePath = "/watchdog",
-  showSorting = true,
-  variant = "panel",
-}: WatchdogFiltersProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const updateParams = useCallback(
-    (updates: Record<string, string | null>) => {
-      const params = new URLSearchParams(searchParams.toString());
-      Object.entries(updates).forEach(([key, value]) => {
-        if (!value) {
-          params.delete(key);
-        } else {
-          params.set(key, value);
-        }
-      });
-      params.set("page", "1");
-      const query = params.toString();
-      router.push(query ? `${basePath}?${query}` : basePath);
+export default function WatchdogFilters({ options, showSorting = true }: WatchdogFiltersProps) {
+  const filters: FilterDef[] = [
+    {
+      key: "q",
+      label: "Search",
+      main: true,
+      params: ["q"],
+      render: () => <SearchFilter param="q" placeholder="What or where" />,
     },
-    [basePath, router, searchParams],
-  );
-
-  const clearFilters = useCallback(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    FILTER_KEYS.forEach(key => params.delete(key));
-    const query = params.toString();
-    router.push(query ? `${basePath}?${query}` : basePath);
-  }, [basePath, router, searchParams]);
-
-  const qValue = getParamValue(searchParams, "q");
-  const sdgsValue = parseListParam(searchParams.get("sdgs"));
-  const challengesValue = parseListParam(searchParams.get("global_challenges"));
-  const demographicValue = parseListParam(searchParams.get("demographics"));
-  const countryValue = parseListParam(searchParams.get("country"));
-  const regionValue = parseListParam(searchParams.get("region"));
-  const urgencyMinValue = getParamValue(searchParams, "urgency_min");
-  const urgencyMaxValue = getParamValue(searchParams, "urgency_max");
-  const dateFromValue = getParamValue(searchParams, "date_from");
-  const dateToValue = getParamValue(searchParams, "date_to");
-  const sortValue = getParamValue(searchParams, "sort") || "created_at";
-  const dirValue = getParamValue(searchParams, "dir") || "desc";
-
-  const [searchValue, setSearchValue] = useState(qValue);
-
-  useEffect(() => {
-    setSearchValue(qValue);
-  }, [qValue]);
-
-  useEffect(() => {
-    if (searchValue === qValue) return;
-    const timeout = setTimeout(() => {
-      updateParams({ q: searchValue });
-    }, 400);
-
-    return () => clearTimeout(timeout);
-  }, [qValue, searchValue, updateParams]);
-
-  const updateListParam = (key: string, values: string[]) => {
-    updateParams({ [key]: values.length ? values.join(",") : "" });
-  };
-
-  const selectedSort = useMemo(() => `${sortValue}.${dirValue}`, [dirValue, sortValue]);
-
-  const containerClassName =
-    variant === "panel"
-      ? "space-y-4 rounded-2xl border border-soltas-line bg-white p-5"
-      : "space-y-4";
+    {
+      key: "country",
+      label: "Countries",
+      main: true,
+      params: ["country"],
+      render: () => <ComboboxFilter param="country" options={options.countries} placeholder="Anywhere" />,
+    },
+    {
+      key: "urgency_min",
+      label: "Urgency",
+      main: true,
+      params: ["urgency_min", "urgency_max"],
+      render: () => <SelectFilter param="urgency_min" options={URGENCY_OPTIONS} placeholder="Any urgency" />,
+    },
+    {
+      key: "demographics",
+      label: "Affected groups",
+      main: true,
+      params: ["demographics"],
+      render: () => <ComboboxFilter param="demographics" options={options.demographics} placeholder="Anyone" />,
+    },
+    {
+      key: "region",
+      label: "Regions",
+      params: ["region"],
+      render: () => <ComboboxFilter param="region" options={options.regions} placeholder="Any region" />,
+    },
+    {
+      key: "sdgs",
+      label: "SDGs",
+      params: ["sdgs"],
+      render: () => <ComboboxFilter param="sdgs" options={options.sdgs} placeholder="Any SDG" />,
+    },
+    {
+      key: "global_challenges",
+      label: "IFRC global challenges",
+      params: ["global_challenges"],
+      render: () => (
+        <ComboboxFilter param="global_challenges" options={options.globalChallenges} placeholder="Any challenge" />
+      ),
+    },
+    {
+      key: "observed",
+      label: "Observed between",
+      params: ["date_from", "date_to"],
+      render: () => <DateRangeFilter fromParam="date_from" toParam="date_to" />,
+    },
+  ];
 
   return (
-    <section className={`@container ${containerClassName}`}>
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Filters</h2>
-        <Button type="button" variant="link" size="sm" onClick={clearFilters}>
-          Clear all
-        </Button>
-      </div>
-
-      <div className="grid gap-4 @md:grid-cols-2 @3xl:grid-cols-3">
-        <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-text">Search</span>
-          <Input
-            value={searchValue}
-            placeholder="Title or description"
-            onChange={event => setSearchValue(event.target.value)}
-          />
-        </label>
-
-        <div className="space-y-2 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-text">Countries</span>
-          <MultiSelect
-            options={options.countries}
-            value={countryValue}
-            onChange={value => updateListParam("country", value)}
-            placeholder="Search countries"
-            emptyMessage="No countries"
-            ariaLabel="Countries"
-          />
-        </div>
-
-        <div className="space-y-2 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-text">Regions</span>
-          <MultiSelect
-            options={options.regions}
-            value={regionValue}
-            onChange={value => updateListParam("region", value)}
-            placeholder="Search regions"
-            emptyMessage="No regions"
-            ariaLabel="Regions"
-          />
-        </div>
-      </div>
-
-      <div className="grid gap-4 @md:grid-cols-2 @3xl:grid-cols-3">
-        <div className="space-y-2 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-text">UN SDGs</span>
-          <MultiSelect
-            options={options.sdgs}
-            value={sdgsValue}
-            onChange={value => updateListParam("sdgs", value)}
-            placeholder="Select SDGs"
-            emptyMessage="No SDGs"
-            ariaLabel="SDG tags"
-          />
-        </div>
-
-        <div className="space-y-2 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-text">IFRC Global Challenges</span>
-          <MultiSelect
-            options={options.globalChallenges}
-            value={challengesValue}
-            onChange={value => updateListParam("global_challenges", value)}
-            placeholder="Select challenges"
-            emptyMessage="No challenges"
-            ariaLabel="IFRC challenges"
-          />
-        </div>
-
-        <div className="space-y-2 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-text">Affected demographics</span>
-          <MultiSelect
-            options={options.demographics}
-            value={demographicValue}
-            onChange={value => updateListParam("demographics", value)}
-            placeholder="Select demographics"
-            emptyMessage="No demographics"
-            ariaLabel="Affected demographics"
-          />
-        </div>
-      </div>
-
-      <div className="grid gap-4 @md:grid-cols-2 @3xl:grid-cols-3">
-        <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-text">Urgency min</span>
-          <Input
-            type="number"
-            min={1}
-            max={5}
-            value={urgencyMinValue}
-            onChange={event => updateParams({ urgency_min: event.target.value })}
-          />
-        </label>
-
-        <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-text">Urgency max</span>
-          <Input
-            type="number"
-            min={1}
-            max={5}
-            value={urgencyMaxValue}
-            onChange={event => updateParams({ urgency_max: event.target.value })}
-          />
-        </label>
-
-        <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-text">Observed after</span>
-          <Input
-            type="date"
-            value={dateFromValue}
-            onChange={event => updateParams({ date_from: event.target.value })}
-          />
-        </label>
-
-        <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-text">Observed before</span>
-          <Input
-            type="date"
-            value={dateToValue}
-            onChange={event => updateParams({ date_to: event.target.value })}
-          />
-        </label>
-
-        {showSorting ? (
-          <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-text">Sort by</span>
-            <Select
-              value={selectedSort}
-              onValueChange={value => {
-                const [sort, dir] = value.split(".");
-                updateParams({ sort, dir });
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Sort" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="created_at.desc">Newest first</SelectItem>
-                <SelectItem value="created_at.asc">Oldest first</SelectItem>
-                <SelectItem value="urgency.desc">Urgency (high to low)</SelectItem>
-                <SelectItem value="urgency.asc">Urgency (low to high)</SelectItem>
-                <SelectItem value="title.asc">Alphabetical (A–Z)</SelectItem>
-                <SelectItem value="title.desc">Alphabetical (Z–A)</SelectItem>
-              </SelectContent>
-            </Select>
-          </label>
-        ) : null}
-      </div>
-    </section>
+    <FilterPanel
+      filters={filters}
+      sort={showSorting ? <SortSelect options={SORT_OPTIONS} defaultValue="created_at:desc" /> : null}
+    />
   );
 }

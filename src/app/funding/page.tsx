@@ -32,7 +32,7 @@ export default async function FindFundingPage({
   // Funding is only visible to authenticated users
   if (!user) {
     return (
-      <main className="mx-auto flex w-full max-w-7xl flex-1 min-h-0 flex-col gap-5 px-4 py-8 sm:gap-6 sm:px-6 sm:py-10">
+      <main className="flex w-full flex-1 min-h-0 flex-col gap-4 px-4 py-5 sm:px-6 lg:px-8">
         <PageHeader
           title="Funding"
           description="Grants and funding opportunities for environmental and humanitarian work."
@@ -93,8 +93,9 @@ export default async function FindFundingPage({
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-7xl flex-1 min-h-0 flex-col gap-5 px-4 py-8 sm:gap-6 sm:px-6 sm:py-10">
+    <main className="flex w-full flex-1 min-h-0 flex-col gap-4 px-4 py-5 sm:px-6 lg:px-8">
       <PageHeader
+        compact
         title="Funding"
         description={
           <>
@@ -118,7 +119,9 @@ export default async function FindFundingPage({
         </div>
       ) : (
         <>
-          <GrantsFilters options={filterOptions} basePath="/funding" showSorting variant="panel" />
+          <div className="card p-5 lg:p-6">
+            <GrantsFilters options={filterOptions} />
+          </div>
           <GrantsTableView rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />
         </>
       )}

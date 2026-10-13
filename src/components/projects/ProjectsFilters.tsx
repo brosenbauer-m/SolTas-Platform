@@ -1,315 +1,155 @@
 "use client";
 
-import { useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import {
+  ComboboxFilter,
+  CURRENCY_OPTIONS,
+  DateRangeFilter,
+  FilterPanel,
+  RangeFilter,
+  SearchFilter,
+  SegmentedFilter,
+  SelectFilter,
+  SortSelect,
+  type FilterDef,
+} from "@/components/find/filters";
+import type { ProjectFilterOptions } from "@/lib/projects/findProjectsQuery";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+const SORT_OPTIONS = [
+  { value: "created_at:desc", label: "Newest" },
+  { value: "created_at:asc", label: "Oldest" },
+  { value: "name:asc", label: "Name A–Z" },
+  { value: "amount_needed:desc", label: "Most funding needed" },
+  { value: "donations_received:desc", label: "Most raised" },
+  { value: "start_date:asc", label: "Starting soonest" },
+];
 
-const FILTER_KEYS = [
-  "q",
-  "type",
-  "category",
-  "country",
-  "region",
-  "currency",
-  "thematic_area",
-  "type_of_intervention",
-  "target_demographic",
-  "partner_org_ids",
-  "min_needed",
-  "max_needed",
-  "min_received",
-  "max_received",
-  "min_lives",
-  "max_lives",
-  "start_from",
-  "end_to",
-  "sort",
-  "dir",
-  "page",
-] as const;
-
-const getParamValue = (searchParams: URLSearchParams, key: string) => searchParams.get(key) ?? "";
+const STAGE_OPTIONS = [
+  { value: "planned", label: "Planned" },
+  { value: "ongoing", label: "Ongoing" },
+  { value: "completed", label: "Completed" },
+];
 
 type ProjectsFiltersProps = {
-  basePath?: string;
+  options: ProjectFilterOptions;
   showSorting?: boolean;
-  variant?: "panel" | "inline";
 };
 
-export default function ProjectsFilters({
-  basePath = "/projects",
-  showSorting = true,
-  variant = "panel",
-}: ProjectsFiltersProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const updateParams = useCallback(
-    (updates: Record<string, string | null>) => {
-      const params = new URLSearchParams(searchParams.toString());
-      Object.entries(updates).forEach(([key, value]) => {
-        if (!value) {
-          params.delete(key);
-        } else {
-          params.set(key, value);
-        }
-      });
-      params.set("page", "1");
-      const query = params.toString();
-      router.push(query ? `${basePath}?${query}` : basePath);
+export default function ProjectsFilters({ options, showSorting = true }: ProjectsFiltersProps) {
+  const filters: FilterDef[] = [
+    {
+      key: "q",
+      label: "Search",
+      main: true,
+      params: ["q"],
+      render: () => <SearchFilter param="q" placeholder="Project name or place" />,
     },
-    [basePath, router, searchParams],
-  );
-
-  const clearFilters = useCallback(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    FILTER_KEYS.forEach(key => params.delete(key));
-    const query = params.toString();
-    router.push(query ? `${basePath}?${query}` : basePath);
-  }, [basePath, router, searchParams]);
-
-  const qValue = getParamValue(searchParams, "q");
-  const categoryValue = getParamValue(searchParams, "category") || getParamValue(searchParams, "type");
-  const countryValue = getParamValue(searchParams, "country");
-  const regionValue = getParamValue(searchParams, "region");
-  const currencyValue = getParamValue(searchParams, "currency");
-  const thematicValue = getParamValue(searchParams, "thematic_area");
-  const interventionValue = getParamValue(searchParams, "type_of_intervention");
-  const demographicValue = getParamValue(searchParams, "target_demographic");
-  const partnerValue = getParamValue(searchParams, "partner_org_ids");
-  const minNeededValue = getParamValue(searchParams, "min_needed");
-  const maxNeededValue = getParamValue(searchParams, "max_needed");
-  const minReceivedValue = getParamValue(searchParams, "min_received");
-  const maxReceivedValue = getParamValue(searchParams, "max_received");
-  const minLivesValue = getParamValue(searchParams, "min_lives");
-  const maxLivesValue = getParamValue(searchParams, "max_lives");
-  const startFromValue = getParamValue(searchParams, "start_from");
-  const endToValue = getParamValue(searchParams, "end_to");
-  const sortValue = getParamValue(searchParams, "sort") || "created_at";
-  const dirValue = getParamValue(searchParams, "dir") || "desc";
-
-  const containerClassName =
-    variant === "panel"
-      ? "space-y-4 rounded-2xl border border-soltas-line bg-white p-5"
-      : "space-y-4";
+    {
+      key: "category",
+      wide: true,
+      label: "Type",
+      main: true,
+      params: ["category", "type"],
+      render: () => (
+        <SegmentedFilter
+          param="category"
+          options={[
+            { value: "humanitarian", label: "Humanitarian" },
+            { value: "environmental", label: "Environmental" },
+          ]}
+        />
+      ),
+    },
+    {
+      key: "thematic_area",
+      label: "Thematic areas",
+      main: true,
+      params: ["thematic_area"],
+      render: () => <ComboboxFilter param="thematic_area" options={options.thematic} placeholder="Any theme" />,
+    },
+    {
+      key: "country",
+      label: "Country",
+      main: true,
+      params: ["country"],
+      render: () => <ComboboxFilter param="country" options={options.countries} placeholder="Anywhere" />,
+    },
+    {
+      key: "stage",
+      label: "Status",
+      main: true,
+      params: ["stage"],
+      render: () => <ComboboxFilter param="stage" options={STAGE_OPTIONS} placeholder="Any status" />,
+    },
+    {
+      key: "region",
+      label: "Region",
+      params: ["region"],
+      render: () => <ComboboxFilter param="region" options={options.regions} placeholder="Any region" />,
+    },
+    {
+      key: "type_of_intervention",
+      label: "Intervention types",
+      params: ["type_of_intervention"],
+      render: () => (
+        <ComboboxFilter param="type_of_intervention" options={options.interventions} placeholder="Any intervention" />
+      ),
+    },
+    {
+      key: "target_demographic",
+      label: "Target groups",
+      params: ["target_demographic"],
+      render: () => (
+        <ComboboxFilter param="target_demographic" options={options.demographics} placeholder="Anyone" />
+      ),
+    },
+    {
+      key: "partner_org_ids",
+      label: "Partner organisation",
+      params: ["partner_org_ids"],
+      render: () => (
+        <ComboboxFilter
+          param="partner_org_ids"
+          options={options.organisations}
+          placeholder="Any organisation"
+          searchPlaceholder="Type an organisation name"
+        />
+      ),
+    },
+    {
+      key: "funding",
+      label: "Funding needed",
+      params: ["min_needed", "max_needed", "currency"],
+      render: () => (
+        <div className="space-y-2">
+          <RangeFilter minParam="min_needed" maxParam="max_needed" step={1000} />
+          <SelectFilter param="currency" options={CURRENCY_OPTIONS} placeholder="Any currency" />
+        </div>
+      ),
+    },
+    {
+      key: "received",
+      label: "Funding raised",
+      params: ["min_received", "max_received"],
+      render: () => <RangeFilter minParam="min_received" maxParam="max_received" step={1000} />,
+    },
+    {
+      key: "lives",
+      label: "People reached",
+      params: ["min_lives", "max_lives"],
+      render: () => <RangeFilter minParam="min_lives" maxParam="max_lives" step={100} />,
+    },
+    {
+      key: "dates",
+      label: "Starts after / ends before",
+      params: ["start_from", "end_to"],
+      render: () => <DateRangeFilter fromParam="start_from" toParam="end_to" />,
+    },
+  ];
 
   return (
-    <section className={`@container ${containerClassName}`}>
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Filters</h2>
-        <Button type="button" variant="link" size="sm" onClick={clearFilters}>
-          Clear all
-        </Button>
-      </div>
-
-      <div className="grid gap-4 @md:grid-cols-2 @4xl:grid-cols-4">
-        <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-text">Search</span>
-          <Input
-            value={qValue}
-            placeholder="Project name or place"
-            onChange={event => updateParams({ q: event.target.value })}
-          />
-        </label>
-
-        <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-text">Project type</span>
-          <Select
-            value={categoryValue || "all"}
-            onValueChange={value =>
-              updateParams({
-                category: value === "all" ? "" : value,
-                type: "",
-              })
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="All types" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All types</SelectItem>
-              <SelectItem value="humanitarian">Humanitarian</SelectItem>
-              <SelectItem value="environmental">Environmental</SelectItem>
-            </SelectContent>
-          </Select>
-        </label>
-
-        <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-text">Country</span>
-          <Input
-            value={countryValue}
-            placeholder="US, CA"
-            onChange={event => updateParams({ country: event.target.value })}
-          />
-        </label>
-
-        <label className="space-y-1 text-sm text-soltas-muted">
-          <span className="font-medium text-soltas-text">Region</span>
-          <Input
-            value={regionValue}
-            placeholder="Region names"
-            onChange={event => updateParams({ region: event.target.value })}
-          />
-        </label>
-      </div>
-
-      <details className="rounded-xl bg-soltas-off-white p-4">
-        <summary className="cursor-pointer text-sm font-medium text-soltas-text">Advanced filters</summary>
-        <div className="mt-4 grid gap-4 @md:grid-cols-2 @4xl:grid-cols-4">
-          <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-text">Thematic areas</span>
-            <Input
-              value={thematicValue}
-              placeholder="comma-separated"
-              onChange={event => updateParams({ thematic_area: event.target.value })}
-            />
-          </label>
-
-          <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-text">Intervention types</span>
-            <Input
-              value={interventionValue}
-              placeholder="comma-separated"
-              onChange={event => updateParams({ type_of_intervention: event.target.value })}
-            />
-          </label>
-
-          <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-text">Target demographics</span>
-            <Input
-              value={demographicValue}
-              placeholder="comma-separated"
-              onChange={event => updateParams({ target_demographic: event.target.value })}
-            />
-          </label>
-
-          <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-text">Partner org IDs</span>
-            <Input
-              value={partnerValue}
-              placeholder="uuid, uuid"
-              onChange={event => updateParams({ partner_org_ids: event.target.value })}
-            />
-          </label>
-
-          <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-text">Currency</span>
-            <Input
-              value={currencyValue}
-              placeholder="USD, EUR"
-              onChange={event => updateParams({ currency: event.target.value })}
-            />
-          </label>
-
-          <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-text">Min funding needed</span>
-            <Input
-              type="number"
-              value={minNeededValue}
-              onChange={event => updateParams({ min_needed: event.target.value })}
-            />
-          </label>
-
-          <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-text">Max funding needed</span>
-            <Input
-              type="number"
-              value={maxNeededValue}
-              onChange={event => updateParams({ max_needed: event.target.value })}
-            />
-          </label>
-
-          <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-text">Min funding received</span>
-            <Input
-              type="number"
-              value={minReceivedValue}
-              onChange={event => updateParams({ min_received: event.target.value })}
-            />
-          </label>
-
-          <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-text">Max funding received</span>
-            <Input
-              type="number"
-              value={maxReceivedValue}
-              onChange={event => updateParams({ max_received: event.target.value })}
-            />
-          </label>
-
-          <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-text">Min lives improved</span>
-            <Input
-              type="number"
-              value={minLivesValue}
-              onChange={event => updateParams({ min_lives: event.target.value })}
-            />
-          </label>
-
-          <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-text">Max lives improved</span>
-            <Input
-              type="number"
-              value={maxLivesValue}
-              onChange={event => updateParams({ max_lives: event.target.value })}
-            />
-          </label>
-
-          <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-text">Start date from</span>
-            <Input
-              type="date"
-              value={startFromValue}
-              onChange={event => updateParams({ start_from: event.target.value })}
-            />
-          </label>
-
-          <label className="space-y-1 text-sm text-soltas-muted">
-            <span className="font-medium text-soltas-text">End date to</span>
-            <Input
-              type="date"
-              value={endToValue}
-              onChange={event => updateParams({ end_to: event.target.value })}
-            />
-          </label>
-
-          {showSorting ? (
-            <>
-              <label className="space-y-1 text-sm text-soltas-muted">
-                <span className="font-medium text-soltas-text">Sort by</span>
-                <Select value={sortValue} onValueChange={value => updateParams({ sort: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="created_at">Newest</SelectItem>
-                    <SelectItem value="name">Name</SelectItem>
-                    <SelectItem value="amount_needed">Amount needed</SelectItem>
-                    <SelectItem value="donations_received">Donations received</SelectItem>
-                    <SelectItem value="start_date">Start date</SelectItem>
-                  </SelectContent>
-                </Select>
-              </label>
-
-              <label className="space-y-1 text-sm text-soltas-muted">
-                <span className="font-medium text-soltas-text">Sort direction</span>
-                <Select value={dirValue} onValueChange={value => updateParams({ dir: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="desc">Descending</SelectItem>
-                    <SelectItem value="asc">Ascending</SelectItem>
-                  </SelectContent>
-                </Select>
-              </label>
-            </>
-          ) : null}
-        </div>
-      </details>
-    </section>
+    <FilterPanel
+      filters={filters}
+      sort={showSorting ? <SortSelect options={SORT_OPTIONS} defaultValue="created_at:desc" /> : null}
+    />
   );
 }

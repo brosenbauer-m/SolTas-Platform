@@ -18,7 +18,7 @@ export default function WatchdogViewToggle({ view }: WatchdogViewToggleProps) {
       const params = new URLSearchParams(searchParams.toString());
       params.set("view", nextView);
       const query = params.toString();
-      router.push(query ? `/watchdog?${query}` : "/watchdog");
+      router.push(query ? `/issues?${query}` : "/issues");
     },
     [router, searchParams],
   );

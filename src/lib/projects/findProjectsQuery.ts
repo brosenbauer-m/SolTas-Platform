@@ -45,6 +45,7 @@ export type FindProjectsParams = {
   type_of_intervention: string[];
   target_demographic: string[];
   partner_org_ids: string[];
+  lifecycle_status: string[];
   min_needed?: number;
   max_needed?: number;
   min_received?: number;
@@ -136,6 +137,7 @@ export function parseFindProjectsSearchParams(searchParams: RawSearchParams): Fi
     type_of_intervention: parseStringList(searchParams.type_of_intervention),
     target_demographic: parseStringList(searchParams.target_demographic),
     partner_org_ids: parseStringList(searchParams.partner_org_ids),
+    lifecycle_status: parseStringList(searchParams.stage),
     min_needed: parseNumber(searchParams.min_needed),
     max_needed: parseNumber(searchParams.max_needed),
     min_received: parseNumber(searchParams.min_received),
@@ -207,21 +209,19 @@ export async function fetchFindProjects({
   }
 
   if (params.thematic_area.length) {
-    params.thematic_area.forEach(value => {
-      query = query.contains("thematic_area", [value]);
-    });
+    query = query.overlaps("thematic_area", params.thematic_area);
   }
 
   if (params.type_of_intervention.length) {
-    params.type_of_intervention.forEach(value => {
-      query = query.contains("type_of_intervention", [value]);
-    });
+    query = query.overlaps("type_of_intervention", params.type_of_intervention);
   }
 
   if (params.partner_org_ids.length) {
-    params.partner_org_ids.forEach(value => {
-      query = query.contains("partner_org_ids", [value]);
-    });
+    query = query.overlaps("partner_org_ids", params.partner_org_ids);
+  }
+
+  if (params.lifecycle_status.length) {
+    query = query.in("lifecycle_status", params.lifecycle_status);
   }
 
   if (typeof params.min_needed === "number") {
@@ -328,21 +328,19 @@ export async function fetchProjectMarkers({
   }
 
   if (params.thematic_area.length) {
-    params.thematic_area.forEach(value => {
-      query = query.contains("thematic_area", [value]);
-    });
+    query = query.overlaps("thematic_area", params.thematic_area);
   }
 
   if (params.type_of_intervention.length) {
-    params.type_of_intervention.forEach(value => {
-      query = query.contains("type_of_intervention", [value]);
-    });
+    query = query.overlaps("type_of_intervention", params.type_of_intervention);
   }
 
   if (params.partner_org_ids.length) {
-    params.partner_org_ids.forEach(value => {
-      query = query.contains("partner_org_ids", [value]);
-    });
+    query = query.overlaps("partner_org_ids", params.partner_org_ids);
+  }
+
+  if (params.lifecycle_status.length) {
+    query = query.in("lifecycle_status", params.lifecycle_status);
   }
 
   if (typeof params.min_needed === "number") {
@@ -384,4 +382,50 @@ export async function fetchProjectMarkers({
   }
 
   return (data ?? []) as ProjectMarker[];
+}
+
+export type ProjectFilterOptions = {
+  countries: { value: string; label: string }[];
+  regions: { value: string; label: string }[];
+  thematic: { value: string; label: string }[];
+  interventions: { value: string; label: string }[];
+  demographics: { value: string; label: string }[];
+  organisations: { value: string; label: string }[];
+};
+
+const uniqueSorted = (values: Array<string | null | undefined>) => {
+  const seen = new Map<string, string>();
+  for (const raw of values) {
+    const value = raw?.trim();
+    if (value && !seen.has(value.toLowerCase())) seen.set(value.toLowerCase(), value);
+  }
+  return Array.from(seen.values())
+    .sort((a, b) => a.localeCompare(b))
+    .map((value) => ({ value, label: value.charAt(0).toUpperCase() + value.slice(1) }));
+};
+
+/** Values that actually occur on public projects, for the filter dropdowns. */
+export async function fetchProjectFilterOptions(): Promise<ProjectFilterOptions> {
+  const supabase = await getServerSupabase();
+  const [{ data: rows }, { data: orgs }] = await Promise.all([
+    supabase
+      .from("projects")
+      .select("country,region,thematic_area,type_of_intervention,target_demographic")
+      .eq("visibility", "public")
+      .eq("status", "approved")
+      .limit(2000),
+    supabase.from("organisations_directory_v1").select("id,name").order("name").limit(1000),
+  ]);
+
+  const list = rows ?? [];
+  return {
+    countries: uniqueSorted(list.map((r) => r.country)),
+    regions: uniqueSorted(list.map((r) => r.region)),
+    thematic: uniqueSorted(list.flatMap((r) => r.thematic_area ?? [])),
+    interventions: uniqueSorted(list.flatMap((r) => r.type_of_intervention ?? [])),
+    demographics: uniqueSorted(list.map((r) => r.target_demographic)),
+    organisations: (orgs ?? [])
+      .filter((o): o is { id: string; name: string } => Boolean(o.id && o.name))
+      .map((o) => ({ value: o.id, label: o.name })),
+  };
 }

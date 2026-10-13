@@ -66,7 +66,7 @@ function getProfileName(profile: ProfileSummary | null) {
 const FEED_TABS = [
   { key: "popular", label: "Popular" },
   { key: "following", label: "Following" },
-  { key: "watchdog", label: "Watchdog" },
+  { key: "watchdog", label: "Issues" },
   { key: "funding", label: "Funding" },
 ] as const;
 
@@ -462,8 +462,8 @@ export default async function FeedPage({
               title = `${orgName} · ${item.title ?? "Organisation update"}`;
               href = `/organisations/${item.org_id}`;
             } else if (item.event_type === "watchdog_update") {
-              title = item.title ?? "Watchdog issue reported";
-              href = item.issue_id ? `/watchdog/${item.issue_id}` : null;
+              title = item.title ?? "Issue reported";
+              href = item.issue_id ? `/issues/${item.issue_id}` : null;
             } else if (item.event_type === "grant_published") {
               // Use title/summary from RPC if available, otherwise show minimal fallback
               title = item.title ?? "New funding opportunity";
@@ -510,7 +510,7 @@ export default async function FeedPage({
         <div className="rounded-2xl border border-soltas-line bg-white p-6 text-sm text-soltas-muted">
           {activeTab === "popular" && "No activity yet"}
           {activeTab === "following" && "Follow projects, organisations, or people to personalize your feed"}
-          {activeTab === "watchdog" && "No verified watchdog items yet"}
+          {activeTab === "watchdog" && "No verified issues yet"}
           {activeTab === "funding" && "No new funding opportunities posted yet"}
         </div>
       )}

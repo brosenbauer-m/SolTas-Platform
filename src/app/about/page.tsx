@@ -51,7 +51,7 @@ const PLATFORM = [
   { href: "/projects", title: "Projects", text: "An interactive globe and table of projects, filterable by place, theme and need." },
   { href: "/find-organisations", title: "Organisations", text: "Verified organisations, their projects, partners and impact." },
   { href: "/funding", title: "Funding", text: "Open and upcoming grants for humanitarian and environmental action." },
-  { href: "/watchdog", title: "Issues", text: "Problems raised by local people, connected to those who can act." },
+  { href: "/issues", title: "Issues", text: "Problems raised by local people, connected to those who can act." },
   { href: "/feed", title: "Feed", text: "Updates, stories and media from projects and organisations." },
 ];
 

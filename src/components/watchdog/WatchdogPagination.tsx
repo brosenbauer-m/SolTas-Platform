@@ -46,7 +46,7 @@ export default function WatchdogPagination({
   page,
   pageCount,
   searchParams,
-  basePath = "/watchdog",
+  basePath = "/issues",
 }: WatchdogPaginationProps) {
   if (pageCount <= 1) {
     return null;

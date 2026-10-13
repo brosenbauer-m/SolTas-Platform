@@ -45,7 +45,7 @@ export default async function WatchdogPage({
     page = result.page;
     pageCount = result.pageCount;
   } catch (error) {
-    console.error("Watchdog issues: list query failed", error);
+    console.error("Issues: list query failed", error);
   }
 
   let markers: Awaited<ReturnType<typeof fetchWatchdogMarkers>> = [];
@@ -53,14 +53,15 @@ export default async function WatchdogPage({
     try {
       markers = await fetchWatchdogMarkers({ searchParams: params });
     } catch (error) {
-      console.error("Watchdog issues: marker query failed", error);
+      console.error("Issues: marker query failed", error);
     }
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-7xl flex-1 min-h-0 flex-col gap-5 px-4 py-8 sm:gap-6 sm:px-6 sm:py-10">
+    <main className="flex w-full flex-1 min-h-0 flex-col gap-4 px-4 py-5 sm:px-6 lg:px-8">
       <PageHeader
-        title="Watchdog"
+        compact
+        title="Issues"
         description={
           <>
             Issues raised by local advocates and reviewed by the Solarpunk Taskforce.{" "}
@@ -70,7 +71,7 @@ export default async function WatchdogPage({
         actions={
           <>
             <WatchdogViewToggle view={safeView} />
-            <Link href="/watchdog/new" className={buttonClasses({ size: "sm" })}>
+            <Link href="/issues/new" className={buttonClasses({ size: "sm" })}>
               Report an issue
             </Link>
           </>
@@ -83,7 +84,9 @@ export default async function WatchdogPage({
         </div>
       ) : (
         <>
-          <WatchdogFilters options={filterOptions} basePath="/watchdog" showSorting variant="panel" />
+          <div className="card p-5 lg:p-6">
+            <WatchdogFilters options={filterOptions} />
+          </div>
           <WatchdogTableView rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />
         </>
       )}

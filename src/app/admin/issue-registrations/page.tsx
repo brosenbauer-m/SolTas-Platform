@@ -129,7 +129,7 @@ export default async function IssueRegistrationsPage({
   return (
     <main className="p-6">
       <h1 className="mb-2 text-2xl font-semibold">Issue Registrations</h1>
-      <p className="mb-4 text-sm text-soltas-muted">Review Watchdog issue submissions and approve them for the public map.</p>
+      <p className="mb-4 text-sm text-soltas-muted">Review issue submissions and approve them for the public map.</p>
 
       {(messageParam || errorParam) && (
         <div
@@ -310,7 +310,7 @@ export default async function IssueRegistrationsPage({
       </div>
 
       <p className="mt-2 text-xs text-soltas-muted">
-        Approved issues are public on the Watchdog Community map and table. Rejected issues remain private.
+        Approved issues are public on the Issues map and table. Rejected issues remain private.
       </p>
     </main>
   );

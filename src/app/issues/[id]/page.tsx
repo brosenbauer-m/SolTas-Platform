@@ -95,10 +95,10 @@ export default async function WatchdogIssuePage({
   const affected = [...demographics, issue.affected_groups_text].filter(Boolean).join(", ");
 
   return (
-    <main className="mx-auto w-full max-w-5xl space-y-6 px-4 py-6 sm:space-y-8 sm:py-10">
+    <main className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:space-y-8 sm:py-10">
       <nav aria-label="Breadcrumb" className="text-sm text-soltas-muted">
-        <Link href="/watchdog" className="text-soltas-ocean hover:underline">
-          Watchdog
+        <Link href="/issues" className="text-soltas-ocean hover:underline">
+          Issues
         </Link>
         <span aria-hidden="true"> / </span>
         <span>Issue</span>

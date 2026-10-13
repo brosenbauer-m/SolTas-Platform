@@ -127,7 +127,7 @@ export default async function OrganisationPage({
   );
 
   return (
-    <main className="mx-auto w-full max-w-5xl space-y-6 px-4 py-6 sm:space-y-8 sm:py-10">
+    <main className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:space-y-8 sm:py-10">
       <Breadcrumbs
         items={[
           { label: "Organisations", href: "/find-organisations" },
