@@ -38,8 +38,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const { error } = await supabase
     .from("grants")
     .update({
+      // status stays open/rolling/closed (check constraint); approval publishes the grant
       moderation_status: "approved",
-      status: "approved",
+      is_published: true,
       approved_at: new Date().toISOString(),
       approved_by: approverId,
       rejected_at: null,

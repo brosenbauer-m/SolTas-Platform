@@ -30,7 +30,7 @@ const formatCurrency = (amount: number | null, currency: string | null) => {
   }
 };
 
-const formatAmountRange = (grant: GrantRow) => {
+const formatAmountRange = (grant: Pick<GrantRow, "amount_min" | "amount_max" | "currency">) => {
   const minLabel = formatCurrency(grant.amount_min, grant.currency);
   const maxLabel = formatCurrency(grant.amount_max, grant.currency);
   if (!minLabel && !maxLabel) return null;
@@ -71,7 +71,13 @@ export default async function GrantDetailPage({
 
   const supabase = await getServerSupabase();
 
-  const { data: grant, error } = await supabase.from("grants").select("*").eq("slug", slug).single();
+  const { data: grant, error } = await supabase
+    .from("grants")
+    .select(
+      "id,slug,title,summary,description,funder_name,funder_website,application_url,contact_email,funding_type,project_type,currency,amount_min,amount_max,open_date,deadline,decision_date,start_date,eligible_countries,remote_ok,location_name,themes,sdgs,status",
+    )
+    .eq("slug", slug)
+    .single();
 
   if (error || !grant) {
     if (error?.code === "PGRST116" || error?.code === "42501") notFound();
