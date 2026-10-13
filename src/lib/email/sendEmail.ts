@@ -3,6 +3,9 @@
 
 const SCW_TEM_ENDPOINT = "https://api.scaleway.com/transactional-email/v1alpha1/regions/fr-par/emails";
 
+/** Same sender as the Supabase auth emails. EMAIL_FROM overrides it if ever needed. */
+const DEFAULT_FROM = "Solarpunk Taskforce <no-reply@solarpunktaskforce.org>";
+
 type SendEmailArgs = {
   to: string;
   subject: string;
@@ -18,17 +21,16 @@ function parseFrom(value: string): { email: string; name?: string } {
 }
 
 export function isEmailConfigured() {
-  return Boolean(process.env.SCW_SECRET_KEY && process.env.SCW_PROJECT_ID && process.env.EMAIL_FROM);
+  return Boolean(process.env.SCW_SECRET_KEY && process.env.SCW_PROJECT_ID);
 }
 
 export async function sendEmail({ to, subject, html, text }: SendEmailArgs) {
   const secretKey = process.env.SCW_SECRET_KEY;
   const projectId = process.env.SCW_PROJECT_ID;
-  const from = process.env.EMAIL_FROM;
+  const from = process.env.EMAIL_FROM || DEFAULT_FROM;
 
   if (!secretKey) throw new Error("Missing SCW_SECRET_KEY");
   if (!projectId) throw new Error("Missing SCW_PROJECT_ID");
-  if (!from) throw new Error("Missing EMAIL_FROM");
 
   const res = await fetch(SCW_TEM_ENDPOINT, {
     method: "POST",

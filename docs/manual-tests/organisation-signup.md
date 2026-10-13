@@ -673,7 +673,7 @@ Notes:
 
 **Email confirmation not received**:
 - Check spam/junk folder
-- Verify SCW_SECRET_KEY, SCW_PROJECT_ID and EMAIL_FROM environment variables are configured
+- Verify SCW_SECRET_KEY and SCW_PROJECT_ID environment variables are configured
 - Check Supabase email settings
 - Verify the email service (Scaleway Transactional Email) is operational
 - Check application logs for email sending errors
