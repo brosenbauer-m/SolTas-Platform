@@ -92,6 +92,13 @@ AND ( humanitarian:true
 - `--mode count` shows how many activities match, how many have exact points, and how many change per week
   (3 calls). We tune the scope before importing anything.
 - Activities that **only name a region** (no country, no point) are left out: we can't place them on the map.
+- First real count (2026-10-13): **107,487** activities matched (35,269 with exact points), and ~20,000 themed
+  activities change per week. The samples showed stale "ongoing" records (ended 2021, last updated 2023) and weak
+  matches (one environmental sector among twenty). So the scope now also requires:
+  - **updated in the last 2 years**;
+  - **end date not passed** by more than 90 days;
+  - a themed sector that is **at least 25 %** of the activity (when percentages are given);
+  - and drops participating organisations that have neither a name nor an ID.
 - Solr can't pair a policy marker with its significance, so the sync re-checks after the transform. A Rio marker
   only counts when its significance is at least 1.
 - **Cap:** `IATI_MAX_ACTIVITIES` (default 25,000, for Supabase Free). The backfill takes the most recently updated

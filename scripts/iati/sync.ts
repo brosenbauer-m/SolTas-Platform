@@ -12,7 +12,7 @@
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-import { IATI_FIELDS, transformActivity, type IatiActivityRow, type IatiDoc } from "./transform";
+import { IATI_FIELDS, sectorShare, transformActivity, type IatiActivityRow, type IatiDoc } from "./transform";
 
 const API_BASE = process.env.IATI_API_BASE || "https://api.iatistandard.org/datastore";
 const MAX_ACTIVITIES = Number(process.env.IATI_MAX_ACTIVITIES || 25000);
@@ -26,14 +26,20 @@ const UPSERT_CHUNK = 500;
 const SECTOR_PREFIXES = ["410", "140", "311", "312", "313", "740"];
 // Rio markers: biodiversity, climate mitigation, climate adaptation, desertification
 const RIO_MARKERS = ["5", "6", "7", "8"];
+/** A themed sector must be at least this share (%) of the activity, not one line among twenty. */
+const MIN_SECTOR_SHARE = 25;
+/** Publishers often leave old activities "ongoing": skip ones whose end date passed this long ago. */
+const ENDED_GRACE_DAYS = 90;
 
 const THEME =
   `(humanitarian:true OR sector_code:(${SECTOR_PREFIXES.map((p) => `${p}*`).join(" OR ")}) ` +
   `OR policy_marker_code:(${RIO_MARKERS.join(" OR ")}))`;
 const HAS_PLACE = "(recipient_country_code:[* TO *] OR location_point_pos:[* TO *])";
 const NOT_SECONDARY = "-reporting_org_secondary_reporter:true";
-/** What we import: planned or ongoing, with a place, on a humanitarian/environmental theme. */
-const SCOPE = `activity_status_code:(1 OR 2) AND ${NOT_SECONDARY} AND ${HAS_PLACE} AND ${THEME}`;
+/** Publishers refresh live activities at least yearly; older records are usually abandoned. */
+const RECENT = "last_updated_datetime:[NOW-2YEARS TO *]";
+/** What we import: planned or ongoing, recently updated, with a place, on a humanitarian/environmental theme. */
+const SCOPE = `activity_status_code:(1 OR 2) AND ${RECENT} AND ${NOT_SECONDARY} AND ${HAS_PLACE} AND ${THEME}`;
 /** What we update: same themes, any status (so an activity that ends gets marked completed). */
 const UPDATE_SCOPE = `${NOT_SECONDARY} AND ${HAS_PLACE} AND ${THEME}`;
 
@@ -125,11 +131,28 @@ async function* offsetPages(q: string, fl: string, sort: string, rows: number, s
   }
 }
 
-/** Second check after the transform: Rio markers must be significant (1-2+), which Solr can't pair. */
-function inTheme(row: IatiActivityRow): boolean {
+/**
+ * Second check after the transform, for what Solr can't pair: a Rio marker must be significant (>= 1),
+ * a themed sector must be a real share of the activity.
+ */
+function inTheme(row: IatiActivityRow, doc: IatiDoc): boolean {
   if (row.humanitarian) return true;
-  if (row.dac_sectors.some((code) => SECTOR_PREFIXES.some((prefix) => code.startsWith(prefix)))) return true;
+  if (sectorShare(doc, SECTOR_PREFIXES) >= MIN_SECTOR_SHARE) return true;
   return row.policy_markers.some((m) => RIO_MARKERS.includes(m.code) && (m.significance ?? 0) >= 1);
+}
+
+function endedLongAgo(row: IatiActivityRow): boolean {
+  if (!row.end_date) return false;
+  return Date.parse(row.end_date) < Date.now() - ENDED_GRACE_DAYS * 24 * 3600 * 1000;
+}
+
+/** Why a new activity is not imported, or null if it is. */
+function rejectReason(row: IatiActivityRow, doc: IatiDoc): string | null {
+  if (row.activity_status == null || row.activity_status > 2) return "not planned/ongoing";
+  if (endedLongAgo(row)) return "end date passed";
+  if (!inTheme(row, doc)) return "theme too weak";
+  if (row.lat == null) return "no map point";
+  return null;
 }
 
 function stats(rows: IatiActivityRow[]) {
@@ -173,9 +196,9 @@ async function runDryRun(limit: number) {
   const skipped: Record<string, number> = {};
   for (const doc of data.response.docs) {
     const result = transformActivity(doc);
-    if ("skip" in result) skipped[result.skip] = (skipped[result.skip] ?? 0) + 1;
-    else if (!inTheme(result.row)) skipped["theme not significant"] = (skipped["theme not significant"] ?? 0) + 1;
-    else rows.push(result.row);
+    const reason = "skip" in result ? result.skip : rejectReason(result.row, doc);
+    if (reason) skipped[reason] = (skipped[reason] ?? 0) + 1;
+    else if ("row" in result) rows.push(result.row);
   }
   console.log(`Fetched ${data.response.docs.length} of ${data.response.numFound} in scope.`);
   console.log("Stats:", JSON.stringify(stats(rows), null, 2));
@@ -241,10 +264,14 @@ async function runIncremental(supabase: SupabaseClient, runId: number) {
       totals.fetched += docs.length;
 
       const rows: IatiActivityRow[] = [];
+      const docsById = new Map<string, IatiDoc>();
       for (const doc of docs) {
         const result = transformActivity(doc);
         if ("skip" in result) totals.skipped++;
-        else rows.push(result.row);
+        else {
+          rows.push(result.row);
+          docsById.set(result.row.iati_identifier, doc);
+        }
         const updated = "row" in result ? result.row.last_updated_at : null;
         if (updated && (!highWater || updated > highWater)) highWater = updated;
       }
@@ -252,8 +279,7 @@ async function runIncremental(supabase: SupabaseClient, runId: number) {
       const known = await existingIds(supabase, rows.map((r) => r.iati_identifier));
       const keep = rows.filter((row) => {
         if (known.has(row.iati_identifier)) return true; // always update what we already show
-        const wanted = row.activity_status != null && row.activity_status <= 2 && inTheme(row);
-        if (!wanted) {
+        if (rejectReason(row, docsById.get(row.iati_identifier) ?? {})) {
           totals.skipped++;
           return false;
         }
