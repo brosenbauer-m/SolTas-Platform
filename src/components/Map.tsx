@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation"
 import mapboxgl from "mapbox-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
 
+import { openRemotePopup } from "@/components/map/remotePopup"
+
 // Token guard
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
 const HAS_MAPBOX_TOKEN = typeof MAPBOX_TOKEN === "string" && MAPBOX_TOKEN.length > 0
@@ -38,15 +40,6 @@ export type MapClusterLayer = {
   badge: string
   ctaLabel: string
   detailsUrl: (id: string) => string
-}
-
-type ClusterDetails = {
-  title: string
-  organisation?: string | null
-  place?: string | null
-  description?: string | null
-  approximate?: boolean
-  href: string
 }
 
 const CLUSTER_SOURCE = "cluster-points"
@@ -289,55 +282,12 @@ export default function Map({
       const layer = clustersRef.current
       const id = feature?.properties?.id
       if (!layer || typeof id !== "string" || feature.geometry.type !== "Point") return
-
-      const popupNode = document.createElement("div")
-      popupNode.className = "space-y-2 text-sm text-soltas-text"
-      const badge = document.createElement("p")
-      badge.className = "text-[11px] font-semibold uppercase tracking-wide text-soltas-muted"
-      badge.textContent = layer.badge
-      const loading = document.createElement("p")
-      loading.className = "text-sm text-soltas-muted"
-      loading.textContent = "Loading…"
-      popupNode.append(badge, loading)
-
-      new mapboxgl.Popup({ offset: 10, maxWidth: "320px" })
-        .setLngLat(feature.geometry.coordinates as [number, number])
-        .setDOMContent(popupNode)
-        .addTo(map)
-
-      fetch(layer.detailsUrl(id))
-        .then((res) => (res.ok ? (res.json() as Promise<ClusterDetails>) : Promise.reject(res.status)))
-        .then((details) => {
-          loading.remove()
-          const titleEl = document.createElement("h3")
-          titleEl.className = "text-base font-semibold text-soltas-text"
-          titleEl.textContent = details.title
-          popupNode.appendChild(titleEl)
-
-          const meta = [details.organisation, details.place].filter(Boolean).join(" · ")
-          if (meta) {
-            const metaEl = document.createElement("p")
-            metaEl.className = "text-xs font-medium text-soltas-muted"
-            metaEl.textContent = details.approximate ? `${meta} (approximate location)` : meta
-            popupNode.appendChild(metaEl)
-          }
-          if (details.description) {
-            const descriptionEl = document.createElement("p")
-            descriptionEl.className = "text-sm leading-snug text-soltas-muted"
-            descriptionEl.textContent = truncate(details.description)
-            popupNode.appendChild(descriptionEl)
-          }
-          const cta = document.createElement("button")
-          cta.type = "button"
-          cta.className =
-            "mt-2 inline-flex w-full items-center justify-center rounded-md bg-soltas-ocean px-3 py-2 text-xs font-medium text-white hover:bg-soltas-abyssal"
-          cta.textContent = layer.ctaLabel
-          cta.addEventListener("click", () => router.push(details.href))
-          popupNode.appendChild(cta)
-        })
-        .catch(() => {
-          loading.textContent = "Couldn’t load this activity."
-        })
+      openRemotePopup(map, feature.geometry.coordinates as [number, number], {
+        badge: layer.badge,
+        ctaLabel: layer.ctaLabel,
+        detailsUrl: layer.detailsUrl(id),
+        onNavigate: (href) => router.push(href),
+      })
     }
 
     const pointer = () => (map.getCanvas().style.cursor = "pointer")

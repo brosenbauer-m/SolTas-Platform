@@ -1,13 +1,13 @@
 "use client";
 
-import { categoryMarkerColor } from "@/lib/markerColors";
+import { categoryMarkerColor, MARKER_COLORS } from "@/lib/markerColors";
 
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import type { FocusEvent } from "react";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import HomeGlobe, { type HomeGlobeMode, type HomeGlobePoint } from "@/components/home/HomeGlobe";
+import HomeGlobe, { type HomeGlobeDotLayer, type HomeGlobeMode, type HomeGlobePoint } from "@/components/home/HomeGlobe";
 import type { GrantMarker } from "@/lib/grants/findGrantsQuery";
 import type { HomeStats } from "@/lib/homeStats";
 import type { ProjectMarker } from "@/lib/projects/findProjectsQuery";
@@ -130,6 +130,21 @@ export default function HomeGlobeSection({
   }, []);
 
   const [mode, setMode] = useState<HomeGlobeMode>(DEFAULT_MODE);
+  const [iatiCount, setIatiCount] = useState<number | undefined>(undefined);
+
+  // IATI activities as small dots in Projects mode (same public, CDN-cached data as Find Projects).
+  const iatiDots = useMemo<HomeGlobeDotLayer>(
+    () => ({
+      mode: "projects",
+      url: "/api/iati/points",
+      color: MARKER_COLORS.iati,
+      badge: "Published to IATI",
+      ctaLabel: "View activity",
+      detailsUrl: (id) => `/api/iati/activity?id=${encodeURIComponent(id)}`,
+      onLoaded: setIatiCount,
+    }),
+    [],
+  );
   const buttonRowRef = useRef<HTMLDivElement | null>(null);
 
   const pointsByMode = useMemo<Record<HomeGlobeMode, HomeGlobePoint[]>>(
@@ -196,12 +211,14 @@ export default function HomeGlobeSection({
         left: [
           { label: "Approved projects", value: homeStatsState?.projects.projects_approved, format: "number" },
           { label: "Ongoing projects", value: homeStatsState?.projects.projects_ongoing, format: "number" },
+          { label: "Published to IATI", value: iatiCount, format: "number" },
         ],
         right: [
           { label: "Verified organisations", value: homeStatsState?.projects.organisations_registered, format: "number" },
           { label: "Donations received", value: homeStatsState?.projects.donations_received_eur, format: "currency" },
         ],
-        footnote: "Totals reflect approved public projects and verified organisations.",
+        footnote:
+          "Totals reflect approved public projects and verified organisations. IATI: activities published to the International Aid Transparency Initiative.",
       },
       funding: {
         leftTitle: "Funding flow",
@@ -221,7 +238,7 @@ export default function HomeGlobeSection({
         footnote: "High-urgency alerts are approved issues marked 4+ on urgency.",
       },
     }),
-    [homeStatsState],
+    [homeStatsState, iatiCount],
   );
 
   const activeStats = statsByMode[mode];
@@ -241,7 +258,7 @@ export default function HomeGlobeSection({
   return (
     <section className="relative h-[calc(100dvh-4rem)] w-full overflow-hidden">
       <div id="home-globe" className="absolute inset-0 z-0">
-        <HomeGlobe mode={mode} pointsByMode={pointsByMode} />
+        <HomeGlobe mode={mode} pointsByMode={pointsByMode} dots={iatiDots} />
         <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-slate-950/30 via-slate-950/10 to-slate-950/40" />
       </div>
 
@@ -349,8 +366,8 @@ function StatsBar({ items }: { items: StatItem[] }) {
   if (!items.length) return null;
   return (
     <dl
-      className="mx-auto grid w-full max-w-3xl grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/15 bg-white/10 shadow-[0_20px_60px_-30px_rgba(15,23,42,0.6)] backdrop-blur-xl sm:[grid-template-columns:repeat(var(--cols),minmax(0,1fr))]"
-      style={{ "--cols": Math.min(items.length, 4) } as React.CSSProperties}
+      className="mx-auto grid w-full max-w-3xl grid-cols-2 [&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:col-span-1 gap-px overflow-hidden rounded-2xl border border-white/15 bg-white/10 shadow-[0_20px_60px_-30px_rgba(15,23,42,0.6)] backdrop-blur-xl sm:[grid-template-columns:repeat(var(--cols),minmax(0,1fr))]"
+      style={{ "--cols": Math.min(items.length, 5) } as React.CSSProperties}
     >
       {items.map((item) => (
         <div key={item.label} className="bg-black/10 px-4 py-3 sm:px-5 sm:py-4">

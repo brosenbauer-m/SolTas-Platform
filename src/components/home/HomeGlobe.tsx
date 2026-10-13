@@ -5,6 +5,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useSearchParams } from "next/navigation";
 
+import { openRemotePopup } from "@/components/map/remotePopup";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
@@ -45,6 +46,24 @@ export type HomeGlobePoint = {
   mediaUrls?: string[] | null;
   mediaCount?: number | null;
 };
+
+/**
+ * A large point set (IATI activities) drawn as small WebGL dots under the markers, shown in one mode.
+ * GeoJSON Point features with properties.id; clicking a dot loads a summary from detailsUrl(id).
+ */
+export type HomeGlobeDotLayer = {
+  mode: HomeGlobeMode;
+  url: string;
+  color: string;
+  badge: string;
+  ctaLabel: string;
+  detailsUrl: (id: string) => string;
+  /** Called with the number of dots once they are loaded. */
+  onLoaded?: (count: number) => void;
+};
+
+const DOT_SOURCE = "home-dots";
+const DOT_LAYER = "home-dots";
 
 type MarkerObject = {
   marker: mapboxgl.Marker;
@@ -128,9 +147,11 @@ const isMarkerInView = (marker: MarkerObject, center: mapboxgl.LngLat) => {
 export default function HomeGlobe({
   mode,
   pointsByMode,
+  dots = null,
 }: {
   mode: HomeGlobeMode;
   pointsByMode: Record<HomeGlobeMode, HomeGlobePoint[]>;
+  dots?: HomeGlobeDotLayer | null;
 }) {
   const reducedMotion = usePrefersReducedMotion();
   const searchParams = useSearchParams();
@@ -164,6 +185,11 @@ export default function HomeGlobe({
   }, []);
 
   const hasLoggedErrorRef = useRef(false);
+  const [styleReady, setStyleReady] = useState(false);
+  const dotsRef = useRef<HomeGlobeDotLayer | null>(dots);
+  useEffect(() => {
+    dotsRef.current = dots;
+  }, [dots]);
 
   const [debugState, setDebugState] = useState<{ mode: HomeGlobeMode; featuredId?: string | null } | null>(
     null,
@@ -285,6 +311,7 @@ export default function HomeGlobe({
 
       // start rotation after confirmed load
       startRotation();
+      setStyleReady(true);
     };
 
     if (map.loaded()) onLoaded();
@@ -310,8 +337,79 @@ export default function HomeGlobe({
       map.off("error", handleMapError);
       map.remove();
       mapRef.current = null;
+      setStyleReady(false);
     };
   }, [markInteracted, startRotation, stopRotation]);
+
+  // Dot layer (IATI activities): loaded once, below the DOM markers, visible only in its mode.
+  const dotsUrl = dots?.url ?? null;
+  const dotsColor = dots?.color ?? null;
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !styleReady || !dotsUrl || !dotsColor) return;
+
+    const controller = new AbortController();
+    map.addSource(DOT_SOURCE, { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+    map.addLayer({
+      id: DOT_LAYER,
+      type: "circle",
+      source: DOT_SOURCE,
+      layout: { visibility: "none" },
+      paint: {
+        "circle-color": dotsColor,
+        "circle-opacity": 0.7,
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 1, 1.8, 4, 3.5, 8, 6],
+        "circle-stroke-color": "#ffffff",
+        "circle-stroke-width": ["interpolate", ["linear"], ["zoom"], 1, 0.4, 6, 1.5],
+      },
+    });
+
+    fetch(dotsUrl, { signal: controller.signal })
+      .then((res) => (res.ok ? (res.json() as Promise<GeoJSON.FeatureCollection<GeoJSON.Point>>) : Promise.reject(res.status)))
+      .then((data) => {
+        (map.getSource(DOT_SOURCE) as mapboxgl.GeoJSONSource | undefined)?.setData(data);
+        dotsRef.current?.onLoaded?.(data.features.length);
+      })
+      .catch(() => {
+        // aborted or failed: the globe still shows the regular markers
+      });
+
+    const openDot = (event: mapboxgl.MapMouseEvent) => {
+      markInteracted();
+      const feature = map.queryRenderedFeatures(event.point, { layers: [DOT_LAYER] })[0];
+      const layer = dotsRef.current;
+      const id = feature?.properties?.id;
+      if (!layer || typeof id !== "string" || feature.geometry.type !== "Point") return;
+      openRemotePopup(map, feature.geometry.coordinates as [number, number], {
+        badge: layer.badge,
+        ctaLabel: layer.ctaLabel,
+        detailsUrl: layer.detailsUrl(id),
+      });
+    };
+    const pointer = () => (map.getCanvas().style.cursor = "pointer");
+    const noPointer = () => (map.getCanvas().style.cursor = "");
+    map.on("click", DOT_LAYER, openDot);
+    map.on("mouseenter", DOT_LAYER, pointer);
+    map.on("mouseleave", DOT_LAYER, noPointer);
+
+    return () => {
+      controller.abort();
+      map.off("click", DOT_LAYER, openDot);
+      map.off("mouseenter", DOT_LAYER, pointer);
+      map.off("mouseleave", DOT_LAYER, noPointer);
+      if (mapRef.current === map && map.getStyle()) {
+        if (map.getLayer(DOT_LAYER)) map.removeLayer(DOT_LAYER);
+        if (map.getSource(DOT_SOURCE)) map.removeSource(DOT_SOURCE);
+      }
+    };
+  }, [styleReady, dotsUrl, dotsColor, markInteracted]);
+
+  const dotsMode = dots?.mode ?? null;
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !styleReady || !map.getLayer(DOT_LAYER)) return;
+    map.setLayoutProperty(DOT_LAYER, "visibility", dotsMode === mode ? "visible" : "none");
+  }, [styleReady, dotsMode, mode, dotsUrl]);
 
   // If reduced motion toggles, start/stop rotation
   useEffect(() => {
