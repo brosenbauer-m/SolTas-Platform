@@ -220,7 +220,7 @@ linked to a native project are left out, so nothing shows twice. Find Projects a
 | 2 | Sync script + dry run + workflow (manual trigger only); count and tune the scope; first backfill | Medium | 1 |
 | 3 | Clustered globe layer (`/api/iati/points`), Source filter, IATI list + activity page `/projects/iati/[id]`, About "Data sources". No view needed: the page reads both tables | Medium | 2 |
 | 4 | Shared taxonomies (`taxonomy_terms`, DAC → Sector crosswalk) for both sources | High | can run in parallel with 2–3 |
-| 5 | Nightly schedule on, weekly full check, admin "hide" button | Medium | 3 |
+| 5 | Nightly schedule on (03:17 UTC incremental), weekly full check (Sundays 04:47 UTC); admin "hide" button still to do | Medium | 3 |
 | 6 | Claim flow: verified organisation adds its IATI publisher ID, admin confirms, activities show on the organisation; "adopt" an activity into a native project (`projects.iati_identifier`) | High | 3, 4 |
 
 Later, beyond this plan:
