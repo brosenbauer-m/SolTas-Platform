@@ -164,8 +164,7 @@ linked to a native project are left out, so nothing shows twice. Find Projects a
   a manual "Run workflow" button). It runs `pnpm sync:iati` (a TypeScript script in `scripts/iati/`). A
   first backfill can take an hour, which is too long for Vercel functions (a few minutes at most) and Supabase
   Edge Functions.
-- **Secrets** (GitHub Actions secrets, never in the repo): `IATI_API_KEY`, `SUPABASE_URL`,
-  `SUPABASE_SERVICE_ROLE_KEY`. Listed in `.env.example` without values.
+- **Secrets** (GitHub Actions secrets, never in the repo): `IATI_API_KEY`, `SUPABASE_DB_URL` (the Postgres connection string the migration workflow already uses). Listed in `.env.example` without values.
 - **Steps:**
   1. Read the last high-water mark from `iati_sync_runs`.
   2. Query the scope with `last_updated_datetime:[mark TO *]` and page through it with `cursorMark`, 1,000 rows per page.

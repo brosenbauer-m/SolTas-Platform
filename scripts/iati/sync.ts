@@ -6,11 +6,12 @@
 //   pnpm sync:iati --mode incremental           first run: backfill (newest first, capped). Then: changes since last run.
 //   pnpm sync:iati --mode full                  withdraw activities that left the scope (identifiers only).
 //
-// Env: IATI_API_KEY (always); SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY (incremental/full).
+// Env: IATI_API_KEY (always); SUPABASE_DB_URL (incremental/full; the Postgres connection string the
+// migration workflow already uses).
 // Optional: IATI_MAX_ACTIVITIES (default 25000, Supabase Free plan), IATI_ROWS (default 1000 per call),
 //           IATI_MAX_CALLS (default 40 per run; the free "Exploratory" key allows 5 calls/min and 100/week).
 
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import postgres from "postgres";
 
 import { IATI_FIELDS, sectorShare, transformActivity, type IatiActivityRow, type IatiDoc } from "./transform";
 
@@ -208,49 +209,53 @@ async function runDryRun(limit: number) {
   console.log("Stats:", JSON.stringify(stats(rows)));
 }
 
-function db(): SupabaseClient {
-  return createClient(requireEnv("SUPABASE_URL"), requireEnv("SUPABASE_SERVICE_ROLE_KEY"), {
-    auth: { persistSession: false, autoRefreshToken: false },
+type Sql = postgres.Sql;
+
+/** Direct database connection (the same SUPABASE_DB_URL the migration workflow uses; bypasses RLS). */
+function db(): Sql {
+  const url = requireEnv("SUPABASE_DB_URL");
+  const local = /@(localhost|127\.0\.0\.1)[:/]/.test(url);
+  return postgres(url, { max: 2, prepare: false, ssl: local ? false : "require", onnotice: () => {} });
+}
+
+const JSON_COLUMNS = ["participating_orgs", "locations", "policy_markers", "links"] as const;
+
+async function existingIds(sql: Sql, ids: string[]): Promise<Set<string>> {
+  if (!ids.length) return new Set();
+  const rows = await sql<{ iati_identifier: string }[]>`
+    select iati_identifier from public.iati_activities where iati_identifier = any(${ids})`;
+  return new Set(rows.map((row) => row.iati_identifier));
+}
+
+async function upsertActivities(sql: Sql, rows: IatiActivityRow[], now: string) {
+  const records = rows.map((row) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- postgres.js helper typing
+    const record: Record<string, any> = { ...row, synced_at: now, withdrawn_at: null };
+    for (const column of JSON_COLUMNS) record[column] = sql.json(row[column] as postgres.JSONValue);
+    return record;
   });
+  const columns = Object.keys(records[0]);
+  const updates = columns.filter((column) => column !== "iati_identifier");
+  await sql`
+    insert into public.iati_activities ${sql(records, columns)}
+    on conflict (iati_identifier) do update set
+    ${sql.unsafe(updates.map((column) => `"${column}" = excluded."${column}"`).join(", "))}`;
 }
 
-async function existingIds(supabase: SupabaseClient, ids: string[]): Promise<Set<string>> {
-  const found = new Set<string>();
-  for (let i = 0; i < ids.length; i += 100) {
-    const { data, error } = await supabase
-      .from("iati_activities")
-      .select("iati_identifier")
-      .in("iati_identifier", ids.slice(i, i + 100));
-    if (error) throw error;
-    for (const row of data ?? []) found.add(row.iati_identifier as string);
-  }
-  return found;
-}
+async function runIncremental(sql: Sql, runId: number) {
+  const [last] = await sql<{ high_water_mark: Date }[]>`
+    select high_water_mark from public.iati_sync_runs
+    where mode in ('incremental', 'full') and ok and high_water_mark is not null
+    order by high_water_mark desc limit 1`;
+  const [{ stored }] = await sql<{ stored: number }[]>`select count(*)::int as stored from public.iati_activities`;
 
-async function runIncremental(supabase: SupabaseClient, runId: number) {
-  const { data: last, error: lastError } = await supabase
-    .from("iati_sync_runs")
-    .select("high_water_mark")
-    .in("mode", ["incremental", "full"])
-    .eq("ok", true)
-    .not("high_water_mark", "is", null)
-    .order("high_water_mark", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (lastError) throw lastError;
-
-  const { count: stored, error: countError } = await supabase
-    .from("iati_activities")
-    .select("iati_identifier", { count: "exact", head: true });
-  if (countError) throw countError;
-
-  // Solr wants UTC with "Z" (Postgres returns "+00:00")
-  const mark = last?.high_water_mark ? new Date(last.high_water_mark as string).toISOString() : null;
+  // Solr wants UTC with "Z"
+  const mark = last ? new Date(last.high_water_mark).toISOString() : null;
   const backfill = !mark;
   // Backfill: newest first, so the cap keeps the most recently updated activities.
   const q = backfill ? SCOPE : `${UPDATE_SCOPE} AND last_updated_datetime:[${mark} TO *]`;
   const sort = backfill ? "last_updated_datetime desc,id asc" : "last_updated_datetime asc,id asc";
-  let room = MAX_ACTIVITIES - (stored ?? 0);
+  let room = MAX_ACTIVITIES - stored;
   console.log(backfill ? "Backfill (no previous run)." : `Changes since ${mark}.`, `Stored: ${stored}, room: ${room}.`);
 
   const totals = { fetched: 0, upserted: 0, skipped: 0, capped: 0 };
@@ -261,7 +266,7 @@ async function runIncremental(supabase: SupabaseClient, runId: number) {
     for await (const { docs, numFound } of pages(q, IATI_FIELDS.join(","), sort)) {
       if (totals.fetched === 0) {
         console.log(`Matching: ${numFound}`);
-        await supabase.from("iati_sync_runs").update({ in_scope: numFound }).eq("id", runId);
+        await sql`update public.iati_sync_runs set in_scope = ${numFound} where id = ${runId}`;
       }
       totals.fetched += docs.length;
 
@@ -278,8 +283,11 @@ async function runIncremental(supabase: SupabaseClient, runId: number) {
         if (updated && (!highWater || updated > highWater)) highWater = updated;
       }
 
-      const known = await existingIds(supabase, rows.map((r) => r.iati_identifier));
+      const known = await existingIds(sql, rows.map((r) => r.iati_identifier));
+      const seen = new Set<string>();
       const keep = rows.filter((row) => {
+        if (seen.has(row.iati_identifier)) return false; // one row per identifier per statement
+        seen.add(row.iati_identifier);
         if (known.has(row.iati_identifier)) return true; // always update what we already show
         if (rejectReason(row, docsById.get(row.iati_identifier) ?? {})) {
           totals.skipped++;
@@ -295,9 +303,8 @@ async function runIncremental(supabase: SupabaseClient, runId: number) {
 
       const now = new Date().toISOString();
       for (let i = 0; i < keep.length; i += UPSERT_CHUNK) {
-        const chunk = keep.slice(i, i + UPSERT_CHUNK).map((row) => ({ ...row, synced_at: now, withdrawn_at: null }));
-        const { error } = await supabase.from("iati_activities").upsert(chunk, { onConflict: "iati_identifier" });
-        if (error) throw error;
+        const chunk = keep.slice(i, i + UPSERT_CHUNK);
+        await upsertActivities(sql, chunk, now);
         totals.upserted += chunk.length;
       }
       console.log(`  fetched ${totals.fetched}, upserted ${totals.upserted}, skipped ${totals.skipped}, over cap ${totals.capped}`);
@@ -315,7 +322,7 @@ async function runIncremental(supabase: SupabaseClient, runId: number) {
   return { ...totals, high_water_mark: highWater, finished };
 }
 
-async function runFull(supabase: SupabaseClient) {
+async function runFull(sql: Sql) {
   const inScope = new Set<string>();
   for await (const { docs } of pages(SCOPE, "iati_identifier", "id asc", ID_ROWS)) {
     for (const doc of docs) {
@@ -325,26 +332,12 @@ async function runFull(supabase: SupabaseClient) {
   }
   console.log(`In scope now: ${inScope.size}`);
 
-  const stale: string[] = [];
-  for (let from = 0; ; from += 1000) {
-    const { data, error } = await supabase
-      .from("iati_activities")
-      .select("iati_identifier")
-      .is("withdrawn_at", null)
-      .order("iati_identifier")
-      .range(from, from + 999);
-    if (error) throw error;
-    for (const row of data ?? []) if (!inScope.has(row.iati_identifier as string)) stale.push(row.iati_identifier as string);
-    if (!data || data.length < 1000) break;
-  }
-
-  const now = new Date().toISOString();
-  for (let i = 0; i < stale.length; i += 100) {
-    const { error } = await supabase
-      .from("iati_activities")
-      .update({ withdrawn_at: now })
-      .in("iati_identifier", stale.slice(i, i + 100));
-    if (error) throw error;
+  const stored = await sql<{ iati_identifier: string }[]>`
+    select iati_identifier from public.iati_activities where withdrawn_at is null`;
+  const stale = stored.map((row) => row.iati_identifier).filter((id) => !inScope.has(id));
+  for (let i = 0; i < stale.length; i += 1000) {
+    await sql`update public.iati_activities set withdrawn_at = now()
+              where iati_identifier = any(${stale.slice(i, i + 1000)})`;
   }
   console.log(`Withdrawn (left the scope or IATI): ${stale.length}`);
   return { withdrawn: stale.length, in_scope: inScope.size };
@@ -360,32 +353,33 @@ async function main() {
   if (mode === "count") return runCount();
   if (mode === "dry-run") return runDryRun(Math.min(Number(arg("limit") ?? 200), 1000));
 
-  const supabase = db();
-  const { data: run, error } = await supabase.from("iati_sync_runs").insert({ mode }).select("id").single();
-  if (error) throw error;
-  const runId = run.id as number;
-
+  const sql = db();
   try {
-    const result = mode === "incremental" ? await runIncremental(supabase, runId) : await runFull(supabase);
-    await supabase
-      .from("iati_sync_runs")
-      .update({
-        finished_at: new Date().toISOString(),
-        ok: true,
-        ...("high_water_mark" in result
-          ? { high_water_mark: result.high_water_mark, fetched: result.fetched, upserted: result.upserted }
-          : { withdrawn: result.withdrawn, in_scope: result.in_scope }),
-        error: "finished" in result && !result.finished ? "stopped early (call limit), see log" : null,
-      })
-      .eq("id", runId);
-    console.log(`Done after ${calls} API calls.`, JSON.stringify(result));
-  } catch (err) {
-    const message = err instanceof Error ? err.message : JSON.stringify(err);
-    await supabase
-      .from("iati_sync_runs")
-      .update({ finished_at: new Date().toISOString(), ok: false, error: message.slice(0, 1000) })
-      .eq("id", runId);
-    throw err;
+    const [{ id: runId }] = await sql<{ id: number }[]>`
+      insert into public.iati_sync_runs (mode) values (${mode}) returning id`;
+    try {
+      const result = mode === "incremental" ? await runIncremental(sql, runId) : await runFull(sql);
+      const stoppedEarly = "finished" in result && !result.finished;
+      if ("high_water_mark" in result) {
+        await sql`update public.iati_sync_runs
+          set finished_at = now(), ok = true, high_water_mark = ${result.high_water_mark},
+              fetched = ${result.fetched}, upserted = ${result.upserted},
+              error = ${stoppedEarly ? "stopped early (call limit), see log" : null}
+          where id = ${runId}`;
+      } else {
+        await sql`update public.iati_sync_runs
+          set finished_at = now(), ok = true, withdrawn = ${result.withdrawn}, in_scope = ${result.in_scope}
+          where id = ${runId}`;
+      }
+      console.log(`Done after ${calls} API calls.`, JSON.stringify(result));
+    } catch (err) {
+      const message = err instanceof Error ? err.message : JSON.stringify(err);
+      await sql`update public.iati_sync_runs set finished_at = now(), ok = false, error = ${message.slice(0, 1000)}
+                where id = ${runId}`;
+      throw err;
+    }
+  } finally {
+    await sql.end({ timeout: 5 });
   }
 }
 

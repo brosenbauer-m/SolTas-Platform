@@ -4,7 +4,7 @@ name: iati-sync
 # Plan: docs/architecture/iati-integration.md. Manual runs only for now (Actions → iati-sync → Run workflow);
 # the nightly schedule is switched on in a later PR once the first backfill looks right.
 #
-# Secrets: IATI_API_KEY (all modes); SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY (incremental, full).
+# Secrets: IATI_API_KEY (all modes); SUPABASE_DB_URL (incremental, full; same secret as supabase-db-auto).
 # The free IATI key allows 5 calls/minute and 100 calls/week: count = 3 calls, dry-run = 1 call.
 on:
   workflow_dispatch:
@@ -40,8 +40,7 @@ jobs:
       - name: Sync
         env:
           IATI_API_KEY: ${{ secrets.IATI_API_KEY }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
           MODE: ${{ inputs.mode }}
           LIMIT: ${{ inputs.limit }}
         run: pnpm sync:iati --mode "$MODE" --limit "$LIMIT"
