@@ -42,8 +42,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const { error } = await supabase
     .from("grants")
     .update({
+      // status stays open/rolling/closed (check constraint); rejection unpublishes the grant
       moderation_status: "rejected",
-      status: "rejected",
+      is_published: false,
       rejected_at: new Date().toISOString(),
       rejected_by: rejectorId,
       rejection_reason: reason,
