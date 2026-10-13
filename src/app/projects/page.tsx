@@ -7,6 +7,7 @@ import ProjectsTableView from "@/components/projects/ProjectsTableView";
 import ProjectsViewToggle from "@/components/projects/ProjectsViewToggle";
 import {
   fetchFindProjects,
+  fetchProjectFilterOptions,
   fetchProjectMarkers,
   type ProjectListRow,
 } from "@/lib/projects/findProjectsQuery";
@@ -38,6 +39,11 @@ export default async function FindProjectsPage({
   } catch (error) {
     console.error("Find projects: list query failed", error);
   }
+
+  const filterOptions = await fetchProjectFilterOptions().catch((error) => {
+    console.error("Find projects: filter options failed", error);
+    return { countries: [], regions: [], thematic: [], interventions: [], demographics: [], organisations: [] };
+  });
 
   let markers: Awaited<ReturnType<typeof fetchProjectMarkers>> = [];
   if (view === "globe") {
@@ -71,11 +77,13 @@ export default async function FindProjectsPage({
 
       {view === "globe" ? (
         <div className="flex-1 min-h-0">
-          <ProjectsGlobeSplitView markers={markers} totalCount={count} focusSlug={focus} />
+          <ProjectsGlobeSplitView options={filterOptions} markers={markers} totalCount={count} focusSlug={focus} />
         </div>
       ) : (
         <>
-          <ProjectsFilters basePath="/projects" showSorting variant="panel" />
+          <div className="card p-5 lg:p-6">
+            <ProjectsFilters options={filterOptions} />
+          </div>
           <ProjectsTableView rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />
         </>
       )}

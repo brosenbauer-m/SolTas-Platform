@@ -34,6 +34,15 @@ Goal: elegant, simple, friendly — see `docs/DESIGN.md`.
 
 ## Phase 2 — Complete the core blueprint
 
+- ✅ Find-page filters: searchable dropdowns, main filters + "Add filter", one Sort menu, Project status, Closing within (#198)
+- ⬜ **Shared taxonomies** (see `docs/research/filters.md`): one fixed Sector list for all four entities, Target groups,
+  Ecosystems, Approaches, Organisation type, Issue type; `taxonomy_terms` table, then one migration PR per entity
+- ⬜ **Missing filters that need new data:** Issue status (reported → resolved), Funding "who can apply" + funder type +
+  forthcoming, Organisation type + verified + "led by", Project "accepting donations/volunteers", climate & nature focus
+- ⬜ Creatable tag fields in the forms (project/organisation): suggest existing tags as you type, create new ones with
+  normalised capitalisation (until the fixed taxonomies replace free tags)
+- ⬜ "Near me" / "Search this map area" on the globe
+
 - ⬜ **Subscribe** UX everywhere: "+" next to the name turns into "✓ Following" with a short confirmation
 - ⬜ **Home globe views**: All · Following (gold pulsing markers for new updates) · Featured (curated)
 - ⬜ **Find Projects filters**: SDG + IFRC tags, target demographics, intervention type, location, organisation, donations range; table sorting (dates, donations, A–Z, status, funding needed)

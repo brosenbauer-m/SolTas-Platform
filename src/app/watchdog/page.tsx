@@ -84,7 +84,9 @@ export default async function WatchdogPage({
         </div>
       ) : (
         <>
-          <WatchdogFilters options={filterOptions} basePath="/watchdog" showSorting variant="panel" />
+          <div className="card p-5 lg:p-6">
+            <WatchdogFilters options={filterOptions} />
+          </div>
           <WatchdogTableView rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />
         </>
       )}

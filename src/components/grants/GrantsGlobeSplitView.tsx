@@ -40,7 +40,7 @@ export default function GrantsGlobeSplitView({ options, markers, totalCount, foc
   return (
     <GlobeSplitView
       storageKey="find:funding:split"
-      filters={<GrantsFilters basePath="/funding" options={options} showSorting={false} variant="inline" />}
+      filters={<GrantsFilters options={options} showSorting={false} />}
       markers={mapMarkers}
       summary={`${markers.length} on the globe · ${totalCount} matching your filters`}
       focusSlug={focusSlug}
