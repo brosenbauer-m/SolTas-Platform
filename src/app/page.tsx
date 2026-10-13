@@ -131,7 +131,7 @@ export default function HomePage() {
                 Join Solarpunk Taskforce
               </Link>
               <Link
-                href="/services"
+                href="/about#services"
                 className={buttonClasses({
                   variant: "ghost",
                   size: "lg",
