@@ -1,6 +1,7 @@
 # IATI integration plan
 
-Status: **proposal, waiting for the owner's decisions** (§8). Nothing here has been built yet.
+Status: **approved** (owner, 2026-10-13: recommendations in §8, Supabase **Free** plan, so the import is capped).
+Phase 1 (tables) is migration `20260324120012_iati_activities.sql`.
 
 ## 1. In short
 
@@ -114,24 +115,23 @@ New tables (one migration PR, High risk, RLS tests included):
 | `links jsonb` | website and documents |
 | `last_updated_at timestamptz`, `synced_at timestamptz`, `withdrawn_at timestamptz` | |
 | `hidden boolean default false` | admins can hide a bad record (moderation) |
-| `linked_project_id uuid`, `linked_organisation_id uuid` | set by the claim flow (§7, phase 5) |
-| `search tsvector` (generated) | title + description + organisations |
+| *later:* `linked_project_id`, `linked_organisation_id` | added with the claim flow (phase 6) |
+| *later:* `search tsvector` | added with free-text search, if `ilike` on the title is too slow |
 
-Indexes: `(lat, lng)`, GIN on `countries`, `sectors`, `search`, and `last_updated_at`.
+Indexes: `(lat, lng)` (visible rows only), `last_updated_at`, `reporting_org_ref`, GIN on `countries`, `dac_sectors`, `sectors`.
 
 **`iati_sync_runs`** (server only, no policies): `started_at`, `finished_at`, `mode` (incremental/full),
 `high_water_mark`, `fetched`, `upserted`, `withdrawn`, `error`. The next run starts from the last successful
 high-water mark.
 
-**`countries`** (public read): ISO code, name, centroid lat/lng, UN M49 region. Places activities that only
-name a country, and gives the country filter a fixed list. (Natural Earth / ISO data, public domain.)
+**Country centroids** ship as a JSON file with the sync script (no table): activities that only name a country
+get that country's centre point at import time.
 
 **RLS**
 - `iati_activities`: SELECT for `anon` + `authenticated` where `not hidden and withdrawn_at is null`. Admins
   (`is_admin()`) may SELECT all rows and UPDATE only `hidden`. No INSERT/DELETE policies; the sync uses the
   service role.
 - `iati_sync_runs`: RLS on, no policies.
-- `countries`: SELECT for everyone.
 
 **One list for the map and Find**: a `security_invoker` view `map_items` that unions approved public
 `projects` and visible `iati_activities` into the same shape: `kind`, `source` (`soltas` / `iati`), `id`,
@@ -198,7 +198,7 @@ linked to a native project are left out, so nothing shows twice. Find Projects a
 | # | PR | Risk | Depends on |
 | --- | --- | --- | --- |
 | 0 | Owner: API key, decisions in §8 | – | – |
-| 1 | Migration: `countries` (+ data), `iati_activities`, `iati_sync_runs`, RLS, `supabase/tests/iati_*` | High | 0 |
+| 1 | Migration: `iati_activities`, `iati_sync_runs`, RLS, `supabase/tests/iati_activities_rls_manual_tests.sql` | High | 0 |
 | 2 | Sync script + dry run + workflow (manual trigger only); count and tune the scope; first backfill | Medium | 1 |
 | 3 | `map_items` view, clustered globe, Source filter, IATI badge, activity page | Medium (view = migration, High) | 2 |
 | 4 | Shared taxonomies (`taxonomy_terms`, DAC → Sector crosswalk) for both sources | High | can run in parallel with 2–3 |
