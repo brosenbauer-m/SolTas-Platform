@@ -34,6 +34,7 @@ export const IATI_FIELDS = [
   "location_exactness_code",
   "sector_code",
   "sector_vocabulary",
+  "sector_percentage",
   "policy_marker_code",
   "policy_marker_significance",
   "policy_marker_vocabulary",
@@ -268,12 +269,31 @@ function pickParticipatingOrgs(doc: IatiDoc): IatiActivityRow["participating_org
   const namesOk = aligned(roles, names);
   const refsOk = aligned(roles, refs);
   const typesOk = aligned(roles, types);
-  return roles.slice(0, MAX_ORGS).map((role, i) => ({
-    role: role || null,
-    name: namesOk ? cleanText(names[i]) : null,
-    ref: refsOk ? refs[i] || null : null,
-    type: typesOk ? types[i] || null : null,
-  }));
+  return roles
+    .map((role, i) => ({
+      role: role || null,
+      name: namesOk ? cleanText(names[i]) : null,
+      ref: refsOk ? refs[i] || null : null,
+      type: typesOk ? types[i] || null : null,
+    }))
+    .filter((org) => org.name || org.ref) // role/type alone tells a visitor nothing
+    .slice(0, MAX_ORGS);
+}
+
+/**
+ * Share (0-100) of the activity's DAC sectors that start with one of the prefixes. Without usable
+ * percentages, any match counts as 100 (a single-sector activity has no percentages either).
+ */
+export function sectorShare(doc: IatiDoc, prefixes: string[]): number {
+  const codes = list(doc.sector_code);
+  const vocabularies = list(doc.sector_vocabulary);
+  const percentages = list(doc.sector_percentage).map(Number);
+  const isDac = (i: number) => !vocabularies.length || !aligned(codes, vocabularies) || ["1", "2"].includes(vocabularies[i]);
+  const matches = (i: number) => isDac(i) && prefixes.some((prefix) => codes[i].startsWith(prefix));
+  const indexes = codes.map((_, i) => i);
+  if (!indexes.some(matches)) return 0;
+  if (!aligned(codes, percentages) || percentages.some((n) => !Number.isFinite(n))) return 100;
+  return indexes.filter(matches).reduce((sum, i) => sum + percentages[i], 0);
 }
 
 export type TransformResult = { row: IatiActivityRow } | { skip: string };
