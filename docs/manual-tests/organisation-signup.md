@@ -673,9 +673,9 @@ Notes:
 
 **Email confirmation not received**:
 - Check spam/junk folder
-- Verify RESEND_API_KEY and RESEND_FROM_EMAIL environment variables configured
+- Verify SCW_SECRET_KEY and SCW_PROJECT_ID environment variables are configured
 - Check Supabase email settings
-- Verify email service (Resend) is operational
+- Verify the email service (Scaleway Transactional Email) is operational
 - Check application logs for email sending errors
 
 **Organisation not appearing in directory**:
