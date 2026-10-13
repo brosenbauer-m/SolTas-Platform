@@ -44,7 +44,7 @@ Goal: elegant, simple, friendly — see `docs/DESIGN.md`.
 - ⬜ **Feed**: three views (Popular · Following · Watchdog); share; donate shortcut on project posts
 - ⬜ **User profiles**: "Independent / Watchdog / Organisation" label, portfolio (projects, issues, organisations with role + period), following list
 - ⬜ **Notifications**: email digests for followed projects (respecting the email setting)
-- ❓ **Who may post in the feed?** Blueprint: only projects/organisations (and verified watchdog issues); today individuals can post too
+- ✅ **Who may post in the feed?** Decided: individuals may post too (current behaviour)
 
 ## Phase 3 — Content and brand
 
@@ -55,8 +55,8 @@ Goal: elegant, simple, friendly — see `docs/DESIGN.md`.
 
 ## Phase 4 — Intelligence and money
 
-- ❓ **AI search** for projects/organisations (needs an EU-hosted model provider and a privacy note)
-- ❓ **AI-assisted impact metrics** (suggest metrics from the project description; builds on Phase 2 metrics)
+- ⬜ **AI search** for projects/organisations: provider decided, **Mistral** (EU); add it to the privacy page when built
+- ⬜ **AI-assisted impact metrics** (Mistral) (suggest metrics from the project description; builds on Phase 2 metrics)
 - ⬜ **Timeline / history**: store project snapshots so the globe can show any point in time
 - ❓ **Donations**: payment provider (e.g. Stripe or Mollie), legal entity, fees, receipts
 - ⬜ Globe clustering and performance for thousands of markers
@@ -71,8 +71,8 @@ Goal: elegant, simple, friendly — see `docs/DESIGN.md`.
 
 ## Decisions needed from the owner
 
-1. Feed posting rules (individuals yes/no).
-2. AI provider for search and impact metrics (EU-hosted?).
+1. ~~Feed posting rules~~: individuals may post (decided 2026-10-13).
+2. ~~AI provider~~: Mistral (decided 2026-10-13).
 3. Donations: provider, which entity receives funds, fees.
 4. Analytics / error monitoring provider.
 5. Note Empathy content owner and store timeline.
