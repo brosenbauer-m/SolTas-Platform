@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, BarChart3, Check, Megaphone } from "lucide-react";
 
 import SiteFooter from "@/components/SiteFooter";
 import { buttonClasses } from "@/components/ui/button";
@@ -8,8 +8,11 @@ import { buttonClasses } from "@/components/ui/button";
 export const metadata: Metadata = {
   title: "About | Solarpunk Taskforce",
   description:
-    "What Solarpunk Taskforce is, why it exists, and how the platform connects people, projects, and organisations to improve global impact.",
+    "Who we are and what we do: a living map of humanitarian and environmental work, plus intelligence and storytelling services for the people doing it.",
 };
+
+const CONTACT_EMAIL = "contact@solarpunktaskforce.org";
+const CONSULTATION_HREF = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Consultation request")}`;
 
 const PROBLEMS = [
   {
@@ -44,57 +47,120 @@ const VISION = [
   "Creative, factual storytelling restores trust in humanitarian work and deepens our understanding of humanity.",
 ];
 
-const SECTIONS = [
-  { href: "/projects", title: "Find projects", text: "An interactive globe and table of projects, filterable by place, theme and need." },
-  { href: "/find-organisations", title: "Find organisations", text: "Verified organisations, their projects, partners and impact." },
-  { href: "/funding", title: "Find funding", text: "Open and upcoming grants for humanitarian and environmental action." },
-  { href: "/watchdog", title: "Watchdog network", text: "Issues raised by local advocates, connected to those who can act." },
+const PLATFORM = [
+  { href: "/projects", title: "Projects", text: "An interactive globe and table of projects, filterable by place, theme and need." },
+  { href: "/find-organisations", title: "Organisations", text: "Verified organisations, their projects, partners and impact." },
+  { href: "/funding", title: "Funding", text: "Open and upcoming grants for humanitarian and environmental action." },
+  { href: "/watchdog", title: "Issues", text: "Problems raised by local people, connected to those who can act." },
   { href: "/feed", title: "Feed", text: "Updates, stories and media from projects and organisations." },
-  { href: "/services", title: "Services", text: "Comparative intelligence and storytelling for registered organisations." },
 ];
+
+const SERVICES = [
+  {
+    icon: BarChart3,
+    title: "Comparative intelligence",
+    text: "Data-driven insight into your field: who else works on your issue, what has worked elsewhere, and where the gaps and funding opportunities are.",
+    features: [
+      "Benchmarking against similar projects",
+      "Potential partners and collaborations",
+      "Proven solutions from related initiatives",
+      "Gap analysis: underserved areas and funding",
+      "Recommendations for resource allocation",
+    ],
+  },
+  {
+    icon: Megaphone,
+    title: "Storytelling and marketing",
+    text: "Modern, honest communication that makes your work visible, builds trust and brings in support, beyond crisis-driven narratives.",
+    features: [
+      "Project narrative and storytelling",
+      "Articles, video, podcasts and visual media",
+      "Social media strategy",
+      "Donor engagement campaigns",
+      "Community and awareness campaigns",
+    ],
+  },
+];
+
+const AUDIENCES = [
+  { title: "NGOs and non-profits", text: "Optimise operations and extend your reach." },
+  { title: "New projects", text: "Get strategic guidance and visibility from day one." },
+  { title: "Funders", text: "Make informed decisions with data on the whole field." },
+  { title: "Social enterprises", text: "Understand your market and position your impact." },
+];
+
+const STEPS = [
+  { title: "Conversation", text: "We talk about your goals, challenges and needs." },
+  { title: "Strategy", text: "We build a plan using platform data and sector expertise." },
+  { title: "Delivery", text: "We put it into practice with you and support you afterwards." },
+];
+
+function SectionTitle({ id, eyebrow, title, intro }: { id: string; eyebrow: string; title: string; intro?: string }) {
+  return (
+    <div className="max-w-3xl">
+      <p className="text-sm font-medium text-soltas-ocean">{eyebrow}</p>
+      <h2 id={id} className="mt-2 text-3xl font-semibold tracking-tight text-soltas-text sm:text-4xl">
+        {title}
+      </h2>
+      {intro ? <p className="mt-3 text-[15px] leading-7 text-soltas-muted">{intro}</p> : null}
+    </div>
+  );
+}
 
 export default function AboutPage() {
   return (
     <main className="flex flex-col">
-      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Hero */}
-        <section className="py-20 sm:py-28">
+        <section className="py-16 sm:py-24">
           <p className="text-sm font-medium text-soltas-ocean">About Solarpunk Taskforce</p>
           <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-tight text-soltas-text sm:text-6xl">
             Bridging action and awareness.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-soltas-muted">
             Solarpunk Taskforce connects people, projects and organisations across the humanitarian and
-            environmental movement. A transparent, living map of global efforts, paired with honest
-            storytelling, so the world can see what is being done, and help where it matters most.
+            environmental movement: a transparent, living map of global efforts, paired with honest storytelling, so
+            the world can see what is being done and help where it matters most.
           </p>
+          <nav aria-label="On this page" className="mt-8 flex flex-wrap gap-2">
+            <a href="#who-we-are" className={buttonClasses({ variant: "outline", size: "sm" })}>
+              Who we are
+            </a>
+            <a href="#what-we-do" className={buttonClasses({ variant: "outline", size: "sm" })}>
+              What we do
+            </a>
+          </nav>
         </section>
 
-        {/* Problems */}
-        <section aria-labelledby="why-heading" className="pb-20 sm:pb-28">
-          <h2 id="why-heading" className="text-3xl font-semibold tracking-tight text-soltas-text sm:text-4xl">
-            Why it matters
-          </h2>
-          <p className="mt-3 max-w-2xl text-[15px] leading-7 text-soltas-muted">
-            Collaboration is at the heart of the impact sector, yet the tools to collaborate are missing.
-          </p>
-          <div className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-            {PROBLEMS.map((p, i) => (
-              <div key={p.title} className="border-t border-soltas-line pt-5">
-                <p className="text-sm font-medium text-soltas-muted">{String(i + 1).padStart(2, "0")}</p>
-                <h3 className="mt-2 text-lg font-semibold text-soltas-text">{p.title}</h3>
-                <p className="mt-2 text-[15px] leading-6 text-soltas-muted">{p.text}</p>
+        {/* ───────────── Who we are ───────────── */}
+        <section id="who-we-are" aria-labelledby="who-heading" className="scroll-mt-24 space-y-16 pb-20 sm:space-y-20 sm:pb-28">
+          <SectionTitle id="who-heading" eyebrow="Who we are" title="A taskforce for people and planet." />
+
+          <div aria-labelledby="mission-heading">
+            <h3 id="mission-heading" className="text-xl font-semibold text-soltas-text">Our mission</h3>
+            <div className="mt-5 grid gap-4 md:grid-cols-2">
+              <div className="card p-7 sm:p-8">
+                <p className="text-sm font-medium text-soltas-ocean">For organisations</p>
+                <p className="mt-3 text-[15px] leading-7 text-soltas-text">
+                  A transparent global platform and living database that tracks humanitarian and environmental
+                  efforts, enabling efficient cooperation, reducing duplicated work and improving how initiatives
+                  communicate and deliver.
+                </p>
               </div>
-            ))}
+              <div className="card p-7 sm:p-8">
+                <p className="text-sm font-medium text-soltas-ocean">For everyone</p>
+                <p className="mt-3 text-[15px] leading-7 text-soltas-text">
+                  Creative, neutral and transparent content on global issues that helps people understand, trust and
+                  meaningfully take part in humanitarian and environmental work.
+                </p>
+              </div>
+            </div>
           </div>
-        </section>
 
-        {/* Vision */}
-        <section aria-labelledby="vision-heading" className="pb-20 sm:pb-28">
-          <div className="rounded-3xl bg-white px-7 py-12 sm:px-12 sm:py-16">
-            <h2 id="vision-heading" className="text-sm font-medium text-soltas-ocean">
+          <div className="rounded-3xl bg-white px-7 py-12 sm:px-12 sm:py-16" aria-labelledby="vision-heading">
+            <h3 id="vision-heading" className="text-sm font-medium text-soltas-ocean">
               Our vision
-            </h2>
+            </h3>
             <ul className="mt-6 space-y-8">
               {VISION.map((v) => (
                 <li key={v} className="text-2xl font-semibold leading-snug tracking-tight text-soltas-text sm:text-3xl">
@@ -103,49 +169,113 @@ export default function AboutPage() {
               ))}
             </ul>
           </div>
-        </section>
 
-        {/* Mission */}
-        <section aria-labelledby="mission-heading" className="grid gap-4 pb-20 sm:pb-28 md:grid-cols-2">
-          <h2 id="mission-heading" className="sr-only">
-            Our mission
-          </h2>
-          <div className="card p-7 sm:p-8">
-            <p className="text-sm font-medium text-soltas-ocean">Mission for organisations</p>
-            <p className="mt-3 text-[15px] leading-7 text-soltas-text">
-              A transparent global platform and living database that tracks humanitarian and environmental
-              efforts, enabling efficient cooperation, reducing duplicated work and improving how initiatives
-              communicate and deliver.
+          <div aria-labelledby="why-heading">
+            <h3 id="why-heading" className="text-xl font-semibold text-soltas-text">Why it matters</h3>
+            <p className="mt-2 max-w-2xl text-[15px] leading-7 text-soltas-muted">
+              Collaboration is at the heart of the impact sector, yet the tools to collaborate are missing.
             </p>
-          </div>
-          <div className="card p-7 sm:p-8">
-            <p className="text-sm font-medium text-soltas-ocean">Mission for everyone</p>
-            <p className="mt-3 text-[15px] leading-7 text-soltas-text">
-              Creative, neutral and transparent content on global issues that helps people understand, trust
-              and meaningfully take part in humanitarian and environmental work.
-            </p>
-          </div>
-        </section>
-
-        {/* Platform */}
-        <section aria-labelledby="platform-heading" className="pb-20 sm:pb-28">
-          <h2 id="platform-heading" className="text-3xl font-semibold tracking-tight text-soltas-text sm:text-4xl">
-            What you can do here
-          </h2>
-          <div className="mt-8 grid gap-3 sm:grid-cols-2">
-            {SECTIONS.map((s) => (
-              <Link key={s.href} href={s.href} className="group card flex items-start justify-between gap-4 p-6 hover:shadow-md">
-                <div>
-                  <h3 className="text-lg font-semibold text-soltas-text">{s.title}</h3>
-                  <p className="mt-1 text-[15px] leading-6 text-soltas-muted">{s.text}</p>
+            <div className="mt-8 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+              {PROBLEMS.map((p, i) => (
+                <div key={p.title} className="border-t border-soltas-line pt-5">
+                  <p className="text-sm font-medium text-soltas-muted">{String(i + 1).padStart(2, "0")}</p>
+                  <h4 className="mt-2 text-lg font-semibold text-soltas-text">{p.title}</h4>
+                  <p className="mt-2 text-[15px] leading-6 text-soltas-muted">{p.text}</p>
                 </div>
-                <ArrowRight className="mt-1 h-5 w-5 shrink-0 text-soltas-ocean transition-transform duration-200 group-hover:translate-x-0.5" />
-              </Link>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
-        {/* CTA */}
+        {/* ───────────── What we do ───────────── */}
+        <section id="what-we-do" aria-labelledby="what-heading" className="scroll-mt-24 space-y-16 border-t border-soltas-line pb-20 pt-16 sm:space-y-20 sm:pb-28 sm:pt-20">
+          <SectionTitle
+            id="what-heading"
+            eyebrow="What we do"
+            title="A platform for the whole movement, and help for the people in it."
+          />
+
+          <div aria-labelledby="platform-heading">
+            <h3 id="platform-heading" className="text-xl font-semibold text-soltas-text">The platform</h3>
+            <p className="mt-2 max-w-2xl text-[15px] leading-7 text-soltas-muted">
+              Free for everyone: explore, follow and contribute to humanitarian and environmental work around the world.
+            </p>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {PLATFORM.map((s) => (
+                <Link key={s.href} href={s.href} className="group card flex items-start justify-between gap-4 p-6 hover:shadow-md">
+                  <div>
+                    <h4 className="text-lg font-semibold text-soltas-text">{s.title}</h4>
+                    <p className="mt-1 text-[15px] leading-6 text-soltas-muted">{s.text}</p>
+                  </div>
+                  <ArrowRight className="mt-1 h-5 w-5 shrink-0 text-soltas-ocean transition-transform duration-200 group-hover:translate-x-0.5" />
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div id="services" className="scroll-mt-24" aria-labelledby="services-heading">
+            <h3 id="services-heading" className="text-xl font-semibold text-soltas-text">Services</h3>
+            <p className="mt-2 max-w-2xl text-[15px] leading-7 text-soltas-muted">
+              For projects and organisations registered on Solarpunk Taskforce: insight from the whole field, and
+              storytelling that shows what you achieve.
+            </p>
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              {SERVICES.map(({ icon: Icon, title, text, features }) => (
+                <div key={title} className="card flex flex-col p-7 sm:p-8">
+                  <span className="grid h-11 w-11 place-items-center rounded-2xl bg-soltas-ocean/10 text-soltas-ocean">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <h4 className="mt-5 text-2xl font-semibold tracking-tight text-soltas-text">{title}</h4>
+                  <p className="mt-2 text-[15px] leading-7 text-soltas-muted">{text}</p>
+                  <ul className="mt-6 space-y-3 border-t border-soltas-line pt-6">
+                    {features.map((f) => (
+                      <li key={f} className="flex items-start gap-3 text-[15px] text-soltas-text">
+                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-soltas-green" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-10 grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
+              {AUDIENCES.map((a) => (
+                <div key={a.title} className="border-t border-soltas-line pt-5">
+                  <h4 className="text-lg font-semibold text-soltas-text">{a.title}</h4>
+                  <p className="mt-1 text-[15px] leading-6 text-soltas-muted">{a.text}</p>
+                </div>
+              ))}
+            </div>
+
+            <ol className="mt-10 grid gap-4 md:grid-cols-3" aria-label="How it works">
+              {STEPS.map((s, i) => (
+                <li key={s.title} className="card p-7">
+                  <span className="grid h-8 w-8 place-items-center rounded-full bg-soltas-ocean text-sm font-semibold text-white">
+                    {i + 1}
+                  </span>
+                  <h4 className="mt-4 text-lg font-semibold text-soltas-text">{s.title}</h4>
+                  <p className="mt-1 text-[15px] leading-6 text-soltas-muted">{s.text}</p>
+                </li>
+              ))}
+            </ol>
+
+            <div className="mt-10 rounded-3xl bg-soltas-abyssal px-7 py-12 text-center text-white sm:px-12 sm:py-16">
+              <p className="text-3xl font-semibold tracking-tight sm:text-4xl">Let&apos;s talk about your work.</p>
+              <p className="mx-auto mt-3 max-w-xl text-[15px] leading-7 text-white/75">
+                Services are available to organisations and projects registered on the platform. Registration is free.
+              </p>
+              <a
+                href={CONSULTATION_HREF}
+                className={buttonClasses({ size: "lg", className: "mt-8 bg-white text-soltas-abyssal hover:bg-white/90" })}
+              >
+                Email {CONTACT_EMAIL}
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* Join */}
         <section className="mb-20 text-center sm:mb-28">
           <h2 className="text-3xl font-semibold tracking-tight text-soltas-text sm:text-4xl">Join the taskforce.</h2>
           <p className="mx-auto mt-3 max-w-xl text-[15px] leading-7 text-soltas-muted">

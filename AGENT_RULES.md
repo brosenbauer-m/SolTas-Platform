@@ -78,7 +78,8 @@ organisation and the matching member permission (`can_create_projects`, `can_pos
 - UI follows `docs/DESIGN.md`: use the shared components in `src/components/ui/` and the design tokens in
   `src/app/globals.css`. No ad-hoc colours, shadows or font sizes.
 - Accessibility: semantic HTML, labels on every input, visible focus, 44px touch targets, works at 390px width.
-- New third-party data processors (email, analytics, AI) need the owner's OK. Prefer EU providers, and keep
+- New third-party data processors (email, analytics, AI) need the owner's OK and must be listed in
+  `src/app/privacy/page.tsx` ("Services we use"). Prefer EU providers, and keep
   `.env.example` in sync. Never commit secrets.
 
 ## PR description (required)

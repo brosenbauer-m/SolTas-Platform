@@ -263,8 +263,8 @@ export default function Header() {
           aria-label="Primary"
         >
           <ul className="flex flex-col">
-            {[{ href: "/", label: "Home" }, ...NAV_ITEMS, { href: "/services", label: "Services" }].map((item) => {
-              const active = item.href === "/" ? pathname === "/" : isActivePath(pathname, item.href) && !(item.href === "/about" && pathname === "/services");
+            {[{ href: "/", label: "Home" }, ...NAV_ITEMS].map((item) => {
+              const active = item.href === "/" ? pathname === "/" : isActivePath(pathname, item.href);
               return (
                 <li key={item.href} className="border-b border-soltas-line">
                   <Link
@@ -291,6 +291,14 @@ export default function Header() {
               </Link>
             </div>
           )}
+          <p className="mt-10 flex gap-5 text-sm text-soltas-muted">
+            <Link href="/privacy" className="hover:text-soltas-text">
+              Privacy
+            </Link>
+            <Link href="/legal" className="hover:text-soltas-text">
+              Legal notice
+            </Link>
+          </p>
         </nav>
       )}
 
