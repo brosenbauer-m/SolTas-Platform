@@ -36,7 +36,6 @@ const initialIndividual = {
   last_name: "",
   email: "",
   password: "",
-  date_of_birth: "",
   organisation_id: "independent",
   country_from: "",
   country_based: "",
@@ -133,7 +132,6 @@ function SignupTabsContent({ client }: { client: SupabaseClient }) {
     if (!individual.last_name.trim()) nextErrors.last_name = "Enter your last name.";
     if (!individual.email.trim()) nextErrors.email = "Enter your email address.";
     if (individual.password.length < 8) nextErrors.password = "Use at least 8 characters.";
-    if (!individual.date_of_birth) nextErrors.date_of_birth = "Enter your date of birth.";
     if (!individual.organisation_id) {
       nextErrors.organisation_id = "Choose an organisation, or Independent.";
     }
@@ -202,7 +200,6 @@ function SignupTabsContent({ client }: { client: SupabaseClient }) {
       const profileFields = {
         first_name: individual.first_name.trim(),
         last_name: individual.last_name.trim(),
-        date_of_birth: individual.date_of_birth,
         organisation_id: organisationId,
         country_from: individual.country_from.trim() || null,
         country_based: individual.country_based.trim(),
@@ -269,9 +266,6 @@ function SignupTabsContent({ client }: { client: SupabaseClient }) {
 
       <Section title="About you">
         <div className="grid gap-5 sm:grid-cols-2">
-          <AuthField label="Date of birth" error={errors.date_of_birth} hint="Never shown on your profile.">
-            <Input type="date" value={individual.date_of_birth} onChange={set("date_of_birth")} className={invalid("date_of_birth")} />
-          </AuthField>
           <AuthField label="Country you live in" error={errors.country_based}>
             <Input autoComplete="country-name" value={individual.country_based} onChange={set("country_based")} className={invalid("country_based")} />
           </AuthField>

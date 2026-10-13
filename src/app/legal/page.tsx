@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { Fill, LegalPage } from "@/components/legal/LegalPage";
+import { LegalPage } from "@/components/legal/LegalPage";
 
 export const metadata: Metadata = { title: "Legal notice | Solarpunk Taskforce" };
 
@@ -13,9 +13,9 @@ export default function LegalNoticePage() {
       <section>
         <h2>Who runs this website</h2>
         <p>
-          Solarpunk Taskforce is a private, non-commercial initiative run by:
+          Solarpunk Taskforce
           <br />
-          <Fill>Your full name</Fill>
+          A private, non-commercial initiative
           <br />
           Vienna, Austria
         </p>
@@ -32,7 +32,7 @@ export default function LegalNoticePage() {
         <h2>Purpose of this website</h2>
         <p>
           Disclosure under § 25 of the Austrian Media Act (MedienG). Owner of the medium (Medieninhaber):{" "}
-          <Fill>Your full name</Fill>, Vienna, Austria. Basic direction (grundlegende Richtung): information about
+          Solarpunk Taskforce, Vienna, Austria. Basic direction (grundlegende Richtung): information about
           humanitarian and environmental projects, organisations, funding opportunities and reported issues, and a
           platform for people to follow, connect with and support this work.
         </p>

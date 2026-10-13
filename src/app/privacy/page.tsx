@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Fill, LegalPage } from "@/components/legal/LegalPage";
+import { LegalPage } from "@/components/legal/LegalPage";
 
 export const metadata: Metadata = { title: "Privacy policy | Solarpunk Taskforce" };
 
@@ -21,7 +21,7 @@ export default function PrivacyPage() {
       <section>
         <h2>1. Who is responsible</h2>
         <p>
-          <Fill>Your full name</Fill>, Vienna, Austria (a private, non-commercial initiative; not yet a registered
+          Solarpunk Taskforce, Vienna, Austria (a private, non-commercial initiative; not yet a registered
           organisation). Email:{" "}
           <a href="mailto:contact@solarpunktaskforce.org">contact@solarpunktaskforce.org</a>. See also the{" "}
           <Link href="/legal">legal notice</Link>.
@@ -33,17 +33,13 @@ export default function PrivacyPage() {
         <h3>Your account</h3>
         <p>
           When you sign up we store your email address, a password (stored only as a secure hash by our
-          authentication provider), your first and last name, date of birth, the country you live in and, if you
+          authentication provider), your first and last name, the country you live in and, if you
           add them, the country you are from, occupation, organisation, bio, photo link and social links.
         </p>
         <ul>
           <li>
             <strong>Why:</strong> to create and run your account and show your public profile.{" "}
             <strong>Legal basis:</strong> performance of our agreement with you (Art. 6(1)(b) GDPR).
-          </li>
-          <li>
-            <strong>Date of birth</strong> is stored privately. It is never shown on your profile and cannot be read
-            by other users.
           </li>
         </ul>
 
