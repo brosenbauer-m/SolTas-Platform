@@ -177,17 +177,18 @@ function stats(rows: IatiActivityRow[]) {
 async function runCount() {
   const fl = IATI_FIELDS.join(",");
   const inScope = await solr({ q: SCOPE, fl, rows: "2" });
-  console.log(`In scope (planned/ongoing, themed, with a place): ${inScope.response.numFound}`);
   const exact = await solr({ q: `${SCOPE} AND location_point_pos:[* TO *]`, rows: "0" });
-  console.log(`  ... of which with exact map points: ${exact.response.numFound}`);
   const since = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
   const weekly = await solr({ q: `${UPDATE_SCOPE} AND last_updated_datetime:[${since} TO *]`, rows: "0" });
-  console.log(`Updated in the last 7 days (any status, same themes): ${weekly.response.numFound}`);
-  console.log(`Cap (IATI_MAX_ACTIVITIES): ${MAX_ACTIVITIES}; rows per call: ${ROWS}`);
   for (const doc of inScope.response.docs) {
     console.log("\nSample (raw):", JSON.stringify(doc).slice(0, 2000));
     console.log("Sample (row):", JSON.stringify(transformActivity(doc), null, 2));
   }
+  // summary last, so it is at the end of the log
+  console.log(`\nIn scope (planned/ongoing, recent, themed, with a place): ${inScope.response.numFound}`);
+  console.log(`  ... of which with exact map points: ${exact.response.numFound}`);
+  console.log(`Updated in the last 7 days (any status, same themes): ${weekly.response.numFound}`);
+  console.log(`Cap (IATI_MAX_ACTIVITIES): ${MAX_ACTIVITIES}; rows per call: ${ROWS}`);
 }
 
 async function runDryRun(limit: number) {
@@ -200,10 +201,11 @@ async function runDryRun(limit: number) {
     if (reason) skipped[reason] = (skipped[reason] ?? 0) + 1;
     else if ("row" in result) rows.push(result.row);
   }
-  console.log(`Fetched ${data.response.docs.length} of ${data.response.numFound} in scope.`);
-  console.log("Stats:", JSON.stringify(stats(rows), null, 2));
-  console.log("Skipped:", JSON.stringify(skipped));
   for (const row of rows.slice(0, 3)) console.log("\nSample row:", JSON.stringify(row, null, 2));
+  // summary last, so it is at the end of the log
+  console.log(`\nFetched ${data.response.docs.length} of ${data.response.numFound} in scope.`);
+  console.log("Skipped:", JSON.stringify(skipped));
+  console.log("Stats:", JSON.stringify(stats(rows)));
 }
 
 function db(): SupabaseClient {

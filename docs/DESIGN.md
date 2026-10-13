@@ -35,7 +35,8 @@ Goal: **elegant, simple, intuitive, modern and friendly**, in the spirit of Appl
 | `border-soltas-line` | `rgba(26,43,56,0.08)` | hairline borders |
 
 Map markers (`src/lib/markerColors.ts`): **humanitarian = warm orange `#E07A3F`**, **environmental = green
-`#2F9E6B`**, other = ocean; white 2px ring for contrast on any map style. Issue urgency uses a green→red scale.
+`#2F9E6B`**, other = ocean; white 2px ring for contrast on any map style. IATI activities = **abyssal `#1A3F54`**,
+clustered (numbered circles); hollow when only the country is known. Issue urgency uses a green→red scale.
 Badges: humanitarian `ocean`, environmental `green`. Always pair colour with a text label (never colour alone).
 
 Radius: inputs/buttons `rounded-full` (pills) or `rounded-xl` for fields; cards `rounded-2xl`; dialogs

@@ -152,7 +152,7 @@ get that country's centre point at import time.
   service role.
 - `iati_sync_runs`: RLS on, no policies.
 
-**One list for the map and Find**: a `security_invoker` view `map_items` that unions approved public
+**One list for the map and Find** (*not built; phase 3 reads both tables directly, which is enough for now*): a `security_invoker` view `map_items` that unions approved public
 `projects` and visible `iati_activities` into the same shape: `kind`, `source` (`soltas` / `iati`), `id`,
 `title`, `lat`, `lng`, `point_precision`, `lifecycle_status`, `sectors`, `countries`, `url`. IATI rows already
 linked to a native project are left out, so nothing shows twice. Find Projects and the globe read this view
@@ -219,7 +219,7 @@ linked to a native project are left out, so nothing shows twice. Find Projects a
 | 0 | Owner: API key, decisions in §8 | – | – |
 | 1 | Migration: `iati_activities`, `iati_sync_runs`, RLS, `supabase/tests/iati_activities_rls_manual_tests.sql` | High | 0 |
 | 2 | Sync script + dry run + workflow (manual trigger only); count and tune the scope; first backfill | Medium | 1 |
-| 3 | `map_items` view, clustered globe, Source filter, IATI badge, activity page | Medium (view = migration, High) | 2 |
+| 3 | Clustered globe layer (`/api/iati/points`), Source filter, IATI list + activity page `/projects/iati/[id]`, About "Data sources". No view needed: the page reads both tables | Medium | 2 |
 | 4 | Shared taxonomies (`taxonomy_terms`, DAC → Sector crosswalk) for both sources | High | can run in parallel with 2–3 |
 | 5 | Nightly schedule on, weekly full check, admin "hide" button | Medium | 3 |
 | 6 | Claim flow: verified organisation adds its IATI publisher ID, admin confirms, activities show on the organisation; "adopt" an activity into a native project (`projects.iati_identifier`) | High | 3, 4 |

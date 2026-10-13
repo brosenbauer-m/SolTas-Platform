@@ -3,13 +3,17 @@
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { GripVertical, SlidersHorizontal, X } from "lucide-react";
 
-import Map, { type MapMarker } from "@/components/Map";
+import Map, { type MapClusterLayer, type MapMarker } from "@/components/Map";
 import { MARKER_COLORS } from "@/lib/markerColors";
 
 type Props = {
   /** The filter form shown in the left panel (and in the drawer on phones). */
   filters: ReactNode;
   markers: MapMarker[];
+  /** Optional clustered layer for large point sets (IATI activities). */
+  clusters?: MapClusterLayer | null;
+  /** Shown over the map, e.g. a colour key. */
+  legend?: ReactNode;
   /** e.g. "12 projects mapped · 40 matching" */
   summary: string;
   focusSlug: string | null;
@@ -51,7 +55,16 @@ function saveRatio(key: string, ratio: number) {
  * The divider has a handle in the middle; drag it, or focus it and use the arrow keys.
  * Double-click the handle to go back to the default 70/30 split.
  */
-export default function GlobeSplitView({ filters, markers, summary, focusSlug, ctaLabel = "See more", storageKey }: Props) {
+export default function GlobeSplitView({
+  filters,
+  markers,
+  clusters = null,
+  legend = null,
+  summary,
+  focusSlug,
+  ctaLabel = "See more",
+  storageKey,
+}: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -140,6 +153,7 @@ export default function GlobeSplitView({ filters, markers, summary, focusSlug, c
   const map = (
     <Map
       markers={markers}
+      clusters={clusters}
       markerColor={MARKER_COLORS.default}
       focusSlug={focusSlug}
       ctaLabel={ctaLabel}
@@ -203,7 +217,10 @@ export default function GlobeSplitView({ filters, markers, summary, focusSlug, c
         </div>
       </div>
 
-      <div className="relative min-h-0 min-w-0">{map}</div>
+      <div className="relative min-h-0 min-w-0">
+        {map}
+        {legend ? <div className="pointer-events-none absolute left-3 right-14 top-3 z-[1] flex">{legend}</div> : null}
+      </div>
 
       {/* Divider: a wide invisible hit area on the border with a handle in the middle */}
       <div

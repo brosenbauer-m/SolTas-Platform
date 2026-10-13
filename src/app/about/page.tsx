@@ -275,6 +275,21 @@ export default function AboutPage() {
           </div>
         </section>
 
+        {/* Data sources */}
+        <section id="data-sources" aria-labelledby="data-heading" className="scroll-mt-24 border-t border-soltas-line pb-20 pt-16 sm:pb-28 sm:pt-20">
+          <h2 id="data-heading" className="text-2xl font-semibold tracking-tight text-soltas-text">Data sources</h2>
+          <p className="mt-3 max-w-3xl text-[15px] leading-7 text-soltas-muted">
+            Besides the projects people add here, the map shows humanitarian and environmental activities that
+            organisations publish to the{" "}
+            <a href="https://iatistandard.org" target="_blank" rel="noopener noreferrer" className="text-soltas-ocean hover:underline">
+              International Aid Transparency Initiative (IATI)
+            </a>
+            . We copy them regularly from the IATI Datastore, mark them &ldquo;Published to IATI&rdquo;, name the
+            publisher on every page and don&apos;t edit them. Each publisher shares its data under its own open
+            licence. Activities that only name a country are shown at the country&apos;s centre.
+          </p>
+        </section>
+
         {/* Join */}
         <section className="mb-20 text-center sm:mb-28">
           <h2 className="text-3xl font-semibold tracking-tight text-soltas-text sm:text-4xl">Join the taskforce.</h2>

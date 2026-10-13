@@ -5,7 +5,7 @@
 // title_narrative_xml_lang) only line up when every element carried the attribute. We only pair
 // values when the lists have the same length, and otherwise fall back to something safe.
 
-import { COUNTRY_CENTROIDS } from "./countryCentroids";
+import { COUNTRY_CENTROIDS } from "../../src/lib/geo/countryCentroids";
 
 export const IATI_FIELDS = [
   "iati_identifier",
