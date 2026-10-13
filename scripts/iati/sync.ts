@@ -247,16 +247,26 @@ async function runIncremental(sql: Sql, runId: number) {
     select high_water_mark from public.iati_sync_runs
     where mode in ('incremental', 'full') and ok and high_water_mark is not null
     order by high_water_mark desc limit 1`;
-  const [{ stored }] = await sql<{ stored: number }[]>`select count(*)::int as stored from public.iati_activities`;
+  const [{ stored, oldest }] = await sql<{ stored: number; oldest: Date | null }[]>`
+    select count(*)::int as stored, min(last_updated_at) as oldest from public.iati_activities`;
 
   // Solr wants UTC with "Z"
   const mark = last ? new Date(last.high_water_mark).toISOString() : null;
   const backfill = !mark;
-  // Backfill: newest first, so the cap keeps the most recently updated activities.
-  const q = backfill ? SCOPE : `${UPDATE_SCOPE} AND last_updated_datetime:[${mark} TO *]`;
+  // Backfill: newest first, so the cap keeps the most recently updated activities. An unfinished backfill
+  // (call limit) resumes below the oldest activity already stored instead of starting over.
+  const resumeBelow = backfill && oldest ? new Date(oldest).toISOString() : null;
+  const q = !backfill
+    ? `${UPDATE_SCOPE} AND last_updated_datetime:[${mark} TO *]`
+    : resumeBelow
+      ? `${SCOPE} AND last_updated_datetime:[* TO ${resumeBelow}]`
+      : SCOPE;
   const sort = backfill ? "last_updated_datetime desc,id asc" : "last_updated_datetime asc,id asc";
   let room = MAX_ACTIVITIES - stored;
-  console.log(backfill ? "Backfill (no previous run)." : `Changes since ${mark}.`, `Stored: ${stored}, room: ${room}.`);
+  console.log(
+    !backfill ? `Changes since ${mark}.` : resumeBelow ? `Backfill, resuming below ${resumeBelow}.` : "Backfill (no previous run).",
+    `Stored: ${stored}, room: ${room}.`,
+  );
 
   const totals = { fetched: 0, upserted: 0, skipped: 0, capped: 0 };
   let highWater: string | null = null;
@@ -315,8 +325,15 @@ async function runIncremental(sql: Sql, runId: number) {
     if (!(error instanceof QuotaError)) throw error;
     console.warn(`Stopped early: ${error.message}`);
     // Incremental runs go oldest change first, so what we processed is safe to mark as done.
-    // An unfinished backfill keeps no mark, so the next run starts the backfill again (upserts are idempotent).
+    // An unfinished backfill keeps no mark; the next run resumes it (see resumeBelow).
     if (backfill) highWater = null;
+  }
+
+  if (backfill && finished) {
+    // The backfill may have taken several runs: incremental updates start from the newest activity stored.
+    const [{ newest }] = await sql<{ newest: Date | null }[]>`
+      select max(last_updated_at) as newest from public.iati_activities`;
+    highWater = newest ? new Date(newest).toISOString() : highWater;
   }
 
   return { ...totals, high_water_mark: highWater, finished };
