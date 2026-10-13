@@ -58,13 +58,14 @@ Goal: elegant, simple, friendly — see `docs/DESIGN.md`.
 - ⬜ **AI search** for projects/organisations: provider decided, **Mistral** (EU); add it to the privacy page when built
 - ⬜ **AI-assisted impact metrics** (Mistral) (suggest metrics from the project description; builds on Phase 2 metrics)
 - ⬜ **Timeline / history**: store project snapshots so the globe can show any point in time
-- ❓ **Donations**: payment provider (e.g. Stripe or Mollie), legal entity, fees, receipts
+- ⬜ **Donations**: placeholder card on project pages (`DONATIONS_ENABLED` in `src/lib/donations.ts`). Later: provider (Mollie/Stripe Connect, or betterplace / Open Collective Europe) once the legal entity exists
 - ⬜ Globe clustering and performance for thousands of markers
 
 ## Quality and operations (ongoing)
 
 - ⬜ End-to-end smoke tests (Playwright) for sign-up, submit project, follow, post update
-- ⬜ Error monitoring and privacy-friendly analytics (EU) ❓
+- ✅ Analytics: Vercel Web Analytics (cookieless). Error monitoring only if a need comes up
+- ⬜ **Privacy policy and legal notice pages** (none exist yet; list Supabase, Vercel, Mapbox, email provider, Mistral)
 - ⬜ SEO: page titles/descriptions, Open Graph images for projects and organisations
 - ⬜ Moderation tools: bulk review, reasons, audit log
 - ⬜ Image uploads for projects/organisations with resizing (Supabase Storage)
@@ -73,6 +74,6 @@ Goal: elegant, simple, friendly — see `docs/DESIGN.md`.
 
 1. ~~Feed posting rules~~: individuals may post (decided 2026-10-13).
 2. ~~AI provider~~: Mistral (decided 2026-10-13).
-3. Donations: provider, which entity receives funds, fees.
-4. Analytics / error monitoring provider.
+3. Donations: decide the provider once the legal entity exists (placeholder live meanwhile).
+4. ~~Analytics~~: Vercel Web Analytics (decided 2026-10-13).
 5. Note Empathy content owner and store timeline.

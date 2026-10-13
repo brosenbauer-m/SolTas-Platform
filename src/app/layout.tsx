@@ -5,6 +5,7 @@ import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import "react-day-picker/dist/style.css";
 
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { ReactNode } from "react";
 import Header from "@/components/Header";
 import { ToastProvider } from "@/hooks/use-toast";
@@ -25,6 +26,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <div className="flex-1 min-h-0 flex flex-col">{children}</div>
           <Toaster />
         </ToastProvider>
+        {/* Vercel Web Analytics: cookieless page views; enable it in Vercel → Project → Analytics */}
+        <Analytics />
       </body>
     </html>
   );

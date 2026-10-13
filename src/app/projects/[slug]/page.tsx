@@ -5,6 +5,7 @@ import type { Database } from "@/lib/database.types";
 import FollowButton from "@/components/FollowButton";
 import { Badge } from "@/components/ui/badge";
 import { buttonClasses } from "@/components/ui/button";
+import { SupportCard } from "@/components/projects/SupportCard";
 import UpdatesSectionWithSocial, { type UpdateSummary } from "@/components/updates/UpdatesSectionWithSocial";
 import { getServerSupabase } from "@/lib/supabaseServer";
 
@@ -308,6 +309,8 @@ export default async function ProjectDetailPage({
           <p className="mt-3 whitespace-pre-wrap text-[15px] leading-7 text-soltas-text">{project.description}</p>
         </section>
       ) : null}
+
+      {project.status === "approved" ? <SupportCard projectName={project.name} /> : null}
 
       <UpdatesSectionWithSocial
         updates={updates}
