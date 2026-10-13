@@ -42,6 +42,8 @@ Goal: elegant, simple, friendly — see `docs/DESIGN.md`.
 - ⬜ Creatable tag fields in the forms (project/organisation): suggest existing tags as you type, create new ones with
   normalised capitalisation (until the fixed taxonomies replace free tags)
 - ⬜ "Near me" / "Search this map area" on the globe
+- ⬜ **IATI data on the globe and in Find Projects**: nightly sync from the IATI Datastore API into a separate,
+  read-only table, with an "IATI" badge and later a claim flow. Plan and open decisions: `docs/architecture/iati-integration.md`
 
 - ⬜ **Subscribe** UX everywhere: "+" next to the name turns into "✓ Following" with a short confirmation
 - ⬜ **Home globe views**: All · Following (gold pulsing markers for new updates) · Featured (curated)
