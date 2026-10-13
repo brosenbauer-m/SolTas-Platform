@@ -1764,6 +1764,147 @@ export type Database = {
         }
         Relationships: []
       }
+      iati_activities: {
+        Row: {
+          activity_status: number | null
+          budget_total: number | null
+          countries: string[]
+          currency: string | null
+          dac_sectors: string[]
+          description: string | null
+          end_date: string | null
+          hidden: boolean
+          humanitarian: boolean
+          iati_identifier: string
+          last_updated_at: string | null
+          lat: number | null
+          lifecycle_status: string
+          links: Json
+          lng: number | null
+          locations: Json
+          participating_orgs: Json
+          point_precision: string | null
+          policy_markers: Json
+          regions: string[]
+          reporting_org_name: string | null
+          reporting_org_ref: string | null
+          reporting_org_type: string | null
+          scope: string | null
+          sdgs: string[]
+          sectors: string[]
+          start_date: string | null
+          synced_at: string
+          title: string
+          withdrawn_at: string | null
+        }
+        Insert: {
+          activity_status?: number | null
+          budget_total?: number | null
+          countries?: string[]
+          currency?: string | null
+          dac_sectors?: string[]
+          description?: string | null
+          end_date?: string | null
+          hidden?: boolean
+          humanitarian?: boolean
+          iati_identifier: string
+          last_updated_at?: string | null
+          lat?: number | null
+          lifecycle_status?: string
+          links?: Json
+          lng?: number | null
+          locations?: Json
+          participating_orgs?: Json
+          point_precision?: string | null
+          policy_markers?: Json
+          regions?: string[]
+          reporting_org_name?: string | null
+          reporting_org_ref?: string | null
+          reporting_org_type?: string | null
+          scope?: string | null
+          sdgs?: string[]
+          sectors?: string[]
+          start_date?: string | null
+          synced_at?: string
+          title: string
+          withdrawn_at?: string | null
+        }
+        Update: {
+          activity_status?: number | null
+          budget_total?: number | null
+          countries?: string[]
+          currency?: string | null
+          dac_sectors?: string[]
+          description?: string | null
+          end_date?: string | null
+          hidden?: boolean
+          humanitarian?: boolean
+          iati_identifier?: string
+          last_updated_at?: string | null
+          lat?: number | null
+          lifecycle_status?: string
+          links?: Json
+          lng?: number | null
+          locations?: Json
+          participating_orgs?: Json
+          point_precision?: string | null
+          policy_markers?: Json
+          regions?: string[]
+          reporting_org_name?: string | null
+          reporting_org_ref?: string | null
+          reporting_org_type?: string | null
+          scope?: string | null
+          sdgs?: string[]
+          sectors?: string[]
+          start_date?: string | null
+          synced_at?: string
+          title?: string
+          withdrawn_at?: string | null
+        }
+        Relationships: []
+      }
+      iati_sync_runs: {
+        Row: {
+          error: string | null
+          fetched: number
+          finished_at: string | null
+          high_water_mark: string | null
+          id: number
+          in_scope: number | null
+          mode: string
+          ok: boolean | null
+          started_at: string
+          upserted: number
+          withdrawn: number
+        }
+        Insert: {
+          error?: string | null
+          fetched?: number
+          finished_at?: string | null
+          high_water_mark?: string | null
+          id?: number
+          in_scope?: number | null
+          mode: string
+          ok?: boolean | null
+          started_at?: string
+          upserted?: number
+          withdrawn?: number
+        }
+        Update: {
+          error?: string | null
+          fetched?: number
+          finished_at?: string | null
+          high_water_mark?: string | null
+          id?: number
+          in_scope?: number | null
+          mode?: string
+          ok?: boolean | null
+          started_at?: string
+          upserted?: number
+          withdrawn?: number
+        }
+        Relationships: []
+      }
       ifrc_challenges: {
         Row: {
           code: string | null
