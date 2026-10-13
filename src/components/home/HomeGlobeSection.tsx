@@ -31,7 +31,7 @@ const MODE_CONFIG: Record<HomeGlobeMode, { label: string; href: string; ctaLabel
   },
   issues: {
     label: "Find Issues",
-    href: "/watchdog",
+    href: "/issues",
     ctaLabel: "Open issue",
     mobileLabel: "Issues",
   },
@@ -177,9 +177,9 @@ export default function HomeGlobeSection({
                 : marker.urgency === 1
                   ? "#84cc16"
                   : "#22c55e",
-        ctaHref: `/watchdog?view=table&focus=${marker.id}`,
+        ctaHref: `/issues/${marker.id}`,
         ctaLabel: MODE_CONFIG.issues.ctaLabel,
-        eyebrow: "Watchdog issue",
+        eyebrow: "Issue",
         meta: formatUrgency(marker.urgency ?? null),
       })),
     }),

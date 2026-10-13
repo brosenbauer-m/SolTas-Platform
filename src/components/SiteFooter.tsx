@@ -7,7 +7,7 @@ const COLUMNS = [
       { href: "/projects", label: "Projects" },
       { href: "/find-organisations", label: "Organisations" },
       { href: "/funding", label: "Funding" },
-      { href: "/watchdog", label: "Watchdog" },
+      { href: "/issues", label: "Issues" },
       { href: "/feed", label: "Feed" },
     ],
   },
@@ -17,7 +17,7 @@ const COLUMNS = [
       { href: "/signup", label: "Join" },
       { href: "/projects/new", label: "Register a project" },
       { href: "/organisations/create", label: "Register an organisation" },
-      { href: "/watchdog/new", label: "Report an issue" },
+      { href: "/issues/new", label: "Report an issue" },
     ],
   },
   {
