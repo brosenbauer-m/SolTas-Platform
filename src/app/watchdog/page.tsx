@@ -58,8 +58,9 @@ export default async function WatchdogPage({
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-7xl flex-1 min-h-0 flex-col gap-5 px-4 py-8 sm:gap-6 sm:px-6 sm:py-10">
+    <main className="flex w-full flex-1 min-h-0 flex-col gap-4 px-4 py-5 sm:px-6 lg:px-8">
       <PageHeader
+        compact
         title="Watchdog"
         description={
           <>

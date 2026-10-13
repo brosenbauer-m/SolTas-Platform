@@ -76,7 +76,7 @@ export default async function ProfilePage({
   const name = [profile.first_name, profile.last_name].filter(Boolean).join(" ");
 
   return (
-    <main className="mx-auto w-full max-w-5xl space-y-8 px-4 py-10">
+    <main className="mx-auto w-full max-w-6xl space-y-8 px-4 py-10">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 items-start gap-4">
           {profile.avatar_url ? (
