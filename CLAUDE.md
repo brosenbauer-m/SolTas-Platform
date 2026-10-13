@@ -18,4 +18,4 @@
   `supabase/functions/` edge functions (`create-organisation` uses the service role)
 - `scripts/db-test/` local throwaway DB + RLS sweep (`pnpm db:test`), `scripts/schema-export.sql` prod drift check
 - Docs: `docs/blueprint.md` (product), `docs/ROADMAP.md` (plan), `docs/DESIGN.md` (UI rules),
-  `docs/schema-drift.md` (DB history and open proposals)
+  `docs/schema-drift.md` (DB history and open proposals), `docs/architecture/` (integration plans, e.g. IATI)
