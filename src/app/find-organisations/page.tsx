@@ -114,7 +114,9 @@ export default async function FindOrganisationsPage({
         </div>
       ) : (
         <>
-          <OrganisationsFilters options={filterOptions} showSorting variant="panel" />
+          <div className="card p-5 lg:p-6">
+            <OrganisationsFilters options={filterOptions} showSorting />
+          </div>
 
           <section className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">

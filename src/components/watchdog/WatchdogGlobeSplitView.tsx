@@ -52,7 +52,7 @@ export default function WatchdogGlobeSplitView({ markers, totalCount, focusId, o
   return (
     <GlobeSplitView
       storageKey="find:issues:split"
-      filters={<WatchdogFilters options={options} basePath="/watchdog" showSorting={false} variant="inline" />}
+      filters={<WatchdogFilters options={options} showSorting={false} />}
       markers={mapMarkers}
       summary={`${markers.length} on the globe · ${totalCount} matching your filters`}
       focusSlug={focusId}

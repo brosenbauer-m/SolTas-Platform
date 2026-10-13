@@ -5,15 +5,16 @@ import { useMemo } from "react";
 import GlobeSplitView from "@/components/find/GlobeSplitView";
 import ProjectsFilters from "@/components/projects/ProjectsFilters";
 import { categoryMarkerColor } from "@/lib/markerColors";
-import type { ProjectMarker } from "@/lib/projects/findProjectsQuery";
+import type { ProjectFilterOptions, ProjectMarker } from "@/lib/projects/findProjectsQuery";
 
 type Props = {
+  options: ProjectFilterOptions;
   markers: ProjectMarker[];
   totalCount: number;
   focusSlug: string | null;
 };
 
-export default function ProjectsGlobeSplitView({ markers, totalCount, focusSlug }: Props) {
+export default function ProjectsGlobeSplitView({ options, markers, totalCount, focusSlug }: Props) {
   const mapMarkers = useMemo(
     () =>
       markers.map((marker) => ({
@@ -33,7 +34,7 @@ export default function ProjectsGlobeSplitView({ markers, totalCount, focusSlug 
   return (
     <GlobeSplitView
       storageKey="find:projects:split"
-      filters={<ProjectsFilters basePath="/projects" showSorting={false} variant="inline" />}
+      filters={<ProjectsFilters options={options} showSorting={false} />}
       markers={mapMarkers}
       summary={`${markers.length} on the globe · ${totalCount} matching your filters`}
       focusSlug={focusSlug}

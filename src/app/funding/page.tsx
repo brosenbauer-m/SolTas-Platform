@@ -119,7 +119,9 @@ export default async function FindFundingPage({
         </div>
       ) : (
         <>
-          <GrantsFilters options={filterOptions} basePath="/funding" showSorting variant="panel" />
+          <div className="card p-5 lg:p-6">
+            <GrantsFilters options={filterOptions} />
+          </div>
           <GrantsTableView rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />
         </>
       )}
