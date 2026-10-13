@@ -21,7 +21,8 @@ export default function PrivacyPage() {
       <section>
         <h2>1. Who is responsible</h2>
         <p>
-          <Fill>Full legal name of the person or entity</Fill>, <Fill>address</Fill>. Email:{" "}
+          <Fill>Your full name</Fill>, Vienna, Austria (a private, non-commercial initiative; not yet a registered
+          organisation). Email:{" "}
           <a href="mailto:contact@solarpunktaskforce.org">contact@solarpunktaskforce.org</a>. See also the{" "}
           <Link href="/legal">legal notice</Link>.
         </p>
@@ -41,8 +42,8 @@ export default function PrivacyPage() {
             <strong>Legal basis:</strong> performance of our agreement with you (Art. 6(1)(b) GDPR).
           </li>
           <li>
-            <strong>Date of birth</strong> is used only to confirm you are old enough to use the platform. It is
-            never shown on your profile and cannot be read by other users.
+            <strong>Date of birth</strong> is stored privately. It is never shown on your profile and cannot be read
+            by other users.
           </li>
         </ul>
 
@@ -96,13 +97,12 @@ export default function PrivacyPage() {
         <p>These companies process data on our behalf, under data processing agreements:</p>
         <ul>
           <li>
-            <strong>Supabase</strong> (database, sign-in and file storage). Data stored in the EU (
-            <Fill>region, e.g. Frankfurt, Germany</Fill>).
+            <strong>Supabase</strong> (database, sign-in and file storage). Data is stored in the EU, in Frankfurt,
+            Germany.
           </li>
           <li>
-            <strong>Vercel Inc.</strong>, USA (website hosting and visitor statistics). Requests are processed in{" "}
-            <Fill>Vercel function region, e.g. Frankfurt (fra1)</Fill>; Vercel is certified under the EU-US Data
-            Privacy Framework.
+            <strong>Vercel Inc.</strong>, USA (website hosting and visitor statistics). Requests are processed in
+            Frankfurt, Germany; Vercel is certified under the EU-US Data Privacy Framework.
           </li>
           <li>
             <strong>Scaleway SAS</strong>, France (sending emails).
@@ -141,20 +141,16 @@ export default function PrivacyPage() {
         <p>
           To use these rights, or to delete your account, email{" "}
           <a href="mailto:contact@solarpunktaskforce.org">contact@solarpunktaskforce.org</a>. We reply within one
-          month. You can also complain to a data protection authority, for example{" "}
-          <Fill>your national authority, e.g. the Austrian Datenschutzbehörde or your German state&apos;s authority</Fill>.
+          month. You can also complain to a data protection authority. In Austria this is the{" "}
+          <a href="https://www.dsb.gv.at" rel="noopener noreferrer" target="_blank">
+            Datenschutzbehörde
+          </a>
+          , Barichgasse 40–42, 1030 Vienna.
         </p>
       </section>
 
       <section>
-        <h2>7. Age</h2>
-        <p>
-          You must be at least <Fill>16</Fill> years old to create an account.
-        </p>
-      </section>
-
-      <section>
-        <h2>8. Changes</h2>
+        <h2>7. Changes</h2>
         <p>
           We will update this policy when we add features or services that process personal data (for example
           AI-assisted search, which we plan to run with Mistral AI in the EU). The date at the top shows the latest

@@ -4,50 +4,37 @@ import { Fill, LegalPage } from "@/components/legal/LegalPage";
 
 export const metadata: Metadata = { title: "Legal notice | Solarpunk Taskforce" };
 
-// DRAFT: fill in every highlighted [placeholder] before this goes live. The exact wording required
-// depends on the country you are registered in (e.g. Germany: § 5 DDG and § 18 MStV;
-// Austria: § 5 ECG and § 25 MedienG). Have it checked once your legal entity exists.
+// Austria, run by a private person (no legal entity yet): information under § 5 ECG and
+// disclosure under § 25 MedienG. When an association or company is founded, add its name, register
+// number (ZVR/FN), registered office and representatives, and update the privacy policy too.
 export default function LegalNoticePage() {
   return (
     <LegalPage title="Legal notice" updated="13 October 2026">
       <section>
         <h2>Who runs this website</h2>
         <p>
-          <Fill>Full legal name of the person or entity, e.g. &ldquo;Solarpunk Taskforce e.V.&rdquo; or your full name</Fill>
+          Solarpunk Taskforce is a private, non-commercial initiative run by:
           <br />
-          <Fill>Street and number</Fill>
+          <Fill>Your full name</Fill>
           <br />
-          <Fill>Postcode, city</Fill>
-          <br />
-          <Fill>Country</Fill>
+          Vienna, Austria
         </p>
         <p>
           Email: <a href="mailto:contact@solarpunktaskforce.org">contact@solarpunktaskforce.org</a>
-          <br />
-          Phone: <Fill>phone number, if required in your country</Fill>
+        </p>
+        <p>
+          Solarpunk Taskforce is not yet a registered association or company. This notice will be updated when it
+          is.
         </p>
       </section>
 
       <section>
-        <h2>Registration and tax</h2>
+        <h2>Purpose of this website</h2>
         <p>
-          <Fill>Register and registration number (association or company register), or remove this section if not registered yet</Fill>
-          <br />
-          <Fill>VAT ID, if you have one</Fill>
-        </p>
-      </section>
-
-      <section>
-        <h2>Represented by</h2>
-        <p>
-          <Fill>Name(s) of the person(s) legally representing the entity, e.g. board members</Fill>
-        </p>
-      </section>
-
-      <section>
-        <h2>Responsible for content</h2>
-        <p>
-          <Fill>Name and address of the person responsible for editorial content</Fill>
+          Disclosure under § 25 of the Austrian Media Act (MedienG). Owner of the medium (Medieninhaber):{" "}
+          <Fill>Your full name</Fill>, Vienna, Austria. Basic direction (grundlegende Richtung): information about
+          humanitarian and environmental projects, organisations, funding opportunities and reported issues, and a
+          platform for people to follow, connect with and support this work.
         </p>
       </section>
 
