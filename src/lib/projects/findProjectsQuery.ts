@@ -293,7 +293,9 @@ export async function fetchProjectMarkers({
 
   let query = supabase
     .from("projects")
-    .select("id,slug,name,category,lat,lng,place_name,description");
+    .select("id,slug,name,category,lat,lng,place_name,description")
+    // Imported (IATI) projects are drawn by the clustered map layer, not as individual markers.
+    .filter("source", "eq", "community");
 
   // Unlisted/private projects are reachable by link only, never listed.
   query = query.eq("visibility", "public");
