@@ -7,7 +7,7 @@ import Link from "next/link";
 import type { FocusEvent } from "react";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import HomeGlobe, { type HomeGlobeDotLayer, type HomeGlobeMode, type HomeGlobePoint } from "@/components/home/HomeGlobe";
+import HomeGlobe, { type HomeGlobeMode, type HomeGlobePoint, type HomeGlobeProjectLayer } from "@/components/home/HomeGlobe";
 import type { GrantMarker } from "@/lib/grants/findGrantsQuery";
 import type { HomeStats } from "@/lib/homeStats";
 import type { ProjectMarker } from "@/lib/projects/findProjectsQuery";
@@ -130,18 +130,15 @@ export default function HomeGlobeSection({
   }, []);
 
   const [mode, setMode] = useState<HomeGlobeMode>(DEFAULT_MODE);
-  const [iatiCount, setIatiCount] = useState<number | undefined>(undefined);
 
-  // IATI activities as small dots in Projects mode (same public, CDN-cached data as Find Projects).
-  const iatiDots = useMemo<HomeGlobeDotLayer>(
+  // Every project (community and imported) as one clustered layer in Projects mode, like Find Projects.
+  const projectLayer = useMemo<HomeGlobeProjectLayer>(
     () => ({
       mode: "projects",
-      url: "/api/iati/points",
-      color: MARKER_COLORS.iati,
-      badge: "Published to IATI",
-      ctaLabel: "View activity",
-      detailsUrl: (id) => `/api/iati/activity?id=${encodeURIComponent(id)}`,
-      onLoaded: setIatiCount,
+      url: "/api/projects/points",
+      color: MARKER_COLORS.project,
+      ctaLabel: MODE_CONFIG.projects.ctaLabel,
+      summaryUrl: (id) => `/api/projects/summary?slug=${encodeURIComponent(id)}`,
     }),
     [],
   );
@@ -211,14 +208,13 @@ export default function HomeGlobeSection({
         left: [
           { label: "Approved projects", value: homeStatsState?.projects.projects_approved, format: "number" },
           { label: "Ongoing projects", value: homeStatsState?.projects.projects_ongoing, format: "number" },
-          { label: "Published to IATI", value: iatiCount, format: "number" },
         ],
         right: [
           { label: "Verified organisations", value: homeStatsState?.projects.organisations_registered, format: "number" },
           { label: "Donations received", value: homeStatsState?.projects.donations_received_eur, format: "currency" },
         ],
         footnote:
-          "Totals reflect approved public projects and verified organisations. IATI: activities published to the International Aid Transparency Initiative.",
+          "Totals include projects added here and projects imported from IATI (the International Aid Transparency Initiative).",
       },
       funding: {
         leftTitle: "Funding flow",
@@ -238,7 +234,7 @@ export default function HomeGlobeSection({
         footnote: "High-urgency alerts are approved issues marked 4+ on urgency.",
       },
     }),
-    [homeStatsState, iatiCount],
+    [homeStatsState],
   );
 
   const activeStats = statsByMode[mode];
@@ -258,7 +254,7 @@ export default function HomeGlobeSection({
   return (
     <section className="relative h-[calc(100dvh-4rem)] w-full overflow-hidden">
       <div id="home-globe" className="absolute inset-0 z-0">
-        <HomeGlobe mode={mode} pointsByMode={pointsByMode} dots={iatiDots} />
+        <HomeGlobe mode={mode} pointsByMode={pointsByMode} projects={projectLayer} />
         <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-slate-950/30 via-slate-950/10 to-slate-950/40" />
       </div>
 

@@ -5,6 +5,7 @@ import type { Database } from "@/lib/database.types";
 import FollowButton from "@/components/FollowButton";
 import { Badge } from "@/components/ui/badge";
 import { buttonClasses } from "@/components/ui/button";
+import ImportedProjectDetails, { publisherName, readSourceData } from "@/components/projects/ImportedProjectDetails";
 import { SupportCard } from "@/components/projects/SupportCard";
 import UpdatesSectionWithSocial, { type UpdateSummary } from "@/components/updates/UpdatesSectionWithSocial";
 import { getServerSupabase } from "@/lib/supabaseServer";
@@ -175,10 +176,20 @@ export default async function ProjectDetailPage({
     ...normalizeJsonLinks(project.links),
   ].filter((l) => typeof l.url === "string" && l.url.trim().length > 0);
 
-  const locationParts = [project.place_name, project.region, project.country].filter(
-    Boolean
-  ) as string[];
+  // de-duplicated: imported projects often have place = country
+  const locationParts = [...new Set([project.place_name, project.region, project.country].filter(Boolean))] as string[];
   const locationLabel = locationParts.length > 0 ? locationParts.join(", ") : null;
+
+  // Imported from IATI: owned by the "IATI" system organisation; show the real publisher instead.
+  const imported = project.source === "iati" && Boolean(project.iati_identifier);
+  const sourceData = readSourceData(project.source_data);
+  const publisher = imported ? publisherName(sourceData) : null;
+  const budget = imported ? formatMoney(sourceData.budget_total ?? null, project.currency) : null;
+
+  // Imported projects have no donations yet: show their budget instead of "Raised 0"
+  const showRaised =
+    (typeof project.donations_received === "number" || typeof project.amount_needed === "number") &&
+    (!imported || (project.donations_received ?? 0) > 0 || (project.amount_needed ?? 0) > 0);
 
   const start = formatDate(project.start_date);
   const end = formatDate(project.end_date);
@@ -213,6 +224,7 @@ export default async function ProjectDetailPage({
             <Badge variant={project.category === "humanitarian" ? "ocean" : "green"} className="capitalize">
               {project.category}
             </Badge>
+            {imported ? <Badge variant="outline">Published to IATI</Badge> : null}
             {project.status !== "approved" && user ? (
               <Badge variant={project.status === "rejected" ? "rose" : "amber"} className="capitalize">
                 {project.status === "pending" ? "Waiting for review" : project.status}
@@ -223,7 +235,18 @@ export default async function ProjectDetailPage({
 
           {leadOrganisation?.name || locationLabel ? (
             <p className="mt-2 text-[15px] text-soltas-muted">
-              {leadOrganisation?.name ? (
+              {imported ? (
+                <>
+                  by <span className="font-medium text-soltas-text">{publisher ?? "the publisher"}</span> via{" "}
+                  {leadOrganisation ? (
+                    <Link className="font-medium text-soltas-ocean hover:underline" href={`/organisations/${leadOrganisation.id}`}>
+                      IATI
+                    </Link>
+                  ) : (
+                    "IATI"
+                  )}
+                </>
+              ) : leadOrganisation?.name ? (
                 <>
                   by{" "}
                   <Link className="font-medium text-soltas-ocean hover:underline" href={`/organisations/${leadOrganisation.id}`}>
@@ -259,9 +282,15 @@ export default async function ProjectDetailPage({
       </header>
 
       {/* Key facts */}
-      {raised !== null || project.lives_improved != null || start || end ? (
+      {showRaised || budget || project.lives_improved != null || start || end ? (
         <section aria-label="Key facts" className="grid gap-3 sm:grid-cols-3">
-          {raised !== null || target !== null ? (
+          {budget ? (
+            <div className="card p-5">
+              <p className="text-xs font-medium text-soltas-muted">Budget</p>
+              <p className="mt-1 text-2xl font-semibold tracking-tight text-soltas-text">{budget}</p>
+            </div>
+          ) : null}
+          {showRaised ? (
             <div className="card p-5">
               <p className="text-xs font-medium text-soltas-muted">Raised</p>
               <p className="mt-1 text-2xl font-semibold tracking-tight text-soltas-text">{donations ?? "—"}</p>
@@ -308,6 +337,10 @@ export default async function ProjectDetailPage({
           <h2 className="text-lg font-semibold tracking-tight text-soltas-text">About this project</h2>
           <p className="mt-3 whitespace-pre-wrap text-[15px] leading-7 text-soltas-text">{project.description}</p>
         </section>
+      ) : null}
+
+      {imported && project.iati_identifier ? (
+        <ImportedProjectDetails data={sourceData} iatiIdentifier={project.iati_identifier} updatedAt={project.source_updated_at} />
       ) : null}
 
       {project.status === "approved" ? <SupportCard projectName={project.name} /> : null}

@@ -1,4 +1,5 @@
 import type { Database } from "@/lib/database.types";
+import { getPublicSupabase } from "@/lib/supabasePublic";
 import { getServerSupabase } from "@/lib/supabaseServer";
 
 export const PAGE_SIZE = 25;
@@ -11,6 +12,7 @@ export type ProjectListRow = Pick<
   | "slug"
   | "name"
   | "category"
+  | "source"
   | "place_name"
   | "region"
   | "country"
@@ -46,6 +48,8 @@ export type FindProjectsParams = {
   target_demographic: string[];
   partner_org_ids: string[];
   lifecycle_status: string[];
+  /** community = added on the platform, iati = imported from IATI; undefined = both */
+  source?: "community" | "iati";
   min_needed?: number;
   max_needed?: number;
   min_received?: number;
@@ -125,6 +129,11 @@ const parseDate = (value: string | string[] | undefined): string | undefined => 
   return parsed;
 };
 
+const parseSource = (value: string | string[] | undefined): FindProjectsParams["source"] => {
+  const parsed = parseString(value);
+  return parsed === "community" || parsed === "iati" ? parsed : undefined;
+};
+
 export function parseFindProjectsSearchParams(searchParams: RawSearchParams): FindProjectsParams {
   return {
     q: parseString(searchParams.q),
@@ -138,6 +147,7 @@ export function parseFindProjectsSearchParams(searchParams: RawSearchParams): Fi
     target_demographic: parseStringList(searchParams.target_demographic),
     partner_org_ids: parseStringList(searchParams.partner_org_ids),
     lifecycle_status: parseStringList(searchParams.stage),
+    source: parseSource(searchParams.source),
     min_needed: parseNumber(searchParams.min_needed),
     max_needed: parseNumber(searchParams.max_needed),
     min_received: parseNumber(searchParams.min_received),
@@ -152,6 +162,95 @@ export function parseFindProjectsSearchParams(searchParams: RawSearchParams): Fi
   };
 }
 
+/**
+ * Filters shared by the list, the counts and the map points, so they always agree.
+ * Generic over the PostgREST builder; every method used here exists on it.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function applyProjectFilters<Q extends Record<string, any>>(query: Q, params: FindProjectsParams): Q {
+  const categoryFilters = params.category.length ? params.category : params.type;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let q: any = query;
+  if (params.source) {
+    q = q.eq("source", params.source);
+  }
+
+  if (params.q) {
+    const escaped = params.q.replace(/%/g, "\\%").replace(/_/g, "\\_");
+    q = q.or(`name.ilike.%${escaped}%,place_name.ilike.%${escaped}%`);
+  }
+
+  if (categoryFilters.length) {
+    q = q.in("category", categoryFilters);
+  }
+
+  if (params.country.length) {
+    q = q.in("country", params.country);
+  }
+
+  if (params.region.length) {
+    q = q.in("region", params.region);
+  }
+
+  if (params.currency.length) {
+    q = q.in("currency", params.currency);
+  }
+
+  if (params.target_demographic.length) {
+    q = q.in("target_demographic", params.target_demographic);
+  }
+
+  if (params.thematic_area.length) {
+    q = q.overlaps("thematic_area", params.thematic_area);
+  }
+
+  if (params.type_of_intervention.length) {
+    q = q.overlaps("type_of_intervention", params.type_of_intervention);
+  }
+
+  if (params.partner_org_ids.length) {
+    q = q.overlaps("partner_org_ids", params.partner_org_ids);
+  }
+
+  if (params.lifecycle_status.length) {
+    q = q.in("lifecycle_status", params.lifecycle_status);
+  }
+
+  if (typeof params.min_needed === "number") {
+    q = q.gte("amount_needed", params.min_needed);
+  }
+
+  if (typeof params.max_needed === "number") {
+    q = q.lte("amount_needed", params.max_needed);
+  }
+
+  if (typeof params.min_received === "number") {
+    q = q.gte("donations_received", params.min_received);
+  }
+
+  if (typeof params.max_received === "number") {
+    q = q.lte("donations_received", params.max_received);
+  }
+
+  if (typeof params.min_lives === "number") {
+    q = q.gte("lives_improved", params.min_lives);
+  }
+
+  if (typeof params.max_lives === "number") {
+    q = q.lte("lives_improved", params.max_lives);
+  }
+
+  if (params.start_from) {
+    q = q.gte("start_date", params.start_from);
+  }
+
+  if (params.end_to) {
+    q = q.lte("end_date", params.end_to);
+  }
+
+  return q as Q;
+}
+
 export async function fetchFindProjects({
   searchParams,
 }: {
@@ -163,7 +262,6 @@ export async function fetchFindProjects({
   pageCount: number;
 }> {
   const params = parseFindProjectsSearchParams(searchParams);
-  const categoryFilters = params.category.length ? params.category : params.type;
   const supabase = await getServerSupabase();
   const {
     data: { user },
@@ -172,7 +270,7 @@ export async function fetchFindProjects({
   let query = supabase
     .from("projects")
     .select(
-      "id,slug,name,category,place_name,region,country,start_date,end_date,donations_received,amount_needed,currency,thematic_area,type_of_intervention,partner_org_ids,target_demographic",
+      "id,slug,name,category,source,place_name,region,country,start_date,end_date,donations_received,amount_needed,currency,thematic_area,type_of_intervention,partner_org_ids,target_demographic",
       { count: "exact" },
     );
 
@@ -183,78 +281,7 @@ export async function fetchFindProjects({
     query = query.eq("status", "approved");
   }
 
-  if (params.q) {
-    const escaped = params.q.replace(/%/g, "\\%").replace(/_/g, "\\_");
-    query = query.or(`name.ilike.%${escaped}%,place_name.ilike.%${escaped}%`);
-  }
-
-  if (categoryFilters.length) {
-    query = query.in("category", categoryFilters);
-  }
-
-  if (params.country.length) {
-    query = query.in("country", params.country);
-  }
-
-  if (params.region.length) {
-    query = query.in("region", params.region);
-  }
-
-  if (params.currency.length) {
-    query = query.in("currency", params.currency);
-  }
-
-  if (params.target_demographic.length) {
-    query = query.in("target_demographic", params.target_demographic);
-  }
-
-  if (params.thematic_area.length) {
-    query = query.overlaps("thematic_area", params.thematic_area);
-  }
-
-  if (params.type_of_intervention.length) {
-    query = query.overlaps("type_of_intervention", params.type_of_intervention);
-  }
-
-  if (params.partner_org_ids.length) {
-    query = query.overlaps("partner_org_ids", params.partner_org_ids);
-  }
-
-  if (params.lifecycle_status.length) {
-    query = query.in("lifecycle_status", params.lifecycle_status);
-  }
-
-  if (typeof params.min_needed === "number") {
-    query = query.gte("amount_needed", params.min_needed);
-  }
-
-  if (typeof params.max_needed === "number") {
-    query = query.lte("amount_needed", params.max_needed);
-  }
-
-  if (typeof params.min_received === "number") {
-    query = query.gte("donations_received", params.min_received);
-  }
-
-  if (typeof params.max_received === "number") {
-    query = query.lte("donations_received", params.max_received);
-  }
-
-  if (typeof params.min_lives === "number") {
-    query = query.gte("lives_improved", params.min_lives);
-  }
-
-  if (typeof params.max_lives === "number") {
-    query = query.lte("lives_improved", params.max_lives);
-  }
-
-  if (params.start_from) {
-    query = query.gte("start_date", params.start_from);
-  }
-
-  if (params.end_to) {
-    query = query.lte("end_date", params.end_to);
-  }
+  query = applyProjectFilters(query, params);
 
   query = query.order(params.sort, { ascending: params.dir === "asc" });
 
@@ -279,111 +306,65 @@ export async function fetchFindProjects({
   };
 }
 
-export async function fetchProjectMarkers({
-  searchParams,
-}: {
-  searchParams: RawSearchParams;
-}): Promise<ProjectMarker[]> {
+export type ProjectPoint = {
+  slug: string;
+  lat: number;
+  lng: number;
+  category: string;
+  /** true when the point is only the country centre (imported projects without an exact location) */
+  approximate: boolean;
+};
+
+const POINT_PAGE = 1000; // PostgREST returns at most 1000 rows per request
+const MAX_POINTS = 80_000;
+
+/**
+ * Every approved, listed project with a location that matches the Find Projects filters, for the clustered
+ * map layer (community and imported projects alike). Public data only, so the result can be CDN-cached.
+ */
+export async function fetchProjectPoints(searchParams: RawSearchParams): Promise<ProjectPoint[]> {
   const params = parseFindProjectsSearchParams(searchParams);
-  const categoryFilters = params.category.length ? params.category : params.type;
-  const supabase = await getServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const supabase = getPublicSupabase();
+  const base = <T extends string>(columns: T, head = false) =>
+    applyProjectFilters(
+      supabase
+        .from("projects")
+        .select(columns, head ? { count: "exact", head: true } : undefined)
+        .eq("visibility", "public")
+        .eq("status", "approved")
+        .not("lat", "is", null)
+        .not("lng", "is", null),
+      params,
+    );
 
-  let query = supabase
-    .from("projects")
-    .select("id,slug,name,category,lat,lng,place_name,description")
-    // Imported (IATI) projects are drawn by the clustered map layer, not as individual markers.
-    .filter("source", "eq", "community");
+  const { count, error: countError } = await base("id", true);
+  if (countError) throw countError;
+  const total = Math.min(count ?? 0, MAX_POINTS);
+  const offsets = Array.from({ length: Math.ceil(total / POINT_PAGE) }, (_, i) => i * POINT_PAGE);
 
-  // Unlisted/private projects are reachable by link only, never listed.
-  query = query.eq("visibility", "public");
-
-  if (!user) {
-    query = query.eq("status", "approved");
+  const points: ProjectPoint[] = [];
+  for (let i = 0; i < offsets.length; i += 6) {
+    const pages = await Promise.all(
+      offsets.slice(i, i + 6).map(async (from) => {
+        const { data, error } = await base("id,slug,lat,lng,category,point_precision")
+          .order("id")
+          .range(from, from + POINT_PAGE - 1);
+        if (error) throw error;
+        return data ?? [];
+      }),
+    );
+    for (const row of pages.flat()) {
+      if (row.lat == null || row.lng == null) continue;
+      points.push({
+        slug: row.slug ?? row.id,
+        lat: row.lat,
+        lng: row.lng,
+        category: row.category,
+        approximate: row.point_precision === "country" || row.point_precision === "region",
+      });
+    }
   }
-
-  if (params.q) {
-    const escaped = params.q.replace(/%/g, "\\%").replace(/_/g, "\\_");
-    query = query.or(`name.ilike.%${escaped}%,place_name.ilike.%${escaped}%`);
-  }
-
-  if (categoryFilters.length) {
-    query = query.in("category", categoryFilters);
-  }
-
-  if (params.country.length) {
-    query = query.in("country", params.country);
-  }
-
-  if (params.region.length) {
-    query = query.in("region", params.region);
-  }
-
-  if (params.currency.length) {
-    query = query.in("currency", params.currency);
-  }
-
-  if (params.target_demographic.length) {
-    query = query.in("target_demographic", params.target_demographic);
-  }
-
-  if (params.thematic_area.length) {
-    query = query.overlaps("thematic_area", params.thematic_area);
-  }
-
-  if (params.type_of_intervention.length) {
-    query = query.overlaps("type_of_intervention", params.type_of_intervention);
-  }
-
-  if (params.partner_org_ids.length) {
-    query = query.overlaps("partner_org_ids", params.partner_org_ids);
-  }
-
-  if (params.lifecycle_status.length) {
-    query = query.in("lifecycle_status", params.lifecycle_status);
-  }
-
-  if (typeof params.min_needed === "number") {
-    query = query.gte("amount_needed", params.min_needed);
-  }
-
-  if (typeof params.max_needed === "number") {
-    query = query.lte("amount_needed", params.max_needed);
-  }
-
-  if (typeof params.min_received === "number") {
-    query = query.gte("donations_received", params.min_received);
-  }
-
-  if (typeof params.max_received === "number") {
-    query = query.lte("donations_received", params.max_received);
-  }
-
-  if (typeof params.min_lives === "number") {
-    query = query.gte("lives_improved", params.min_lives);
-  }
-
-  if (typeof params.max_lives === "number") {
-    query = query.lte("lives_improved", params.max_lives);
-  }
-
-  if (params.start_from) {
-    query = query.gte("start_date", params.start_from);
-  }
-
-  if (params.end_to) {
-    query = query.lte("end_date", params.end_to);
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    throw error;
-  }
-
-  return (data ?? []) as ProjectMarker[];
+  return points;
 }
 
 export type ProjectFilterOptions = {
