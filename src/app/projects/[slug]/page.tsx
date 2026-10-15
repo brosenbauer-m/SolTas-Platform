@@ -176,9 +176,8 @@ export default async function ProjectDetailPage({
     ...normalizeJsonLinks(project.links),
   ].filter((l) => typeof l.url === "string" && l.url.trim().length > 0);
 
-  const locationParts = [project.place_name, project.region, project.country].filter(
-    Boolean
-  ) as string[];
+  // de-duplicated: imported projects often have place = country
+  const locationParts = [...new Set([project.place_name, project.region, project.country].filter(Boolean))] as string[];
   const locationLabel = locationParts.length > 0 ? locationParts.join(", ") : null;
 
   // Imported from IATI: owned by the "IATI" system organisation; show the real publisher instead.
