@@ -1,8 +1,10 @@
 import mapboxgl from "mapbox-gl";
 
-/** Summary returned by a details endpoint such as /api/iati/activity. */
+/** Summary returned by a details endpoint such as /api/projects/summary. */
 export type RemotePopupDetails = {
   title: string;
+  /** replaces the badge once loaded, e.g. "Published to IATI" */
+  eyebrow?: string | null;
   organisation?: string | null;
   place?: string | null;
   description?: string | null;
@@ -11,8 +13,8 @@ export type RemotePopupDetails = {
 };
 
 export type RemotePopupOptions = {
-  /** Small label above the title, e.g. "Published to IATI" */
-  badge: string;
+  /** Small label above the title until the details arrive */
+  badge?: string;
   ctaLabel: string;
   detailsUrl: string;
   /** Client-side navigation (router.push); without it the button is a plain link. */
@@ -28,7 +30,7 @@ export function openRemotePopup(map: mapboxgl.Map, lngLat: [number, number], opt
   node.className = "space-y-2 text-sm text-soltas-text";
   const badge = document.createElement("p");
   badge.className = "text-[11px] font-semibold uppercase tracking-wide text-soltas-muted";
-  badge.textContent = options.badge;
+  badge.textContent = options.badge ?? "";
   const loading = document.createElement("p");
   loading.className = "text-sm text-soltas-muted";
   loading.textContent = "Loading…";
@@ -40,6 +42,7 @@ export function openRemotePopup(map: mapboxgl.Map, lngLat: [number, number], opt
     .then((res) => (res.ok ? (res.json() as Promise<RemotePopupDetails>) : Promise.reject(res.status)))
     .then((details) => {
       loading.remove();
+      if (details.eyebrow) badge.textContent = details.eyebrow;
       const title = document.createElement("h3");
       title.className = "text-base font-semibold text-soltas-text";
       title.textContent = details.title;
@@ -72,7 +75,7 @@ export function openRemotePopup(map: mapboxgl.Map, lngLat: [number, number], opt
       node.appendChild(cta);
     })
     .catch(() => {
-      loading.textContent = "Couldn’t load this activity.";
+      loading.textContent = "Couldn’t load this project.";
     });
 
   return popup;

@@ -106,14 +106,10 @@ export default function ProjectsTableView({
             {rows.map(project => {
               const slugForPath = getProjectSlug(project);
               const tags = getTagPreview(project);
-              const focusSlug = project.slug ?? null;
               const mapParams = new URLSearchParams();
               mapParams.set("view", "globe");
-              if (project.category) {
-                mapParams.set("type", project.category);
-              }
-              if (focusSlug) {
-                mapParams.set("focus", focusSlug);
+              if (project.country) {
+                mapParams.set("country", project.country);
               }
               const mapHref = `/projects?${mapParams.toString()}`;
 
@@ -126,6 +122,13 @@ export default function ProjectsTableView({
                     >
                       {project.name}
                     </Link>
+                    {project.source === "iati" ? (
+                      <div className="mt-1">
+                        <Badge variant="outline" className="text-xs">
+                          Published to IATI
+                        </Badge>
+                      </div>
+                    ) : null}
                   </td>
                   <td className="px-4 py-4 capitalize text-soltas-text">{project.category}</td>
                   <td className="px-4 py-4 text-soltas-muted">{getLocationLabel(project)}</td>

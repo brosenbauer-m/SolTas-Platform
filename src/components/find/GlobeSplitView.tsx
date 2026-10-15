@@ -3,15 +3,15 @@
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { GripVertical, SlidersHorizontal, X } from "lucide-react";
 
-import Map, { type MapClusterLayer, type MapMarker } from "@/components/Map";
+import Map, { type MapMarker, type MapProjectLayer } from "@/components/Map";
 import { MARKER_COLORS } from "@/lib/markerColors";
 
 type Props = {
   /** The filter form shown in the left panel (and in the drawer on phones). */
   filters: ReactNode;
   markers: MapMarker[];
-  /** Optional clustered layer for large point sets (IATI activities). */
-  clusters?: MapClusterLayer | null;
+  /** All projects as one clustered layer (Find Projects). */
+  projects?: MapProjectLayer | null;
   /** Shown over the map, e.g. a colour key. */
   legend?: ReactNode;
   /** e.g. "12 projects mapped · 40 matching" */
@@ -58,7 +58,7 @@ function saveRatio(key: string, ratio: number) {
 export default function GlobeSplitView({
   filters,
   markers,
-  clusters = null,
+  projects = null,
   legend = null,
   summary,
   focusSlug,
@@ -153,7 +153,7 @@ export default function GlobeSplitView({
   const map = (
     <Map
       markers={markers}
-      clusters={clusters}
+      projects={projects}
       markerColor={MARKER_COLORS.default}
       focusSlug={focusSlug}
       ctaLabel={ctaLabel}

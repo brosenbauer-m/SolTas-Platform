@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import mapboxgl from "mapbox-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
 
-import { openRemotePopup } from "@/components/map/remotePopup"
+import { addProjectLayer } from "@/components/map/projectLayer"
 
 // Token guard
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
@@ -28,27 +28,19 @@ export type MapMarker = {
   markerColor?: string
 }
 
-/**
- * A large point set drawn as clustered circles (numbers that split as you zoom in) instead of DOM markers.
- * The GeoJSON at `url` has Point features with properties.id and optionally properties.a = 1 (approximate,
- * drawn hollow). Clicking a point loads a short summary from `detailsUrl(id)` for the popup.
- */
-export type MapClusterLayer = {
+/** The clustered project layer (see components/map/projectLayer.ts). */
+export type MapProjectLayer = {
+  /** /api/projects/points with the page's filters */
   url: string
   color: string
-  /** Small label above the popup title, e.g. "Published to IATI" */
-  badge: string
   ctaLabel: string
-  detailsUrl: (id: string) => string
+  summaryUrl: (id: string) => string
 }
-
-const CLUSTER_SOURCE = "cluster-points"
-const CLUSTER_LAYERS = ["cluster-circles", "cluster-counts", "cluster-points"] as const
 
 type MapProps = {
   markers?: MapMarker[]
-  /** Optional clustered layer for large point sets (e.g. IATI activities). */
-  clusters?: MapClusterLayer | null
+  /** All projects as one clustered layer (Find Projects). */
+  projects?: MapProjectLayer | null
   markerColor?: string
   focusSlug?: string | null
   ctaLabel?: string
@@ -75,7 +67,7 @@ const getMarkerScale = (zoom: number) => {
 
 export default function Map({
   markers = [],
-  clusters = null,
+  projects = null,
   markerColor = "#2E6B8A",
   focusSlug = null,
   ctaLabel = "View",
@@ -88,10 +80,10 @@ export default function Map({
   const mapRef = useRef<mapboxgl.Map | null>(null)
   const markerObjs = useRef<MarkerObject[]>([])
   const [styleReady, setStyleReady] = useState(false)
-  const clustersRef = useRef<MapClusterLayer | null>(clusters)
+  const projectsRef = useRef<MapProjectLayer | null>(projects)
   useEffect(() => {
-    clustersRef.current = clusters
-  }, [clusters])
+    projectsRef.current = projects
+  }, [projects])
   const hasDomMarkersRef = useRef(false)
 
   const userInteractedRef = useRef(false)
@@ -183,134 +175,30 @@ export default function Map({
     }
   }, [])
 
-  // Clustered layer: added once the style has loaded; rebuilt (cleanup + add) when the URL changes.
-  const clusterUrl = clusters?.url ?? null
-  const clusterColor = clusters?.color ?? null
+  // Clustered project layer: added once the style has loaded; rebuilt when the URL (filters) changes.
+  const projectsUrl = projects?.url ?? null
+  const projectsColor = projects?.color ?? null
   useEffect(() => {
     const map = mapRef.current
-    if (!map || !styleReady) return
+    const layer = projectsRef.current
+    if (!map || !styleReady || !projectsUrl || !projectsColor || !layer) return
 
-    const removeLayer = () => {
-      CLUSTER_LAYERS.forEach((id) => map.getLayer(id) && map.removeLayer(id))
-      if (map.getSource(CLUSTER_SOURCE)) map.removeSource(CLUSTER_SOURCE)
-    }
-
-    if (!clusterUrl || !clusterColor) {
-      removeLayer()
-      return
-    }
-
-    // We fetch the GeoJSON ourselves so we can frame the points when they are all the map shows.
-    const controller = new AbortController()
-    const loadData = () =>
-      fetch(clusterUrl, { signal: controller.signal })
-        .then((res) => (res.ok ? (res.json() as Promise<GeoJSON.FeatureCollection<GeoJSON.Point>>) : Promise.reject(res.status)))
-        .then((data) => {
-          const source = map.getSource(CLUSTER_SOURCE) as mapboxgl.GeoJSONSource | undefined
-          source?.setData(data)
-          if (hasDomMarkersRef.current || !data.features.length) return
-          const bounds = new mapboxgl.LngLatBounds()
-          data.features.forEach((f) => bounds.extend(f.geometry.coordinates as [number, number]))
-          map.fitBounds(bounds, { padding: 48, maxZoom: 6, duration: 350 })
-        })
-        .catch(() => {
-          // aborted or failed: the layer stays as it was
-        })
-
-    map.addSource(CLUSTER_SOURCE, {
-      type: "geojson",
-      data: { type: "FeatureCollection", features: [] },
-      cluster: true,
-      clusterRadius: 44,
-      clusterMaxZoom: 9,
-    })
-    loadData()
-    map.addLayer({
-      id: "cluster-circles",
-      type: "circle",
-      source: CLUSTER_SOURCE,
-      filter: ["has", "point_count"],
-      paint: {
-        "circle-color": clusterColor,
-        "circle-opacity": 0.85,
-        "circle-radius": ["step", ["get", "point_count"], 13, 25, 16, 250, 20, 2500, 25],
-        "circle-stroke-color": "#ffffff",
-        "circle-stroke-width": 2,
+    const handle = addProjectLayer(map, {
+      url: projectsUrl,
+      color: projectsColor,
+      ctaLabel: layer.ctaLabel,
+      summaryUrl: (id) => projectsRef.current?.summaryUrl(id) ?? layer.summaryUrl(id),
+      onNavigate: (href) => router.push(href),
+      // Frame the projects when they are all the map shows
+      onLoaded: (data) => {
+        if (hasDomMarkersRef.current || !data.features.length) return
+        const bounds = new mapboxgl.LngLatBounds()
+        data.features.forEach((f) => bounds.extend(f.geometry.coordinates as [number, number]))
+        map.fitBounds(bounds, { padding: 48, maxZoom: 6, duration: 350 })
       },
     })
-    map.addLayer({
-      id: "cluster-counts",
-      type: "symbol",
-      source: CLUSTER_SOURCE,
-      filter: ["has", "point_count"],
-      layout: {
-        "text-field": ["get", "point_count_abbreviated"],
-        "text-size": 12,
-        "text-font": ["DIN Pro Medium", "Arial Unicode MS Bold"],
-        "text-allow-overlap": true,
-      },
-      paint: { "text-color": "#ffffff" },
-    })
-    map.addLayer({
-      id: "cluster-points",
-      type: "circle",
-      source: CLUSTER_SOURCE,
-      filter: ["!", ["has", "point_count"]],
-      paint: {
-        // approximate (country centre) points are hollow
-        "circle-color": ["case", ["==", ["get", "a"], 1], "#ffffff", clusterColor],
-        "circle-radius": 6,
-        "circle-stroke-color": ["case", ["==", ["get", "a"], 1], clusterColor, "#ffffff"],
-        "circle-stroke-width": 2,
-      },
-    })
-
-    const zoomIntoCluster = (event: mapboxgl.MapMouseEvent) => {
-      const feature = map.queryRenderedFeatures(event.point, { layers: ["cluster-circles"] })[0]
-      const clusterId = feature?.properties?.cluster_id
-      const source = map.getSource(CLUSTER_SOURCE) as mapboxgl.GeoJSONSource | undefined
-      if (clusterId == null || !source || feature.geometry.type !== "Point") return
-      const center = feature.geometry.coordinates as [number, number]
-      source.getClusterExpansionZoom(clusterId, (error, zoom) => {
-        if (error || zoom == null) return
-        map.easeTo({ center, zoom })
-      })
-    }
-
-    const openPoint = (event: mapboxgl.MapMouseEvent) => {
-      const feature = map.queryRenderedFeatures(event.point, { layers: ["cluster-points"] })[0]
-      const layer = clustersRef.current
-      const id = feature?.properties?.id
-      if (!layer || typeof id !== "string" || feature.geometry.type !== "Point") return
-      openRemotePopup(map, feature.geometry.coordinates as [number, number], {
-        badge: layer.badge,
-        ctaLabel: layer.ctaLabel,
-        detailsUrl: layer.detailsUrl(id),
-        onNavigate: (href) => router.push(href),
-      })
-    }
-
-    const pointer = () => (map.getCanvas().style.cursor = "pointer")
-    const noPointer = () => (map.getCanvas().style.cursor = "")
-    map.on("click", "cluster-circles", zoomIntoCluster)
-    map.on("click", "cluster-points", openPoint)
-    for (const id of ["cluster-circles", "cluster-points"] as const) {
-      map.on("mouseenter", id, pointer)
-      map.on("mouseleave", id, noPointer)
-    }
-
-    return () => {
-      controller.abort()
-      map.off("click", "cluster-circles", zoomIntoCluster)
-      map.off("click", "cluster-points", openPoint)
-      for (const id of ["cluster-circles", "cluster-points"] as const) {
-        map.off("mouseenter", id, pointer)
-        map.off("mouseleave", id, noPointer)
-      }
-      // the map may already be gone (unmount)
-      if (mapRef.current === map && map.getStyle()) removeLayer()
-    }
-  }, [styleReady, clusterUrl, clusterColor, router])
+    return () => handle.remove()
+  }, [styleReady, projectsUrl, projectsColor, router])
 
   // IMPORTANT: when freeze is enabled, we intentionally do NOT resize continuously.
   // We'll do a single resize once freeze is turned off.

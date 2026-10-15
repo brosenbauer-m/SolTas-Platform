@@ -5,7 +5,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useSearchParams } from "next/navigation";
 
-import { openRemotePopup } from "@/components/map/remotePopup";
+import { addProjectLayer, type ProjectLayerHandle } from "@/components/map/projectLayer";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
@@ -47,26 +47,19 @@ export type HomeGlobePoint = {
   mediaCount?: number | null;
 };
 
-/**
- * A large point set (IATI activities) drawn as small WebGL dots under the markers, shown in one mode.
- * GeoJSON Point features with properties.id; clicking a dot loads a summary from detailsUrl(id).
- */
-export type HomeGlobeDotLayer = {
+/** All projects as one clustered layer (components/map/projectLayer.ts), shown in one mode instead of markers. */
+export type HomeGlobeProjectLayer = {
   mode: HomeGlobeMode;
   url: string;
   color: string;
-  badge: string;
   ctaLabel: string;
-  detailsUrl: (id: string) => string;
-  /** Called with the number of dots once they are loaded. */
-  onLoaded?: (count: number) => void;
+  summaryUrl: (id: string) => string;
 };
 
-const DOT_SOURCE = "home-dots";
-const DOT_LAYER = "home-dots";
-
 type MarkerObject = {
-  marker: mapboxgl.Marker;
+  /** DOM marker; absent in the mode drawn by the project layer (the popup is then opened on its own) */
+  marker?: mapboxgl.Marker;
+  popup: mapboxgl.Popup;
   id: string;
   lng: number;
   lat: number;
@@ -147,11 +140,11 @@ const isMarkerInView = (marker: MarkerObject, center: mapboxgl.LngLat) => {
 export default function HomeGlobe({
   mode,
   pointsByMode,
-  dots = null,
+  projects = null,
 }: {
   mode: HomeGlobeMode;
   pointsByMode: Record<HomeGlobeMode, HomeGlobePoint[]>;
-  dots?: HomeGlobeDotLayer | null;
+  projects?: HomeGlobeProjectLayer | null;
 }) {
   const reducedMotion = usePrefersReducedMotion();
   const searchParams = useSearchParams();
@@ -186,10 +179,11 @@ export default function HomeGlobe({
 
   const hasLoggedErrorRef = useRef(false);
   const [styleReady, setStyleReady] = useState(false);
-  const dotsRef = useRef<HomeGlobeDotLayer | null>(dots);
+  const projectsRef = useRef<HomeGlobeProjectLayer | null>(projects);
   useEffect(() => {
-    dotsRef.current = dots;
-  }, [dots]);
+    projectsRef.current = projects;
+  }, [projects]);
+  const projectLayerRef = useRef<ProjectLayerHandle | null>(null);
 
   const [debugState, setDebugState] = useState<{ mode: HomeGlobeMode; featuredId?: string | null } | null>(
     null,
@@ -341,75 +335,31 @@ export default function HomeGlobe({
     };
   }, [markInteracted, startRotation, stopRotation]);
 
-  // Dot layer (IATI activities): loaded once, below the DOM markers, visible only in its mode.
-  const dotsUrl = dots?.url ?? null;
-  const dotsColor = dots?.color ?? null;
+  // Project layer: every project as clustered dots, visible in its mode (Projects).
+  const projectsUrl = projects?.url ?? null;
+  const projectsColor = projects?.color ?? null;
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !styleReady || !dotsUrl || !dotsColor) return;
-
-    const controller = new AbortController();
-    map.addSource(DOT_SOURCE, { type: "geojson", data: { type: "FeatureCollection", features: [] } });
-    map.addLayer({
-      id: DOT_LAYER,
-      type: "circle",
-      source: DOT_SOURCE,
-      layout: { visibility: "none" },
-      paint: {
-        "circle-color": dotsColor,
-        "circle-opacity": 0.7,
-        "circle-radius": ["interpolate", ["linear"], ["zoom"], 1, 1.8, 4, 3.5, 8, 6],
-        "circle-stroke-color": "#ffffff",
-        "circle-stroke-width": ["interpolate", ["linear"], ["zoom"], 1, 0.4, 6, 1.5],
-      },
+    const layer = projectsRef.current;
+    if (!map || !styleReady || !projectsUrl || !projectsColor || !layer) return;
+    const handle = addProjectLayer(map, {
+      url: projectsUrl,
+      color: projectsColor,
+      ctaLabel: layer.ctaLabel,
+      summaryUrl: (id) => projectsRef.current?.summaryUrl(id) ?? layer.summaryUrl(id),
+      onInteract: markInteracted,
     });
-
-    fetch(dotsUrl, { signal: controller.signal })
-      .then((res) => (res.ok ? (res.json() as Promise<GeoJSON.FeatureCollection<GeoJSON.Point>>) : Promise.reject(res.status)))
-      .then((data) => {
-        (map.getSource(DOT_SOURCE) as mapboxgl.GeoJSONSource | undefined)?.setData(data);
-        dotsRef.current?.onLoaded?.(data.features.length);
-      })
-      .catch(() => {
-        // aborted or failed: the globe still shows the regular markers
-      });
-
-    const openDot = (event: mapboxgl.MapMouseEvent) => {
-      markInteracted();
-      const feature = map.queryRenderedFeatures(event.point, { layers: [DOT_LAYER] })[0];
-      const layer = dotsRef.current;
-      const id = feature?.properties?.id;
-      if (!layer || typeof id !== "string" || feature.geometry.type !== "Point") return;
-      openRemotePopup(map, feature.geometry.coordinates as [number, number], {
-        badge: layer.badge,
-        ctaLabel: layer.ctaLabel,
-        detailsUrl: layer.detailsUrl(id),
-      });
-    };
-    const pointer = () => (map.getCanvas().style.cursor = "pointer");
-    const noPointer = () => (map.getCanvas().style.cursor = "");
-    map.on("click", DOT_LAYER, openDot);
-    map.on("mouseenter", DOT_LAYER, pointer);
-    map.on("mouseleave", DOT_LAYER, noPointer);
-
+    projectLayerRef.current = handle;
     return () => {
-      controller.abort();
-      map.off("click", DOT_LAYER, openDot);
-      map.off("mouseenter", DOT_LAYER, pointer);
-      map.off("mouseleave", DOT_LAYER, noPointer);
-      if (mapRef.current === map && map.getStyle()) {
-        if (map.getLayer(DOT_LAYER)) map.removeLayer(DOT_LAYER);
-        if (map.getSource(DOT_SOURCE)) map.removeSource(DOT_SOURCE);
-      }
+      projectLayerRef.current = null;
+      handle.remove();
     };
-  }, [styleReady, dotsUrl, dotsColor, markInteracted]);
+  }, [styleReady, projectsUrl, projectsColor, markInteracted]);
 
-  const dotsMode = dots?.mode ?? null;
+  const projectsMode = projects?.mode ?? null;
   useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !styleReady || !map.getLayer(DOT_LAYER)) return;
-    map.setLayoutProperty(DOT_LAYER, "visibility", dotsMode === mode ? "visible" : "none");
-  }, [styleReady, dotsMode, mode, dotsUrl]);
+    projectLayerRef.current?.setVisible(projectsMode === mode);
+  }, [styleReady, projectsMode, mode, projectsUrl]);
 
   // If reduced motion toggles, start/stop rotation
   useEffect(() => {
@@ -424,8 +374,13 @@ export default function HomeGlobe({
     const map = mapRef.current;
     if (!map) return;
 
-    markerObjs.current.forEach((obj) => obj.marker.remove());
+    markerObjs.current.forEach((obj) => {
+      obj.popup.remove();
+      obj.marker?.remove();
+    });
     markerObjs.current = [];
+    // In the mode drawn by the project layer, points only feed the featured popups (no DOM markers).
+    const layerMode = mode === projectsMode;
     activeMarkerRef.current = null;
 
     mapMarkers.forEach((marker) => {
@@ -479,6 +434,14 @@ export default function HomeGlobe({
 
       popup.setDOMContent(popupNode);
 
+      popup.setLngLat([marker.lng, marker.lat]);
+      popup.on("close", markInteracted);
+
+      if (layerMode) {
+        markerObjs.current.push({ popup, id: marker.id, lng: marker.lng, lat: marker.lat, point: marker });
+        return;
+      }
+
       const el = document.createElement("div");
       Object.assign(el.style, {
         width: "14px",
@@ -496,23 +459,23 @@ export default function HomeGlobe({
         .addTo(map);
 
       el.addEventListener("click", markInteracted);
-      popup.on("close", markInteracted);
 
       markerObjs.current.push({
         marker: mapMarker,
+        popup,
         id: marker.id,
         lng: marker.lng,
         lat: marker.lat,
         point: marker,
       });
     });
-  }, [mapMarkers, markInteracted]);
+  }, [mapMarkers, markInteracted, mode, projectsMode]);
 
   // Reset featured on mode switch
   useEffect(() => {
     const current = activeMarkerRef.current;
     if (current) {
-      current.marker.getPopup()?.remove();
+      current.popup.remove();
       activeMarkerRef.current = null;
     }
     lastSwitchRef.current = 0;
@@ -536,7 +499,7 @@ export default function HomeGlobe({
       if (current && isMarkerInView(current, center)) return;
 
       if (current) {
-        current.marker.getPopup()?.remove();
+        current.popup.remove();
         activeMarkerRef.current = null;
       }
 
@@ -558,7 +521,7 @@ export default function HomeGlobe({
       const choice = pickWeightedCandidate(fresh, now);
       if (!choice) return;
 
-      choice.marker.getPopup()?.addTo(map);
+      choice.popup.addTo(map);
       activeMarkerRef.current = choice;
       lastSwitchRef.current = now;
 
@@ -580,7 +543,7 @@ export default function HomeGlobe({
     if (!reducedMotion) return;
     const current = activeMarkerRef.current;
     if (current) {
-      current.marker.getPopup()?.remove();
+      current.popup.remove();
       activeMarkerRef.current = null;
     }
   }, [reducedMotion]);

@@ -4,8 +4,9 @@ export const MARKER_COLORS = {
   environmental: "#2F9E6B",
   default: "#2E6B8A",
   issue: "#D64545",
-  /** Activities imported from IATI (brand "abyssal"); hollow when the point is only the country centre. */
-  iati: "#1A3F54",
+  /** All projects on the maps (community and imported): one vivid violet, distinct on land, sea and the dark globe.
+   *  Hollow when only the country is known. */
+  project: "#7C3AED",
 } as const;
 
 export function categoryMarkerColor(category: string | null | undefined) {
