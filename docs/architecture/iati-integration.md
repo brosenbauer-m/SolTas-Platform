@@ -3,6 +3,13 @@
 Status: **approved** (owner, 2026-10-13: recommendations in §8, Supabase **Free** plan, so the import is capped).
 Phase 1 (tables) is migration `20260324120012_iati_activities.sql`.
 
+**Update 2026-10-15 (owner decision): IATI activities are now regular projects.** Migration
+`20260324120013_merge_iati_into_projects.sql` copies them into `public.projects` (`source = 'iati'`,
+`iati_identifier`, `source_data` with the published details). They are owned by one verified system organisation
+"IATI" (`a7a71000-0000-4000-8000-000000000001`) and get every project feature. The sync writes to `projects`.
+Withdrawn activities become `visibility = 'unlisted'`. `iati_activities` is kept until a follow-up migration
+drops it. The sections below describe the original separate-table design.
+
 ## 1. In short
 
 - **What:** show projects that organisations already publish to IATI (the International Aid Transparency

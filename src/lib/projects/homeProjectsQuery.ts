@@ -12,6 +12,8 @@ export async function fetchHomeProjectMarkers(limit: number = DEFAULT_LIMIT): Pr
   let query = supabase
     .from("projects")
     .select("id,slug,name,category,lat,lng,place_name,description")
+    // Imported (IATI) projects are drawn as a separate dot layer on the home globe.
+    .filter("source", "eq", "community")
     .order("created_at", { ascending: false })
     .limit(limit);
 

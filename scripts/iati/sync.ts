@@ -1,4 +1,5 @@
-// IATI sync: copies humanitarian/environmental activities from the IATI Datastore API into public.iati_activities.
+// IATI sync: copies humanitarian/environmental activities from the IATI Datastore API into public.projects
+// (source = 'iati', owned by the IATI system organisation).
 // Plan: docs/architecture/iati-integration.md. Runs in GitHub Actions (.github/workflows/iati-sync.yml).
 //
 //   pnpm sync:iati --mode count                 how many activities are in scope (+ 2 samples). No DB needed.
@@ -11,7 +12,11 @@
 // Optional: IATI_MAX_ACTIVITIES (default 25000, Supabase Free plan), IATI_ROWS (default 1000 per call),
 //           IATI_MAX_CALLS (default 40 per run; the free "Exploratory" key allows 5 calls/min and 100/week).
 
+import { createHash } from "node:crypto";
+
 import postgres from "postgres";
+
+import { countryName } from "../../src/lib/geo/countries";
 
 import { IATI_FIELDS, sectorShare, transformActivity, type IatiActivityRow, type IatiDoc } from "./transform";
 
@@ -218,28 +223,99 @@ function db(): Sql {
   return postgres(url, { max: 2, prepare: false, ssl: local ? false : "require", onnotice: () => {} });
 }
 
-const JSON_COLUMNS = ["participating_orgs", "locations", "policy_markers", "links"] as const;
+/** The verified system organisation that owns every imported project (migration 20260324120013). */
+const IATI_ORG_ID = "a7a71000-0000-4000-8000-000000000001";
+
+/** Stable project slug: "iati-<identifier>-<6 hex of md5>" (same formula as the migration that copied the first rows). */
+export function iatiSlug(identifier: string) {
+  const base = identifier
+    .replace(/[^A-Za-z0-9]+/g, "-")
+    .toLowerCase()
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+  return `iati-${base}-${createHash("md5").update(identifier).digest("hex").slice(0, 6)}`;
+}
+
+/** Columns the sync refreshes on every update (status, owner and slug are set once on insert). */
+const UPDATE_COLUMNS = [
+  "name",
+  "description",
+  "category",
+  "lifecycle_status",
+  "start_date",
+  "end_date",
+  "lat",
+  "lng",
+  "place_name",
+  "country",
+  "sdgs",
+  "currency",
+  "point_precision",
+  "source_data",
+  "source_updated_at",
+  "visibility",
+] as const;
+
+function toProjectRecord(sql: Sql, row: IatiActivityRow) {
+  const country = row.countries[0] ? countryName(row.countries[0]) : null;
+  return {
+    name: row.title,
+    slug: iatiSlug(row.iati_identifier),
+    description: row.description,
+    category: row.humanitarian ? "humanitarian" : "environmental",
+    lifecycle_status: row.lifecycle_status,
+    start_date: row.start_date,
+    end_date: row.end_date,
+    lat: row.lat,
+    lng: row.lng,
+    place_name: row.locations[0]?.name ?? country,
+    country,
+    sdgs: row.sdgs,
+    currency: row.currency,
+    point_precision: row.point_precision,
+    source_data: sql.json({
+      reporting_org: { ref: row.reporting_org_ref, name: row.reporting_org_name, type: row.reporting_org_type },
+      participating_orgs: row.participating_orgs,
+      activity_status: row.activity_status,
+      countries: row.countries,
+      regions: row.regions,
+      scope: row.scope,
+      locations: row.locations,
+      dac_sectors: row.dac_sectors,
+      policy_markers: row.policy_markers,
+      humanitarian: row.humanitarian,
+      budget_total: row.budget_total,
+      links: row.links,
+    } as postgres.JSONValue),
+    source_updated_at: row.last_updated_at,
+    visibility: "public",
+    // insert only
+    status: "approved",
+    review_status: "approved",
+    approved_at: new Date().toISOString(),
+    owner_type: "organisation",
+    owner_id: IATI_ORG_ID,
+    lead_org_id: IATI_ORG_ID,
+    source: "iati",
+    iati_identifier: row.iati_identifier,
+  };
+}
 
 async function existingIds(sql: Sql, ids: string[]): Promise<Set<string>> {
   if (!ids.length) return new Set();
   const rows = await sql<{ iati_identifier: string }[]>`
-    select iati_identifier from public.iati_activities where iati_identifier = any(${ids})`;
+    select iati_identifier from public.projects where iati_identifier = any(${ids})`;
   return new Set(rows.map((row) => row.iati_identifier));
 }
 
-async function upsertActivities(sql: Sql, rows: IatiActivityRow[], now: string) {
-  const records = rows.map((row) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- postgres.js helper typing
-    const record: Record<string, any> = { ...row, synced_at: now, withdrawn_at: null };
-    for (const column of JSON_COLUMNS) record[column] = sql.json(row[column] as postgres.JSONValue);
-    return record;
-  });
+async function upsertProjects(sql: Sql, rows: IatiActivityRow[]) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- postgres.js helper typing
+  const records: Record<string, any>[] = rows.map((row) => toProjectRecord(sql, row));
   const columns = Object.keys(records[0]);
-  const updates = columns.filter((column) => column !== "iati_identifier");
   await sql`
-    insert into public.iati_activities ${sql(records, columns)}
+    insert into public.projects ${sql(records, columns)}
     on conflict (iati_identifier) do update set
-    ${sql.unsafe(updates.map((column) => `"${column}" = excluded."${column}"`).join(", "))}`;
+    ${sql.unsafe(UPDATE_COLUMNS.map((column) => `"${column}" = excluded."${column}"`).join(", "))}`;
 }
 
 async function runIncremental(sql: Sql, runId: number) {
@@ -247,10 +323,10 @@ async function runIncremental(sql: Sql, runId: number) {
     select high_water_mark from public.iati_sync_runs
     where mode in ('incremental', 'full') and ok and high_water_mark is not null
     order by high_water_mark desc limit 1`;
-  // Only visible activities count towards the cap, so withdrawn ones free their place for new ones.
+  // Only listed (public) imported projects count towards the cap, so withdrawn ones free their place.
   const [{ stored, oldest }] = await sql<{ stored: number; oldest: Date | null }[]>`
-    select count(*) filter (where withdrawn_at is null)::int as stored, min(last_updated_at) as oldest
-    from public.iati_activities`;
+    select count(*) filter (where visibility = 'public')::int as stored, min(source_updated_at) as oldest
+    from public.projects where source = 'iati'`;
 
   // Solr wants UTC with "Z"
   const mark = last ? new Date(last.high_water_mark).toISOString() : null;
@@ -313,10 +389,9 @@ async function runIncremental(sql: Sql, runId: number) {
         return true;
       });
 
-      const now = new Date().toISOString();
       for (let i = 0; i < keep.length; i += UPSERT_CHUNK) {
         const chunk = keep.slice(i, i + UPSERT_CHUNK);
-        await upsertActivities(sql, chunk, now);
+        await upsertProjects(sql, chunk);
         totals.upserted += chunk.length;
       }
       console.log(`  fetched ${totals.fetched}, upserted ${totals.upserted}, skipped ${totals.skipped}, over cap ${totals.capped}`);
@@ -334,7 +409,7 @@ async function runIncremental(sql: Sql, runId: number) {
   if (backfill && finished) {
     // The backfill may have taken several runs: incremental updates start from the newest activity stored.
     const [{ newest }] = await sql<{ newest: Date | null }[]>`
-      select max(last_updated_at) as newest from public.iati_activities`;
+      select max(source_updated_at) as newest from public.projects where source = 'iati'`;
     highWater = newest ? new Date(newest).toISOString() : highWater;
   }
 
@@ -352,11 +427,12 @@ async function runFull(sql: Sql) {
   console.log(`In scope now: ${inScope.size}`);
 
   const stored = await sql<{ iati_identifier: string }[]>`
-    select iati_identifier from public.iati_activities where withdrawn_at is null`;
+    select iati_identifier from public.projects where source = 'iati' and visibility = 'public'`;
   const stale = stored.map((row) => row.iati_identifier).filter((id) => !inScope.has(id));
   for (let i = 0; i < stale.length; i += 1000) {
-    await sql`update public.iati_activities set withdrawn_at = now()
-              where iati_identifier = any(${stale.slice(i, i + 1000)})`;
+    // Unlisted: off the map and lists, but the page (and its followers, updates) still opens by link.
+    await sql`update public.projects set visibility = 'unlisted'
+              where source = 'iati' and iati_identifier = any(${stale.slice(i, i + 1000)})`;
   }
   console.log(`Withdrawn (left the scope or IATI): ${stale.length}`);
   return { withdrawn: stale.length, in_scope: inScope.size };
@@ -364,13 +440,14 @@ async function runFull(sql: Sql) {
 
 /** Supabase Free allows 500 MB in total; print how much we use so the cap can be tuned. */
 async function logDatabaseSize(sql: Sql) {
-  const [size] = await sql<{ database: string; iati: string; rows: number; visible: number }[]>`
+  const [size] = await sql<{ database: string; projects: string; rows: number; visible: number }[]>`
     select pg_size_pretty(pg_database_size(current_database())) as database,
-           pg_size_pretty(pg_total_relation_size('public.iati_activities')) as iati,
-           (select count(*)::int from public.iati_activities) as rows,
-           (select count(*)::int from public.iati_activities where withdrawn_at is null) as visible`;
+           pg_size_pretty(pg_total_relation_size('public.projects')) as projects,
+           (select count(*)::int from public.projects where source = 'iati') as rows,
+           (select count(*)::int from public.projects where source = 'iati' and visibility = 'public') as visible`;
   console.log(
-    `Database: ${size.database} in total; IATI table ${size.iati} (${size.rows} rows, ${size.visible} visible, cap ${MAX_ACTIVITIES}).`,
+    `Database: ${size.database} in total; projects table ${size.projects} ` +
+      `(${size.rows} imported from IATI, ${size.visible} listed, cap ${MAX_ACTIVITIES}).`,
   );
 }
 
