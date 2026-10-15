@@ -2762,6 +2762,7 @@ export type Database = {
           description: string | null
           donations_received: number | null
           end_date: string | null
+          iati_identifier: string | null
           id: string
           ifrc_global_challenges: string[] | null
           intervention_type: string | null
@@ -2776,6 +2777,7 @@ export type Database = {
           owner_type: string
           partner_org_ids: string[] | null
           place_name: string | null
+          point_precision: string | null
           region: string | null
           rejected_at: string | null
           rejected_by: string | null
@@ -2783,6 +2785,9 @@ export type Database = {
           review_status: string
           sdgs: string[] | null
           slug: string | null
+          source: string
+          source_data: Json | null
+          source_updated_at: string | null
           start_date: string | null
           status: string
           target_demographic: string | null
@@ -2803,6 +2808,7 @@ export type Database = {
           description?: string | null
           donations_received?: number | null
           end_date?: string | null
+          iati_identifier?: string | null
           id?: string
           ifrc_global_challenges?: string[] | null
           intervention_type?: string | null
@@ -2817,6 +2823,7 @@ export type Database = {
           owner_type: string
           partner_org_ids?: string[] | null
           place_name?: string | null
+          point_precision?: string | null
           region?: string | null
           rejected_at?: string | null
           rejected_by?: string | null
@@ -2824,6 +2831,9 @@ export type Database = {
           review_status?: string
           sdgs?: string[] | null
           slug?: string | null
+          source?: string
+          source_data?: Json | null
+          source_updated_at?: string | null
           start_date?: string | null
           status?: string
           target_demographic?: string | null
@@ -2844,6 +2854,7 @@ export type Database = {
           description?: string | null
           donations_received?: number | null
           end_date?: string | null
+          iati_identifier?: string | null
           id?: string
           ifrc_global_challenges?: string[] | null
           intervention_type?: string | null
@@ -2858,6 +2869,7 @@ export type Database = {
           owner_type?: string
           partner_org_ids?: string[] | null
           place_name?: string | null
+          point_precision?: string | null
           region?: string | null
           rejected_at?: string | null
           rejected_by?: string | null
@@ -2865,6 +2877,9 @@ export type Database = {
           review_status?: string
           sdgs?: string[] | null
           slug?: string | null
+          source?: string
+          source_data?: Json | null
+          source_updated_at?: string | null
           start_date?: string | null
           status?: string
           target_demographic?: string | null
