@@ -49,9 +49,9 @@ Header: Ocp-Apim-Subscription-Key: <key>      (verify the header name when we ha
 
 **Call limits.** The free **Exploratory** key allows **5 calls per minute and 100 calls per week**. The free
 **Full Access** subscription has no limit, but the IATI Secretariat has to approve it (request it on the developer
-portal). The sync is built for the free limits: up to 1,000 activities per call, at least 13 s between calls, and at
-most 40 calls per run (`IATI_MAX_CALLS`). A 25,000-activity backfill takes about 25 calls, and a nightly update
-takes 1–3 calls.
+portal). The sync is built for the free limits: up to 1,000 activities per call (the API's maximum, also when more
+are asked for), at least 13 s between calls, and at most 10 calls per nightly run (`IATI_MAX_CALLS`, 70 a week).
+A nightly update takes 1–3 calls; the rest of the run tops up with older activities while there is room.
 
 Field names below were checked against the Datastore's Solr schema
 (`IATI/datastore-solr-configs/configsets/activity/conf/managed-schema`). "Many" means a list.
@@ -111,11 +111,21 @@ AND ( humanitarian:true
   - and drops participating organisations that have neither a name nor an ID.
 - Solr can't pair a policy marker with its significance, so the sync re-checks after the transform. A Rio marker
   only counts when its significance is at least 1.
-- **Cap:** `IATI_MAX_ACTIVITIES` (default 25,000, for Supabase Free). The backfill takes the most recently updated
-  activities first. Activities we already store are always updated; new ones beyond the cap are skipped.
-- Ended activities (status 3–6) that we already hold are updated, not deleted, so their pages keep working.
-- Activities that leave the scope or disappear from IATI get `withdrawn_at` set and drop off the map. We don't
+- **Cap:** as many as the plan allows. `IATI_MAX_ACTIVITIES` (default 100,000 listed projects) and `IATI_MAX_DB_MB`
+  (default 400: no new imports once the whole database is that big; Supabase Free allows 500 MB). Measured
+  2026-10: about 4 KB per imported project including indexes, so the whole scope (~60,000) fits. The backfill takes
+  the most recently updated activities first; each nightly run then tops up with older ones below the oldest
+  stored, until the scope (2 years) is covered or the limits are reached.
+- Activities we already store are always updated. When they no longer fit the scope (ended, completed, theme too
+  weak) they become `visibility = 'unlisted'`: off the map and lists, but their pages keep working. We don't
   delete them; deleting data needs the owner's OK (AGENT_RULES).
+- Every run also unlists by date alone (no API calls): not updated for 2 years, or ended more than 90 days ago.
+- **Full mode** (monthly, 1st at 04:47 UTC) lists every identifier in scope (one facet call, or one call per 1,000
+  if the API refuses the facet), unlists stored projects that left the scope or IATI, and lists again stored ones
+  that are back. Safeguards: an incomplete identifier list withdraws nothing, and it never withdraws more than 20 %
+  of the listed projects at once (`IATI_MAX_WITHDRAW_SHARE`). Lesson from 2026-10-18: the API returned 1,000 of the
+  5,000 rows asked for, the old scan stopped there and unlisted 24,517 projects; they were listed again by the
+  next full run.
 
 **Size.** About 3 KB per activity without the raw JSON. 100,000 activities ≈ 300 MB plus indexes. That is too
 much for Supabase Free (500 MB in total) and fine for Pro (8 GB). See question 3 in §8.
@@ -230,7 +240,7 @@ linked to a native project are left out, so nothing shows twice. Find Projects a
 | 2 | Sync script + dry run + workflow (manual trigger only); count and tune the scope; first backfill | Medium | 1 |
 | 3 | Clustered globe layer (`/api/iati/points`), Source filter, IATI list + activity page `/projects/iati/[id]`, About "Data sources". No view needed: the page reads both tables | Medium | 2 |
 | 4 | Shared taxonomies (`taxonomy_terms`, DAC → Sector crosswalk) for both sources | High | can run in parallel with 2–3 |
-| 5 | Nightly schedule on (03:17 UTC incremental), weekly full check (Sundays 04:47 UTC); admin "hide" button still to do | Medium | 3 |
+| 5 | Nightly schedule on (03:17 UTC incremental), monthly full check (1st, 04:47 UTC); admin "hide" button still to do | Medium | 3 |
 | 6 | Claim flow: verified organisation adds its IATI publisher ID, admin confirms, activities show on the organisation; "adopt" an activity into a native project (`projects.iati_identifier`) | High | 3, 4 |
 
 Later, beyond this plan:

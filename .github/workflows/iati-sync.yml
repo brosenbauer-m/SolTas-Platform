@@ -1,19 +1,21 @@
 name: iati-sync
 
-# Copies humanitarian/environmental activities from the IATI Datastore into public.iati_activities.
-# Plan: docs/architecture/iati-integration.md. Runs nightly (changes since the last run) and weekly (withdraw
-# activities that left the scope); can also be started by hand (Actions → iati-sync → Run workflow).
+# Copies humanitarian/environmental activities from the IATI Datastore into public.projects (source = 'iati').
+# Plan: docs/architecture/iati-integration.md. Runs nightly (changes since the last run, then a top-up with older
+# activities while there is room) and monthly (withdraw activities that left the scope); can also be started by
+# hand (Actions → iati-sync → Run workflow).
 #
 # Secrets: IATI_API_KEY (all modes); SUPABASE_DB_URL (incremental, full; same secret as supabase-db-auto).
-# The free IATI key allows 5 calls/minute and 100 calls/week: count = 3 calls, dry-run = 1 call.
+# The free IATI key allows 5 calls/minute and 100 calls/week: nightly runs use at most 10 (70 a week),
+# full = 1 call if the API returns the identifier list at once (else one per 1000), count = 4, dry-run = 1.
 on:
   schedule:
     - cron: "17 3 * * *" # nightly 03:17 UTC: incremental
-    - cron: "47 4 * * 0" # Sundays 04:47 UTC: full (withdraw stale)
+    - cron: "47 4 1 * *" # 1st of the month 04:47 UTC: full (withdraw stale)
   workflow_dispatch:
     inputs:
       mode:
-        description: "count = how many match · dry-run = preview, no writes · incremental = import/update · full = withdraw stale"
+        description: "count = how many match · dry-run = preview, no writes · incremental = import/update/top-up · full = withdraw stale, list again what is back"
         type: choice
         options: [count, dry-run, incremental, full]
         default: count
@@ -44,6 +46,6 @@ jobs:
         env:
           IATI_API_KEY: ${{ secrets.IATI_API_KEY }}
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-          MODE: ${{ inputs.mode || (github.event.schedule == '47 4 * * 0' && 'full' || 'incremental') }}
+          MODE: ${{ inputs.mode || (github.event.schedule == '47 4 1 * *' && 'full' || 'incremental') }}
           LIMIT: ${{ inputs.limit || '200' }}
         run: pnpm sync:iati --mode "$MODE" --limit "$LIMIT"
