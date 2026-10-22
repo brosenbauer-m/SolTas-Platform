@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 
 import GlobeSplitView from "@/components/find/GlobeSplitView";
 import GrantsFilters from "@/components/grants/GrantsFilters";
@@ -12,6 +12,8 @@ type Props = {
   markers: GrantMarker[];
   totalCount: number;
   focusSlug: string | null;
+  /** The matching results (table), shown under the filters */
+  results?: ReactNode;
 };
 
 const resolveMarkerColor = (projectType: string | null) => {
@@ -20,7 +22,7 @@ const resolveMarkerColor = (projectType: string | null) => {
   return MARKER_COLORS.default;
 };
 
-export default function GrantsGlobeSplitView({ options, markers, totalCount, focusSlug }: Props) {
+export default function GrantsGlobeSplitView({ options, markers, totalCount, focusSlug, results }: Props) {
   const mapMarkers = useMemo(
     () =>
       markers.map((marker) => ({
@@ -39,6 +41,7 @@ export default function GrantsGlobeSplitView({ options, markers, totalCount, foc
 
   return (
     <GlobeSplitView
+      results={results}
       storageKey="find:funding:split"
       filters={<GrantsFilters options={options} showSorting={false} />}
       markers={mapMarkers}

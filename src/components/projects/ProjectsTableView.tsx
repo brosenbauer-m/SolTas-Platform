@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import IatiTag from "@/components/iati/IatiTag";
 import ProjectsPagination from "@/components/projects/ProjectsPagination";
 import { Badge } from "@/components/ui/badge";
 import type { ProjectListRow } from "@/lib/projects/findProjectsQuery";
@@ -122,13 +123,7 @@ export default function ProjectsTableView({
                     >
                       {project.name}
                     </Link>
-                    {project.source === "iati" ? (
-                      <div className="mt-1">
-                        <Badge variant="outline" className="text-xs">
-                          Published to IATI
-                        </Badge>
-                      </div>
-                    ) : null}
+                    {project.source === "iati" ? <IatiTag className="ml-2" /> : null}
                   </td>
                   <td className="px-4 py-4 capitalize text-soltas-text">{project.category}</td>
                   <td className="px-4 py-4 text-soltas-muted">{getLocationLabel(project)}</td>

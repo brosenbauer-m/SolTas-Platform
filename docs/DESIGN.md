@@ -35,9 +35,12 @@ Goal: **elegant, simple, intuitive, modern and friendly**, in the spirit of Appl
 | `border-soltas-line` | `rgba(26,43,56,0.08)` | hairline borders |
 
 Map markers (`src/lib/markerColors.ts`): **humanitarian = warm orange `#E07A3F`**, **environmental = green
-`#2F9E6B`**, other = ocean; white 2px ring for contrast on any map style. **Projects (community and
-imported from IATI) = violet `#7C3AED`**, one clustered layer: numbered circles when zoomed out, single dots (7 px,
-10 px on hover) when zoomed in; hollow when only the country is known. Issue urgency uses a green→red scale.
+`#2F9E6B`**, other = ocean. Every marker is a **frosted-glass circle** (`.soltas-map-glass` in globals.css:
+translucent white, backdrop blur, soft shadow) with a coloured core for its type. **Projects (community and imported
+from IATI)**: one clustered layer of glass circles with the number of projects (sizes grow gently with the count,
+numbers always add up), single projects as small glass dots with an ocean core; dashed ring when only the country is
+known; circles grow on hover. Popups (`soltas-popup`): rounded 24 px card, no tip, pill button. Issue urgency uses a
+green→red scale.
 Badges: humanitarian `ocean`, environmental `green`. Always pair colour with a text label (never colour alone).
 
 Radius: inputs/buttons `rounded-full` (pills) or `rounded-xl` for fields; cards `rounded-2xl`; dialogs

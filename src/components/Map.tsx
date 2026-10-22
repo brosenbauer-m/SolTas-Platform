@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import mapboxgl from "mapbox-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
 
+import { glassMarker } from "@/components/map/glassMarker"
 import { addProjectLayer } from "@/components/map/projectLayer"
 
 // Token guard
@@ -58,11 +59,6 @@ type MarkerObject = {
   slug: string
   lng: number
   lat: number
-}
-
-const getMarkerScale = (zoom: number) => {
-  const scale = zoom / 8
-  return Math.min(Math.max(scale, 0.65), 1.75)
 }
 
 export default function Map({
@@ -243,10 +239,8 @@ export default function Map({
     markerObjs.current = []
     hasDomMarkersRef.current = validMarkers.length > 0
 
-    const scale = getMarkerScale(map.getZoom())
-
     validMarkers.forEach((m) => {
-      const popup = new mapboxgl.Popup({ offset: 12, maxWidth: "320px" })
+      const popup = new mapboxgl.Popup({ offset: 18, maxWidth: "380px", className: "soltas-popup", focusAfterOpen: false })
 
       const popupNode = document.createElement("div")
       popupNode.className = "space-y-2 text-sm text-soltas-text"
@@ -272,8 +266,7 @@ export default function Map({
 
       const cta = document.createElement("button")
       cta.type = "button"
-      cta.className =
-        "mt-2 inline-flex w-full items-center justify-center rounded-md bg-soltas-ocean px-3 py-2 text-xs font-medium text-white hover:bg-soltas-abyssal"
+      cta.className = "soltas-popup-cta"
       cta.textContent = ctaLabel
       cta.addEventListener("click", () => {
         const href = m.ctaHref ?? `/projects/${m.slug}`
@@ -283,16 +276,7 @@ export default function Map({
 
       popup.setDOMContent(popupNode)
 
-      const el = document.createElement("div")
-      Object.assign(el.style, {
-        width: "20px",
-        height: "20px",
-        borderRadius: "9999px",
-        backgroundColor: m.markerColor ?? markerColor,
-        border: "2px solid #ffffff",
-        boxShadow: "0 2px 8px rgba(15, 23, 42, 0.35)",
-        transform: `translate(-50%, -50%) scale(${scale})`,
-      })
+      const el = glassMarker(m.markerColor ?? markerColor, m.title)
 
       const marker = new mapboxgl.Marker({ element: el })
         .setLngLat([m.lng, m.lat])

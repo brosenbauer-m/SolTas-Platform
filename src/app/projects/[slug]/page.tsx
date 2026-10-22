@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import type { Database } from "@/lib/database.types";
 import FollowButton from "@/components/FollowButton";
+import IatiTag from "@/components/iati/IatiTag";
 import { Badge } from "@/components/ui/badge";
 import { buttonClasses } from "@/components/ui/button";
 import ImportedProjectDetails, { publisherName, readSourceData } from "@/components/projects/ImportedProjectDetails";
@@ -224,7 +225,7 @@ export default async function ProjectDetailPage({
             <Badge variant={project.category === "humanitarian" ? "ocean" : "green"} className="capitalize">
               {project.category}
             </Badge>
-            {imported ? <Badge variant="outline">Published to IATI</Badge> : null}
+            {imported ? <IatiTag /> : null}
             {project.status !== "approved" && user ? (
               <Badge variant={project.status === "rejected" ? "rose" : "amber"} className="capitalize">
                 {project.status === "pending" ? "Waiting for review" : project.status}
@@ -237,14 +238,7 @@ export default async function ProjectDetailPage({
             <p className="mt-2 text-[15px] text-soltas-muted">
               {imported ? (
                 <>
-                  by <span className="font-medium text-soltas-text">{publisher ?? "the publisher"}</span> via{" "}
-                  {leadOrganisation ? (
-                    <Link className="font-medium text-soltas-ocean hover:underline" href={`/organisations/${leadOrganisation.id}`}>
-                      IATI
-                    </Link>
-                  ) : (
-                    "IATI"
-                  )}
+                  by <span className="font-medium text-soltas-text">{publisher ?? "the publisher"}</span>
                 </>
               ) : leadOrganisation?.name ? (
                 <>

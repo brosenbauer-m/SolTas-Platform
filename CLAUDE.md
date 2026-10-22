@@ -8,10 +8,11 @@
   `[slug]` profile, `[slug]/edit`, `new`), `find-organisations` + `organisations/[id]` (profile, `edit`,
   `members`, `create`), `funding`, `issues` (formerly Watchdog: `new`, `[id]`; code and tables still say watchdog), `feed`, `people/[id]`, `notifications`,
   `settings`, `me/organisations`, `admin/*` (moderation), `login` / `signup` / `forgot-password` / `reset-password` / `auth/callback` (email links) / `onboarding`
-- `src/app/api/` route handlers (projects incl. `projects/points` + `projects/summary` for the maps, updates, feed-posts, comments, follow, grants, watchdog,
+- `src/app/api/` route handlers (projects incl. `projects/points` + `projects/at` + `projects/summary` for the maps, updates, feed-posts, comments, follow, grants, watchdog,
   home-stats, home-markers, admin/*)
 - `src/components/` UI: `ui/` (shared primitives), `Header.tsx` + `UserMenu.tsx` (nav), `home/`, `map/` (clustered
-  project layer + popups, used by Find Projects and the home globe), `projects/`,
+  glass-circle project layer + popups, used by Find Projects and the home globe), `find/` (split view: filters +
+  results table + globe), `iati/` (`IatiTag` with its (i)), `projects/`,
   `organisations/`, `grants/`, `watchdog/`, `feed/`, `social/` (likes, comments), `updates/`
 - `src/lib/` data access: `supabaseServer.ts` (server client), `supabaseClient.ts` (browser client),
   `projects/`, `organisations/`, `grants/`, `watchdog/` query helpers, `email/`

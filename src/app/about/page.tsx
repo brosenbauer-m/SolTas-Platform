@@ -284,7 +284,7 @@ export default function AboutPage() {
             <a href="https://iatistandard.org" target="_blank" rel="noopener noreferrer" className="text-soltas-ocean hover:underline">
               International Aid Transparency Initiative (IATI)
             </a>
-            . We copy them regularly from the IATI Datastore, mark them &ldquo;Published to IATI&rdquo;, name the
+            . We copy them regularly from the IATI Datastore, tag them &ldquo;IATI&rdquo;, name the
             publisher on every page and don&apos;t edit them. Each publisher shares its data under its own open
             licence. Activities that only name a country are shown at the country&apos;s centre.
           </p>

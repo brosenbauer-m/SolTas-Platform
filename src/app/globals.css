@@ -99,6 +99,123 @@ body {
   border-bottom: 1px solid var(--soltas-line);
 }
 
+/* Map: frosted-glass project circles (src/components/map/projectLayer.ts) */
+.soltas-map-glass {
+  --glass-size: 34px;
+  display: grid;
+  place-items: center;
+  width: var(--glass-size);
+  height: var(--glass-size);
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: radial-gradient(
+    circle at 32% 26%,
+    rgba(255, 255, 255, 0.8),
+    rgba(255, 255, 255, 0.38) 55%,
+    rgba(237, 241, 244, 0.3)
+  );
+  backdrop-filter: blur(10px) saturate(170%);
+  -webkit-backdrop-filter: blur(10px) saturate(170%);
+  box-shadow:
+    0 6px 18px rgba(26, 43, 56, 0.22),
+    0 0 0 1px rgba(26, 43, 56, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.95),
+    inset 0 -8px 14px rgba(46, 107, 138, 0.12);
+  color: var(--soltas-abyssal);
+  font-size: clamp(11px, calc(var(--glass-size) * 0.3), 16px);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition:
+    transform 160ms,
+    box-shadow 160ms,
+    background 160ms;
+}
+.soltas-map-glass:hover,
+.soltas-map-glass:focus-visible {
+  transform: scale(1.12);
+  background: radial-gradient(
+    circle at 32% 26%,
+    rgba(255, 255, 255, 0.92),
+    rgba(255, 255, 255, 0.55) 55%,
+    rgba(237, 241, 244, 0.45)
+  );
+  box-shadow:
+    0 10px 26px rgba(26, 43, 56, 0.28),
+    0 0 0 1px rgba(26, 43, 56, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 1),
+    inset 0 -8px 14px rgba(46, 107, 138, 0.16);
+}
+/* only the country is known */
+.soltas-map-glass--approx {
+  border: 1.5px dashed rgba(46, 107, 138, 0.6);
+}
+.soltas-map-glass--point {
+  backdrop-filter: blur(4px) saturate(160%);
+  -webkit-backdrop-filter: blur(4px) saturate(160%);
+}
+.soltas-map-glass__core {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  border: 2px solid;
+}
+
+/* Map popups: a rounded floating card (all maps) */
+.soltas-popup .mapboxgl-popup-content {
+  min-width: min(280px, 100%);
+  padding: 18px 20px 20px;
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow:
+    0 20px 50px rgba(26, 43, 56, 0.2),
+    0 0 0 1px var(--soltas-line);
+  font-family: var(--font-sans);
+}
+.soltas-popup .mapboxgl-popup-tip {
+  display: none;
+}
+.soltas-popup .mapboxgl-popup-content > div > :first-child {
+  padding-right: 28px;
+}
+.soltas-popup .mapboxgl-popup-close-button {
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  color: var(--soltas-muted);
+  font-size: 20px;
+  line-height: 1;
+}
+.soltas-popup .mapboxgl-popup-close-button:hover {
+  background: var(--soltas-off-white);
+  color: var(--soltas-text);
+}
+.soltas-popup-cta {
+  @apply mt-3 flex w-full items-center justify-center rounded-full bg-soltas-ocean px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-soltas-abyssal;
+}
+.soltas-popup-list {
+  @apply -mx-3 max-h-72 space-y-0.5 overflow-y-auto;
+}
+
+/* "IATI" tag and the (i) that explains it */
+.soltas-tag-iati {
+  @apply inline-flex items-center rounded-full bg-soltas-ocean/10 px-2 py-0.5 text-[11px] font-semibold tracking-wide text-soltas-ocean;
+}
+.soltas-info-button {
+  @apply relative inline-grid h-[18px] w-[18px] place-items-center rounded-full border border-soltas-ocean/40 font-serif text-[11px] font-semibold italic text-soltas-ocean transition-colors hover:bg-soltas-ocean hover:text-white;
+}
+/* 44px touch target around the small (i) */
+.soltas-info-button::after {
+  content: "";
+  position: absolute;
+  inset: -13px;
+}
+
 /* Cards: white surface, hairline border, lift on hover only when interactive */
 .card {
   @apply rounded-2xl border border-soltas-line bg-white transition-all duration-200;
