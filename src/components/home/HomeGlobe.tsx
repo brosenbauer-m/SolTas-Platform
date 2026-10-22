@@ -5,6 +5,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useSearchParams } from "next/navigation";
 
+import { glassMarker } from "@/components/map/glassMarker";
 import { addProjectLayer, type ProjectLayerHandle } from "@/components/map/projectLayer";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
@@ -386,7 +387,13 @@ export default function HomeGlobe({
     mapMarkers.forEach((marker) => {
       if (!Number.isFinite(marker.lng) || !Number.isFinite(marker.lat)) return;
 
-      const popup = new mapboxgl.Popup({ offset: 12, maxWidth: "320px", closeButton: false });
+      const popup = new mapboxgl.Popup({
+        offset: 18,
+        maxWidth: "380px",
+        closeButton: false,
+        className: "soltas-popup",
+        focusAfterOpen: false,
+      });
 
       const popupNode = document.createElement("div");
       popupNode.className =
@@ -427,8 +434,7 @@ export default function HomeGlobe({
 
       const cta = document.createElement("a");
       cta.href = marker.ctaHref;
-      cta.className =
-        "mt-2 inline-flex w-full items-center justify-center rounded-md bg-soltas-ocean px-3 py-2 text-xs font-medium text-white hover:bg-soltas-abyssal";
+      cta.className = "soltas-popup-cta";
       cta.textContent = marker.ctaLabel;
       popupNode.appendChild(cta);
 
@@ -442,16 +448,7 @@ export default function HomeGlobe({
         return;
       }
 
-      const el = document.createElement("div");
-      Object.assign(el.style, {
-        width: "14px",
-        height: "14px",
-        borderRadius: "9999px",
-        backgroundColor: marker.markerColor ?? "#2E6B8A",
-        border: "2px solid #ffffff",
-        boxShadow: "0 2px 8px rgba(15, 23, 42, 0.35)",
-        transform: "translate(-50%, -50%)",
-      });
+      const el = glassMarker(marker.markerColor ?? "#2E6B8A", marker.title);
 
       const mapMarker = new mapboxgl.Marker({ element: el })
         .setLngLat([marker.lng, marker.lat])

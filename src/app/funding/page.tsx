@@ -115,7 +115,13 @@ export default async function FindFundingPage({
 
       {safeView === "globe" ? (
         <div className="flex-1 min-h-0">
-          <GrantsGlobeSplitView options={filterOptions} markers={markers} totalCount={count} focusSlug={focus} />
+          <GrantsGlobeSplitView
+            options={filterOptions}
+            markers={markers}
+            totalCount={count}
+            focusSlug={focus}
+            results={<GrantsTableView rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />}
+          />
         </div>
       ) : (
         <>

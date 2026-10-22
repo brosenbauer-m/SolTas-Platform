@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 
 import GlobeSplitView from "@/components/find/GlobeSplitView";
 import WatchdogFilters from "@/components/watchdog/WatchdogFilters";
@@ -12,6 +12,8 @@ type Props = {
   totalCount: number;
   focusId: string | null;
   options: WatchdogFilterOptions;
+  /** The matching results (table), shown under the filters */
+  results?: ReactNode;
 };
 
 const URGENCY_COLORS = [
@@ -32,7 +34,7 @@ const formatPlaceName = (marker: WatchdogIssueMarker) => {
   return parts.length ? parts.join(", ") : null;
 };
 
-export default function WatchdogGlobeSplitView({ markers, totalCount, focusId, options }: Props) {
+export default function WatchdogGlobeSplitView({ markers, totalCount, focusId, options, results }: Props) {
   const mapMarkers = useMemo(
     () =>
       markers.map((marker) => ({
@@ -51,6 +53,7 @@ export default function WatchdogGlobeSplitView({ markers, totalCount, focusId, o
 
   return (
     <GlobeSplitView
+      results={results}
       storageKey="find:issues:split"
       filters={<WatchdogFilters options={options} showSorting={false} />}
       markers={mapMarkers}

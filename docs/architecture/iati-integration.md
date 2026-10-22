@@ -9,7 +9,7 @@ Phase 1 (tables) is migration `20260324120012_iati_activities.sql`.
 "IATI" (`a7a71000-0000-4000-8000-000000000001`) and get every project feature. The sync writes to `projects`.
 Withdrawn activities become `visibility = 'unlisted'`. The first copy in `iati_activities` was dropped
 in `20260324120014_drop_iati_activities.sql` (the sections below describe it as it was planned). Maps: one clustered layer for all projects (`src/components/map/projectLayer.ts`, data from `/api/projects/points`),
-violet, numbered clusters that split when zoomed in, dots grow on hover. The project page shows a "Published details"
+frosted-glass circles with counts that add up (projects at the same spot are one circle listing them), split when zoomed in. The project page shows a "Published details"
 card for imported projects (`ImportedProjectDetails`). Old `/projects/iati/<identifier>` links redirect.
 The sections below describe the original separate-table design.
 

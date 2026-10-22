@@ -73,6 +73,9 @@ export default async function FindProjectsPage({
             options={filterOptions}
             totalCount={count}
             pointsQuery={toQueryString(params, ["view", "focus", "page", "sort", "dir"])}
+            results={
+              <ProjectsTableView rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />
+            }
           />
         </div>
       ) : (

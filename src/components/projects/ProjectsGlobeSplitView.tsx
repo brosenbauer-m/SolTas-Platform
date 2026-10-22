@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 
 import GlobeSplitView from "@/components/find/GlobeSplitView";
 import type { MapProjectLayer } from "@/components/Map";
@@ -14,10 +14,12 @@ type Props = {
   totalCount: number;
   /** Query string with the page's filters, for /api/projects/points */
   pointsQuery: string;
+  /** The matching results (table), shown under the filters */
+  results?: ReactNode;
 };
 
 /** Find Projects: filters on the left, every matching project (community and imported) on the globe. */
-export default function ProjectsGlobeSplitView({ options, totalCount, pointsQuery }: Props) {
+export default function ProjectsGlobeSplitView({ options, totalCount, pointsQuery, results }: Props) {
   const projects = useMemo<MapProjectLayer>(
     () => ({
       url: `/api/projects/points${pointsQuery ? `?${pointsQuery}` : ""}`,
@@ -29,10 +31,16 @@ export default function ProjectsGlobeSplitView({ options, totalCount, pointsQuer
   );
 
   const legend = (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-full bg-white/95 px-3 py-1.5 text-xs text-soltas-text shadow-sm ring-1 ring-black/5">
+    <div className="glass-card flex flex-wrap items-center gap-x-3 gap-y-1 !rounded-full px-3 py-1.5 text-xs text-soltas-text">
       <span className="inline-flex items-center gap-1.5">
         <Dot color={MARKER_COLORS.project} />
         Project
+      </span>
+      <span className="inline-flex items-center gap-1.5">
+        <span aria-hidden className="soltas-map-glass !h-5 !w-5 !text-[10px]">
+          3
+        </span>
+        Projects at one place
       </span>
       <span className="inline-flex items-center gap-1.5">
         <Dot color={MARKER_COLORS.project} hollow />
@@ -43,6 +51,7 @@ export default function ProjectsGlobeSplitView({ options, totalCount, pointsQuer
 
   return (
     <GlobeSplitView
+      results={results}
       storageKey="find:projects:split"
       filters={<ProjectsFilters options={options} showSorting={false} />}
       markers={[]}
@@ -58,8 +67,12 @@ function Dot({ color, hollow = false }: { color: string; hollow?: boolean }) {
   return (
     <span
       aria-hidden
-      className="inline-block h-2.5 w-2.5 rounded-full"
-      style={hollow ? { border: `2px solid ${color}`, background: "#fff" } : { background: color }}
-    />
+      className={`soltas-map-glass soltas-map-glass--point !h-4 !w-4 ${hollow ? "soltas-map-glass--approx" : ""}`}
+    >
+      <span
+        className="soltas-map-glass__core !h-2 !w-2 !border-[1.5px]"
+        style={{ borderColor: color, background: hollow ? "transparent" : color }}
+      />
+    </span>
   );
 }

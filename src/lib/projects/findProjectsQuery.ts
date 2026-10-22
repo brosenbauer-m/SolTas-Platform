@@ -316,7 +316,8 @@ export type ProjectPoint = {
 };
 
 const POINT_PAGE = 1000; // PostgREST returns at most 1000 rows per request
-const MAX_POINTS = 80_000;
+const MAX_POINTS = 150_000;
+const PARALLEL_PAGES = 10;
 
 /**
  * Every approved, listed project with a location that matches the Find Projects filters, for the clustered
@@ -343,9 +344,9 @@ export async function fetchProjectPoints(searchParams: RawSearchParams): Promise
   const offsets = Array.from({ length: Math.ceil(total / POINT_PAGE) }, (_, i) => i * POINT_PAGE);
 
   const points: ProjectPoint[] = [];
-  for (let i = 0; i < offsets.length; i += 6) {
+  for (let i = 0; i < offsets.length; i += PARALLEL_PAGES) {
     const pages = await Promise.all(
-      offsets.slice(i, i + 6).map(async (from) => {
+      offsets.slice(i, i + PARALLEL_PAGES).map(async (from) => {
         const { data, error } = await base("id,slug,lat,lng,category,point_precision")
           .order("id")
           .range(from, from + POINT_PAGE - 1);
@@ -365,6 +366,77 @@ export async function fetchProjectPoints(searchParams: RawSearchParams): Promise
     }
   }
   return points;
+}
+
+export type ProjectAtSpot = {
+  slug: string;
+  name: string;
+  category: string;
+  source: string;
+  place: string | null;
+  organisation: string | null;
+};
+
+type SpotRow = {
+  slug: string | null;
+  id: string;
+  name: string;
+  category: string;
+  source: string;
+  place_name: string | null;
+  country: string | null;
+  source_data: unknown;
+  lead_org: { name: string | null } | { name: string | null }[] | null;
+};
+
+/**
+ * The projects at one spot of the map (same rounded coordinates as /api/projects/points), with the page's
+ * filters, A-Z. For the popup of a dot that stands for several projects.
+ */
+export async function fetchProjectsAt(
+  searchParams: RawSearchParams,
+  lng: number,
+  lat: number,
+  limit = 100,
+): Promise<{ total: number; country: string | null; items: ProjectAtSpot[] }> {
+  const params = parseFindProjectsSearchParams(searchParams);
+  const half = 0.00005; // points are rounded to 4 decimals
+  const { data, count, error } = await applyProjectFilters(
+    getPublicSupabase()
+      .from("projects")
+      .select(
+        "id,slug,name,category,source,place_name,country,source_data,lead_org:organisations!projects_lead_org_id_fkey(name)",
+        { count: "exact" },
+      )
+      .eq("visibility", "public")
+      .eq("status", "approved")
+      .gte("lng", lng - half)
+      .lt("lng", lng + half)
+      .gte("lat", lat - half)
+      .lt("lat", lat + half),
+    params,
+  )
+    .order("name")
+    .range(0, limit - 1);
+  if (error) throw error;
+  const rows = (data ?? []) as unknown as SpotRow[];
+  const countries = new Set(rows.map((row) => row.country).filter(Boolean));
+  return {
+    total: count ?? rows.length,
+    country: countries.size === 1 ? ([...countries][0] as string) : null,
+    items: rows.map((row) => {
+      const leadOrg = Array.isArray(row.lead_org) ? row.lead_org[0] : row.lead_org;
+      const reporting = (row.source_data as { reporting_org?: { name?: string | null } } | null)?.reporting_org?.name;
+      return {
+        slug: row.slug ?? row.id,
+        name: row.name,
+        category: row.category,
+        source: row.source,
+        place: row.place_name ?? row.country,
+        organisation: row.source === "iati" ? (reporting ?? null) : (leadOrg?.name ?? null),
+      };
+    }),
+  };
 }
 
 export type ProjectFilterOptions = {

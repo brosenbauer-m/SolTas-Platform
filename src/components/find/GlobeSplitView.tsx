@@ -16,6 +16,8 @@ type Props = {
   legend?: ReactNode;
   /** e.g. "12 projects mapped · 40 matching" */
   summary: string;
+  /** The matching results as a list/table, shown under the filters (and under the map on phones). */
+  results?: ReactNode;
   focusSlug: string | null;
   ctaLabel?: string;
   /** localStorage key to remember the panel width per page. */
@@ -61,6 +63,7 @@ export default function GlobeSplitView({
   projects = null,
   legend = null,
   summary,
+  results = null,
   focusSlug,
   ctaLabel = "See more",
   storageKey,
@@ -163,41 +166,44 @@ export default function GlobeSplitView({
 
   if (isMobile) {
     return (
-      <section className="relative h-full min-h-[480px] w-full overflow-hidden rounded-2xl border border-soltas-line bg-white">
-        {map}
-        <button
-          type="button"
-          onClick={() => setDrawerOpen(true)}
-          className="absolute left-3 top-3 z-10 inline-flex min-h-11 items-center gap-1.5 rounded-full bg-white px-4 text-sm font-medium text-soltas-text shadow-lg ring-1 ring-black/10"
-        >
-          <SlidersHorizontal className="h-4 w-4" aria-hidden />
-          Filters
-        </button>
-        {drawerOpen ? (
-          <>
-            <div className="absolute inset-0 z-20 bg-soltas-text/20" onClick={() => setDrawerOpen(false)} />
-            <div
-              role="dialog"
-              aria-label="Filters"
-              className="absolute inset-x-0 bottom-0 z-30 max-h-[80%] overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl"
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <span className="text-[15px] font-semibold text-soltas-text">Filters</span>
-                <button
-                  type="button"
-                  onClick={() => setDrawerOpen(false)}
-                  aria-label="Close filters"
-                  className="grid h-10 w-10 place-items-center rounded-full hover:bg-soltas-light"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+      <div className="space-y-4">
+        <section className="relative h-[65vh] min-h-[420px] w-full overflow-hidden rounded-2xl border border-soltas-line bg-white">
+          {map}
+          <button
+            type="button"
+            onClick={() => setDrawerOpen(true)}
+            className="absolute left-3 top-3 z-10 inline-flex min-h-11 items-center gap-1.5 rounded-full bg-white px-4 text-sm font-medium text-soltas-text shadow-lg ring-1 ring-black/10"
+          >
+            <SlidersHorizontal className="h-4 w-4" aria-hidden />
+            Filters
+          </button>
+          {drawerOpen ? (
+            <>
+              <div className="absolute inset-0 z-20 bg-soltas-text/20" onClick={() => setDrawerOpen(false)} />
+              <div
+                role="dialog"
+                aria-label="Filters"
+                className="absolute inset-x-0 bottom-0 z-30 max-h-[80%] overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl"
+              >
+                <div className="mb-4 flex items-center justify-between">
+                  <span className="text-[15px] font-semibold text-soltas-text">Filters</span>
+                  <button
+                    type="button"
+                    onClick={() => setDrawerOpen(false)}
+                    aria-label="Close filters"
+                    className="grid h-10 w-10 place-items-center rounded-full hover:bg-soltas-light"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                {filters}
+                <p className="mt-4 text-sm text-soltas-muted">{summary}</p>
               </div>
-              {filters}
-              <p className="mt-4 text-sm text-soltas-muted">{summary}</p>
-            </div>
-          </>
-        ) : null}
-      </section>
+            </>
+          ) : null}
+        </section>
+        {results ? <div className="min-w-0">{results}</div> : <p className="text-sm text-soltas-muted">{summary}</p>}
+      </div>
     );
   }
 
@@ -208,12 +214,19 @@ export default function GlobeSplitView({
       ref={containerRef}
       className="relative grid h-full min-h-0 w-full overflow-hidden rounded-2xl border border-soltas-line bg-white"
       // minmax(0, 1fr) row: the panel scrolls instead of growing past the screen (and the globe stays centred)
-      style={{ gridTemplateColumns: `${percent} minmax(0, 1fr)`, gridTemplateRows: "minmax(0, 1fr)" }}
+      style={{
+        gridTemplateColumns: `${percent} minmax(0, 1fr)`,
+        gridTemplateRows: "minmax(0, 1fr)",
+      }}
     >
       <div className="min-h-0 min-w-0 overflow-y-auto overscroll-contain border-r border-soltas-line">
         <div className="p-5 lg:p-6">
           {filters}
-          <p className="mt-5 text-sm text-soltas-muted">{summary}</p>
+          {results ? (
+            <div className="mt-6 border-t border-soltas-line pt-6">{results}</div>
+          ) : (
+            <p className="mt-5 text-sm text-soltas-muted">{summary}</p>
+          )}
         </div>
       </div>
 

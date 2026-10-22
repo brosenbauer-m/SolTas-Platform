@@ -80,7 +80,13 @@ export default async function WatchdogPage({
 
       {safeView === "globe" ? (
         <div className="flex-1 min-h-0">
-          <WatchdogGlobeSplitView markers={markers} totalCount={count} focusId={focus} options={filterOptions} />
+          <WatchdogGlobeSplitView
+            markers={markers}
+            totalCount={count}
+            focusId={focus}
+            options={filterOptions}
+            results={<WatchdogTableView rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />}
+          />
         </div>
       ) : (
         <>

@@ -28,7 +28,8 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(
     {
       title: data.name,
-      eyebrow: imported ? "Published to IATI" : data.category === "humanitarian" ? "Humanitarian project" : "Environmental project",
+      eyebrow: data.category === "humanitarian" ? "Humanitarian project" : "Environmental project",
+      iati: imported,
       organisation,
       place: data.place_name ?? data.country,
       description: data.description,
