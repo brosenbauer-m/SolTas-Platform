@@ -1,4 +1,4 @@
-// Turns one IATI Datastore activity document (Solr, flattened fields) into an iati_activities row.
+// Turns one IATI Datastore activity document (Solr, flattened fields) into an IatiActivityRow (the sync turns it into a projects row).
 // Field names: IATI/datastore-solr-configs configsets/activity/conf/managed-schema.
 //
 // Solr flattens repeated XML elements per field, so parallel lists (e.g. title_narrative and
