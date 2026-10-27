@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { z } from "zod";
 
 import { getServerSupabase } from "@/lib/supabaseServer";
+import { autoTagProject } from "@/lib/ai/autoTag";
 
 const locationSchema = z.object({
   lat: z.number(),
@@ -142,6 +143,9 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const { error } = await supabase.from("project_ifrc_challenges").insert(ifrcRows);
     if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   }
+
+  // Projects saved before tagging existed get AI tags once; projects that have tags keep them as they are.
+  after(() => autoTagProject(id, user.id));
 
   return NextResponse.json(updated);
 }

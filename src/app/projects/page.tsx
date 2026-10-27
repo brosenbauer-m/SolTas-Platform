@@ -7,6 +7,8 @@ import ProjectsTableView from "@/components/projects/ProjectsTableView";
 import ProjectsViewToggle from "@/components/projects/ProjectsViewToggle";
 import { COUNTRY_NAMES } from "@/lib/geo/countries";
 import { fetchFindProjects, fetchProjectFilterOptions, type ProjectListRow } from "@/lib/projects/findProjectsQuery";
+import AiProjectSearch from "@/components/ai/AiProjectSearch";
+import { getServerSupabase } from "@/lib/supabaseServer";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -16,6 +18,13 @@ export default async function FindProjectsPage({
   searchParams?: Promise<SearchParams>;
 }) {
   const params: SearchParams = searchParams ? await searchParams : {};
+  const supabase = await getServerSupabase();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const aiSearch = (
+    <AiProjectSearch signedIn={Boolean(user)} currentQuery={typeof params.ai === "string" ? params.ai : null} />
+  );
 
   const viewParam = typeof params.view === "string" ? params.view : "globe";
   const view: "globe" | "table" = viewParam === "table" ? "table" : "globe";
@@ -72,7 +81,8 @@ export default async function FindProjectsPage({
           <ProjectsGlobeSplitView
             options={filterOptions}
             totalCount={count}
-            pointsQuery={toQueryString(params, ["view", "focus", "page", "sort", "dir"])}
+            pointsQuery={toQueryString(params, ["view", "focus", "page", "sort", "dir", "ai"])}
+            search={aiSearch}
             results={
               <ProjectsTableView rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />
             }
@@ -81,6 +91,7 @@ export default async function FindProjectsPage({
       ) : (
         <>
           <div className="card p-5 lg:p-6">
+            <div className="mb-6">{aiSearch}</div>
             <ProjectsFilters options={filterOptions} />
           </div>
           <ProjectsTableView rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />

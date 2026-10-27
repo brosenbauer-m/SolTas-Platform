@@ -104,6 +104,11 @@ export default function PrivacyPage() {
             <strong>Scaleway SAS</strong>, France (sending emails).
           </li>
           <li>
+            <strong>Mistral AI SAS</strong>, France (AI project search and automatic tags). When you use AI search, the
+            text you type is sent to Mistral; when a project is saved, its name, description and themes are sent so
+            the AI can suggest tags. We send no name, email or other account data with it.
+          </li>
+          <li>
             <strong>Mapbox Inc.</strong>, USA (maps, the globe and place search). When you view a map or search for a
             place, your IP address and the search text are sent to Mapbox. Transfers are covered by the EU Standard
             Contractual Clauses.

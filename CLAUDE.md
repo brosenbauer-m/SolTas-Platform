@@ -17,6 +17,7 @@
 - `src/lib/` data access: `supabaseServer.ts` (server client), `supabaseClient.ts` (browser client),
   `projects/`, `organisations/`, `grants/`, `watchdog/` query helpers, `email/`
 - Tags: `public.tags` (shared vocabulary, only admins/server add), `project_tags`, `tag_requests` (admin queue `/admin/tag-requests`); IATI sector names → tags in `scripts/iati/sync.ts` via `src/lib/tags/iatiSectors.ts`; Find Projects filter `?tag=<slug>`
+- AI (Mistral, EU): `src/lib/ai/` (`mistral.ts` client, `autoTag.ts` tags projects after create/edit via `after()`, `usage.ts` daily limit + `ai_usage` log), `/api/ai/search` (signed-in, turns a sentence into Find Projects filters), `components/ai/AiProjectSearch.tsx`; service role only via `src/lib/supabaseAdmin.ts`. Off unless `MISTRAL_API_KEY` + `SUPABASE_SERVICE_ROLE_KEY` are set
 - `supabase/migrations/` schema (forward-only), `supabase/tests/` RLS test scripts,
   `supabase/functions/` edge functions (`create-organisation` uses the service role)
 - `scripts/db-test/` local throwaway DB + RLS sweep (`pnpm db:test`), `scripts/schema-export.sql` prod drift check
