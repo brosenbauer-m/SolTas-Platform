@@ -4,7 +4,9 @@ import { fetchHomeGrantMarkers } from "@/lib/grants/homeGrantsQuery";
 import { fetchHomeProjectMarkers } from "@/lib/projects/homeProjectsQuery";
 import { fetchHomeWatchdogMarkers } from "@/lib/watchdog/homeWatchdogQuery";
 
-export const revalidate = 600;
+// Funding markers are for signed-in people only, so the answer depends on who asks: never share it through
+// the CDN (an admin's or member's answer must not reach anonymous visitors, and the other way round).
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
@@ -22,7 +24,7 @@ export async function GET() {
       },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=600, stale-while-revalidate=3600",
+          "Cache-Control": "private, max-age=60",
         },
       },
     );

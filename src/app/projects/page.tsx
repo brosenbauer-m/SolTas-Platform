@@ -7,6 +7,7 @@ import ProjectsTableView from "@/components/projects/ProjectsTableView";
 import ProjectsViewToggle from "@/components/projects/ProjectsViewToggle";
 import { COUNTRY_NAMES } from "@/lib/geo/countries";
 import { fetchFindProjects, fetchProjectFilterOptions, type ProjectListRow } from "@/lib/projects/findProjectsQuery";
+import { plural } from "@/lib/plural";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -54,7 +55,7 @@ export default async function FindProjectsPage({
         description={
           <>
             Humanitarian and environmental projects from around the world.{" "}
-            <span className="whitespace-nowrap">{count.toLocaleString()} projects</span>
+            <span className="whitespace-nowrap">{plural(count, "project")}</span>
           </>
         }
         actions={

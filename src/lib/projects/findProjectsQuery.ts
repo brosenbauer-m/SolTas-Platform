@@ -2,6 +2,7 @@ import type { Database } from "@/lib/database.types";
 import { getPublicSupabase } from "@/lib/supabasePublic";
 import { getServerSupabase } from "@/lib/supabaseServer";
 import { IATI_ORG_ID } from "@/lib/iati/systemOrg";
+import { ilikeAny } from "@/lib/postgrestSearch";
 
 export const PAGE_SIZE = 25;
 
@@ -191,8 +192,7 @@ function applyProjectFilters<Q extends Record<string, any>>(query: Q, params: Fi
   }
 
   if (params.q) {
-    const escaped = params.q.replace(/%/g, "\\%").replace(/_/g, "\\_");
-    q = q.or(`name.ilike.%${escaped}%,place_name.ilike.%${escaped}%`);
+    q = q.or(ilikeAny(["name", "place_name"], params.q));
   }
 
   if (categoryFilters.length) {
@@ -283,9 +283,6 @@ export async function fetchFindProjects({
 }> {
   const params = parseFindProjectsSearchParams(searchParams);
   const supabase = await getServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   let query = supabase
     .from("projects")
@@ -295,12 +292,8 @@ export async function fetchFindProjects({
       { count: "exact" },
     );
 
-  // Unlisted/private projects are reachable by link only, never listed.
-  query = query.eq("visibility", "public");
-
-  if (!user) {
-    query = query.eq("status", "approved");
-  }
+  // Lists show only approved, public projects, for everyone (owners see their drafts on their own pages).
+  query = query.eq("visibility", "public").eq("status", "approved");
 
   query = applyProjectFilters(query, params);
 

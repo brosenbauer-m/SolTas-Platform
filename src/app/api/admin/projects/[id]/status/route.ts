@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 
 import { getServerSupabase } from "@/lib/supabaseServer";
 
-type AllowedStatus = "approved" | "rejected" | "archived";
+type AllowedStatus = "pending" | "approved" | "rejected";
 
 function isAllowedStatus(value: unknown): value is AllowedStatus {
-  return value === "approved" || value === "rejected" || value === "archived";
+  return value === "pending" || value === "approved" || value === "rejected";
 }
 
 export async function POST(

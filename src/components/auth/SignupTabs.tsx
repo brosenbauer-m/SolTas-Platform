@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils";
 
 import { MissingSupabaseEnvError } from "@/lib/supabaseConfig";
 import { supabaseClient } from "@/lib/supabaseClient";
+import { safeReturnTo as safeReturnToPath } from "@/lib/safeRedirect";
+import { IATI_ORG_ID } from "@/lib/iati/systemOrg";
 
 let supabaseInitializationError: MissingSupabaseEnvError | null = null;
 let supabase: ReturnType<typeof supabaseClient> | null = null;
@@ -81,6 +83,7 @@ function SignupTabsContent({ client }: { client: SupabaseClient }) {
       const { data, error } = await client
         .from("verified_organisations")
         .select("id, name")
+        .neq("id", IATI_ORG_ID)
         .order("name");
 
       if (!isActive) return;
@@ -226,7 +229,7 @@ function SignupTabsContent({ client }: { client: SupabaseClient }) {
 
       setMessage({ text: "Welcome! Taking you in…", tone: "success" });
       const returnTo = searchParams.get("returnTo");
-      const safeReturnTo = returnTo?.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/projects";
+      const safeReturnTo = safeReturnToPath(returnTo);
       setTimeout(() => {
         router.replace(safeReturnTo);
         router.refresh();

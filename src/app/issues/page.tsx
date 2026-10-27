@@ -11,6 +11,7 @@ import {
   fetchWatchdogMarkers,
   type WatchdogIssueListRow,
 } from "@/lib/watchdog/findWatchdogIssuesQuery";
+import { plural } from "@/lib/plural";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -65,7 +66,7 @@ export default async function WatchdogPage({
         description={
           <>
             Issues raised by local advocates and reviewed by the Solarpunk Taskforce.{" "}
-            <span className="whitespace-nowrap">{count.toLocaleString()} issues</span>
+            <span className="whitespace-nowrap">{plural(count, "issue")}</span>
           </>
         }
         actions={

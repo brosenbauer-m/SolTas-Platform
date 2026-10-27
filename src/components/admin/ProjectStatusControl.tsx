@@ -3,12 +3,13 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
-type AllowedStatus = "approved" | "rejected" | "archived";
+// The values projects_status_check allows
+type AllowedStatus = "pending" | "approved" | "rejected";
 
 const OPTIONS: { value: AllowedStatus; label: string }[] = [
+  { value: "pending", label: "Pending review (Hidden)" },
   { value: "approved", label: "Approved (Public)" },
   { value: "rejected", label: "Rejected (Hidden)" },
-  { value: "archived", label: "Archived (Hidden)" },
 ];
 
 export function ProjectStatusControl({
@@ -23,11 +24,10 @@ export function ProjectStatusControl({
   const [localValue, setLocalValue] = useState<string>(currentStatus ?? "");
 
   const normalizedCurrent = useMemo(() => {
-    // If old records have null/other statuses, default to "rejected" in UI but don’t auto-write.
-    if (currentStatus === "approved" || currentStatus === "rejected" || currentStatus === "archived") {
+    if (currentStatus === "approved" || currentStatus === "rejected" || currentStatus === "pending") {
       return currentStatus;
     }
-    return "rejected";
+    return "pending";
   }, [currentStatus]);
 
   async function updateStatus(nextStatus: AllowedStatus) {
@@ -54,10 +54,11 @@ export function ProjectStatusControl({
 
   return (
     <div className="flex items-center gap-2">
-      <label className="text-xs font-medium text-soltas-muted">
+      <label htmlFor={`status-${projectId}`} className="text-xs font-medium text-soltas-muted">
         Status
       </label>
       <select
+        id={`status-${projectId}`}
         className="rounded-md border bg-white px-2 py-1 text-sm"
         value={localValue || normalizedCurrent}
         disabled={isPending}
