@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AlertTriangle, BadgeCheck, Building2, ChevronRight, Coins, FolderKanban, ShieldCheck } from "lucide-react";
+import { AlertTriangle, BadgeCheck, Building2, ChevronRight, Coins, FolderKanban, ShieldCheck, Tags } from "lucide-react";
 
 import { PageHeader } from "@/components/ui/page-header";
 import { getServerSupabase } from "@/lib/supabaseServer";
@@ -18,7 +18,7 @@ export default async function AdminIndexPage() {
 
   const count = (query: PromiseLike<{ count: number | null }>) => Promise.resolve(query).then((r) => r.count ?? 0);
 
-  const [{ data: isSuper }, projects, organisations, submissions, funding, issues] = await Promise.all([
+  const [{ data: isSuper }, projects, organisations, submissions, funding, issues, tagRequests] = await Promise.all([
     supabase.rpc("is_superadmin"),
     count(supabase.from("projects").select("id", { count: "exact", head: true }).eq("status", "pending")),
     count(
@@ -32,6 +32,7 @@ export default async function AdminIndexPage() {
     ),
     count(supabase.from("grants").select("id", { count: "exact", head: true }).eq("moderation_status", "pending")),
     count(supabase.from("watchdog_issues").select("id", { count: "exact", head: true }).eq("status", "pending")),
+    count(supabase.from("tag_requests").select("id", { count: "exact", head: true }).eq("status", "pending")),
   ]);
 
   const queues = [
@@ -40,6 +41,7 @@ export default async function AdminIndexPage() {
     { href: "/admin/organisations/submissions", title: "Verification documents", description: "Evidence sent in by organisations", pending: submissions, icon: BadgeCheck },
     { href: "/admin/funding-registrations", title: "Funding", description: "Funding opportunities to review", pending: funding, icon: Coins },
     { href: "/admin/issue-registrations", title: "Issues", description: "Reported issues to review", pending: issues, icon: AlertTriangle },
+    { href: "/admin/tag-requests", title: "Tag requests", description: "New tags people asked for", pending: tagRequests, icon: Tags },
   ];
   const totalPending = queues.reduce((sum, queue) => sum + queue.pending, 0);
 
