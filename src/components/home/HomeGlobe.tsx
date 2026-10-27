@@ -14,8 +14,10 @@ const HAS_MAPBOX_TOKEN = typeof MAPBOX_TOKEN === "string" && MAPBOX_TOKEN.length
 mapboxgl.accessToken = MAPBOX_TOKEN || "";
 ;(mapboxgl as typeof mapboxgl & { setTelemetryEnabled?: (enabled: boolean) => void }).setTelemetryEnabled?.(false);
 
-const ROTATION_SPEED_DEG_PER_SEC = 1.25;
-const ROTATION_RESUME_DELAY_MS = 1500;
+/** The globe turns slowly west to east around its axis (one turn in about 3 minutes). */
+const ROTATION_SPEED_DEG_PER_SEC = 2;
+/** After someone drags, zooms or clicks, wait this long before turning again. */
+const ROTATION_RESUME_DELAY_MS = 4000;
 
 const MIN_SWITCH_MS = 10000;
 const POPUP_CHECK_INTERVAL_MS = 1500;
@@ -212,13 +214,15 @@ export default function HomeGlobe({
       rotationFrameRef.current = window.requestAnimationFrame(animate);
 
       if (lastRotationTimeRef.current == null) lastRotationTimeRef.current = time;
-      const dt = (time - lastRotationTimeRef.current) / 1000;
+      const dt = Math.min(0.5, (time - lastRotationTimeRef.current) / 1000); // no jump after a paused tab
       lastRotationTimeRef.current = time;
 
       if (Date.now() < pausedUntilRef.current) return;
+      // never fight the user: no turning while they drag or zoom
+      if (map.dragPan.isActive() || map.isZooming() || map.isRotating() || document.hidden) return;
 
-      const nextBearing = map.getBearing() + ROTATION_SPEED_DEG_PER_SEC * dt;
-      map.setBearing(nextBearing % 360);
+      const center = map.getCenter();
+      map.setCenter([((center.lng - ROTATION_SPEED_DEG_PER_SEC * dt + 540) % 360) - 180, center.lat]);
     };
 
     rotationFrameRef.current = window.requestAnimationFrame(animate);

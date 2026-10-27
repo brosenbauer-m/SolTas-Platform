@@ -201,13 +201,19 @@ export function addProjectLayer(map: mapboxgl.Map, options: ProjectLayerOptions)
   const onSourceData = (event: mapboxgl.MapSourceDataEvent) => {
     if (event.sourceId === SOURCE && event.isSourceLoaded) schedule();
   };
-  // Turning alone (the home globe's slow spin changes only the bearing) shows the same circles: skip it.
-  let lastView = "";
+  // Small moves (the home globe's slow turn) show the same circles: rebuild only when the zoom changes or the
+  // centre has moved half a degree, so the turning globe doesn't query the map every frame.
+  let lastZoom = NaN;
+  let lastCenter: [number, number] = [NaN, NaN];
   const onMove = () => {
-    const center = map.getCenter();
-    const view = `${map.getZoom().toFixed(2)}|${center.lng.toFixed(3)}|${center.lat.toFixed(3)}|${map.getPitch().toFixed(0)}`;
-    if (view === lastView) return;
-    lastView = view;
+    const zoom = map.getZoom();
+    const { lng, lat } = map.getCenter();
+    const step = 0.5 / 2 ** Math.max(0, zoom - 2);
+    if (Math.abs(zoom - lastZoom) < 0.01 && Math.abs(lng - lastCenter[0]) < step && Math.abs(lat - lastCenter[1]) < step) {
+      return;
+    }
+    lastZoom = zoom;
+    lastCenter = [lng, lat];
     schedule();
   };
   map.on("move", onMove);

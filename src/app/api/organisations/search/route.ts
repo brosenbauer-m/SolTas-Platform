@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSupabase } from "@/lib/supabaseServer";
+import { IATI_ORG_ID } from "@/lib/iati/systemOrg";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -37,6 +38,7 @@ export async function GET(request: NextRequest) {
     .from("organisations")
     .select("id, name, logo_url, country_based")
     .in("id", orgIds)
+    .neq("id", IATI_ORG_ID)
     .eq("verification_status", "verified");
 
   if (detailsError) {
