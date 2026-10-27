@@ -27,6 +27,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
+import { IATI_ORG_ID } from "@/lib/iati/systemOrg";
 
 const locationSchema = z.object({
   lat: z.number(),
@@ -407,7 +408,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
       const userRes = await supabase.auth.getUser();
       const userId = userRes.data.user?.id ?? null;
       const [orgRes, sdgRes, ifrcRes, creatableOrgsRes] = await Promise.all([
-        supabase.from("organisations").select("id, name").order("name"),
+        supabase.from("organisations").select("id, name").neq("id", IATI_ORG_ID).order("name"),
         supabase.from("sdgs").select("id, name").order("id"),
         supabase.from("ifrc_challenges").select("id, name").order("name"),
         // Only the current user's own memberships that allow creating projects

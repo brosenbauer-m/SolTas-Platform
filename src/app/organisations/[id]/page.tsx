@@ -10,6 +10,7 @@ import { buttonClasses } from "@/components/ui/button";
 import { SocialLinks } from "@/components/profiles/SocialLinks";
 import UpdatesSection, { type UpdateSummary } from "@/components/updates/UpdatesSection";
 import { getServerSupabase } from "@/lib/supabaseServer";
+import { IATI_ORG_ID } from "@/lib/iati/systemOrg";
 
 function formatDate(value: string | null) {
   if (!value) return "—";
@@ -29,7 +30,8 @@ export default async function OrganisationPage({
   const search = await searchParams;
   const showSavedMessage = search.saved === "true";
 
-  if (!id || typeof id !== "string") notFound();
+  // The IATI system organisation only owns imported projects; it has no page.
+  if (!id || typeof id !== "string" || id === IATI_ORG_ID) notFound();
 
   const supabase = await getServerSupabase();
 
