@@ -37,7 +37,7 @@ export default async function FindProjectsPage({
 
   const projectOptions = await fetchProjectFilterOptions().catch((error) => {
     console.error("Find projects: filter options failed", error);
-    return { countries: [], regions: [], thematic: [], interventions: [], demographics: [], organisations: [] };
+    return { countries: [], regions: [], thematic: [], interventions: [], demographics: [], organisations: [], tags: [] };
   });
   // Every country, not only those in use, so imported projects can be filtered by any country.
   const countryValues = new Set([...projectOptions.countries.map((option) => option.value), ...COUNTRY_NAMES]);
