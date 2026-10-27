@@ -2602,6 +2602,49 @@ export type Database = {
           },
         ]
       }
+      project_tags: {
+        Row: {
+          added_by: string
+          created_at: string
+          project_id: string
+          tag_id: string
+        }
+        Insert: {
+          added_by: string
+          created_at?: string
+          project_id: string
+          tag_id: string
+        }
+        Update: {
+          added_by?: string
+          created_at?: string
+          project_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_tags_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_tags_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "rejected_projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_updates: {
         Row: {
           author_user_id: string
@@ -2825,6 +2868,94 @@ export type Database = {
         Update: {
           id?: number
           name?: string
+        }
+        Relationships: []
+      }
+      tag_requests: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          project_id: string | null
+          reason: string | null
+          requested_by: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          tag_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          project_id?: string | null
+          reason?: string | null
+          requested_by?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          tag_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          project_id?: string | null
+          reason?: string | null
+          requested_by?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          tag_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tag_requests_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tag_requests_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "rejected_projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tag_requests_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tags: {
+        Row: {
+          created_at: string
+          iati_codes: string[]
+          id: string
+          label: string
+          origin: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          iati_codes?: string[]
+          id?: string
+          label: string
+          origin: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          iati_codes?: string[]
+          id?: string
+          label?: string
+          origin?: string
+          slug?: string
         }
         Relationships: []
       }
