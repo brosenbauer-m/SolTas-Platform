@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import SocialLinksEditor from "@/components/profiles/SocialLinksEditor";
 import { normalizeSocialLinks } from "@/components/profiles/SocialLinks";
 import { getServerSupabase } from "@/lib/supabaseServer";
+import { IATI_ORG_ID } from "@/lib/iati/systemOrg";
 
 function toOptionalString(value: FormDataEntryValue | null) {
   if (typeof value !== "string") return null;
@@ -134,6 +135,7 @@ export default async function ProfileEditPage({
     .from("organisations")
     .select("id, name")
     .eq("verification_status", "verified")
+    .neq("id", IATI_ORG_ID)
     .order("name");
 
   // Combine and deduplicate organisations

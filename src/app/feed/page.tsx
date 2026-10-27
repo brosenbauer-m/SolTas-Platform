@@ -339,6 +339,7 @@ export default async function FeedPage({
     .from("projects")
     .select("id,name,slug")
     .eq("visibility", "public")
+    .eq("status", "approved")
     .order("created_at", { ascending: false })
     .limit(5);
 

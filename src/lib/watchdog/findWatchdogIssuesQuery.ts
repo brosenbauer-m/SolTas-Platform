@@ -1,5 +1,6 @@
 import type { Database } from "@/lib/database.types";
 import { getServerSupabase } from "@/lib/supabaseServer";
+import { ilikeAny } from "@/lib/postgrestSearch";
 
 export const PAGE_SIZE = 25;
 export const FILTER_OPTIONS_LIMIT = 2000;
@@ -165,8 +166,7 @@ export async function fetchWatchdogIssues({
     .eq("status", "approved");
 
   if (params.q) {
-    const escaped = params.q.replace(/%/g, "\\%").replace(/_/g, "\\_");
-    query = query.or(`title.ilike.%${escaped}%,description.ilike.%${escaped}%`);
+    query = query.or(ilikeAny(["title", "description"], params.q));
   }
 
   if (params.country.length) query = query.in("country", params.country);
@@ -220,8 +220,7 @@ export async function fetchWatchdogMarkers({
     .eq("status", "approved");
 
   if (params.q) {
-    const escaped = params.q.replace(/%/g, "\\%").replace(/_/g, "\\_");
-    query = query.or(`title.ilike.%${escaped}%,description.ilike.%${escaped}%`);
+    query = query.or(ilikeAny(["title", "description"], params.q));
   }
 
   if (params.country.length) query = query.in("country", params.country);

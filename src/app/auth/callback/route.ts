@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
+import { safeReturnTo } from "@/lib/safeRedirect";
 import { ensureSupabaseConfig } from "@/lib/supabaseConfig";
 
 /**
@@ -11,7 +12,7 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
   const nextParam = searchParams.get("next") ?? "/";
-  const next = nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "/";
+  const next = safeReturnTo(nextParam, "/");
 
   if (!code) {
     return NextResponse.redirect(`${origin}${next}`);

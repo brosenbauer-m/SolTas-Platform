@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { MissingSupabaseEnvError } from "@/lib/supabaseConfig";
 import { supabaseClient } from "@/lib/supabaseClient";
 import { cn } from "@/lib/utils";
+import { safeReturnTo as safeReturnToPath } from "@/lib/safeRedirect";
 
 let supabaseInitializationError: MissingSupabaseEnvError | null = null;
 let supabase: ReturnType<typeof supabaseClient> | null = null;
@@ -81,7 +82,7 @@ function LoginFormContent({ client }: { client: SupabaseClient }) {
     }
 
     const returnTo = searchParams.get("returnTo");
-    const safeReturnTo = returnTo?.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/projects";
+    const safeReturnTo = safeReturnToPath(returnTo);
     router.replace(safeReturnTo);
     router.refresh();
   }

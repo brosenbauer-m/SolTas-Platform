@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import OrganisationsPagination from "@/components/organisations/OrganisationsPagination";
 import { PAGE_SIZE, type OrganisationListRow } from "@/lib/organisations/findOrganisationsQuery";
+import { plural } from "@/lib/plural";
 
 const formatLocation = (organisation: OrganisationListRow) => {
   if (organisation.based_in_region && organisation.based_in_country) {
@@ -43,7 +44,7 @@ export default function OrganisationsTableView({ rows, count, page, pageCount, s
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm text-soltas-muted">
-          Showing {rows.length} of {count} organisations · {PAGE_SIZE} per page
+          Showing {rows.length} of {plural(count, "organisation")} · {PAGE_SIZE} per page
         </p>
         <OrganisationsPagination page={page} pageCount={pageCount} searchParams={params} />
       </div>

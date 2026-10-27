@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getServerSupabase } from "@/lib/supabaseServer";
+import { getPublicSupabase } from "@/lib/supabasePublic";
 import type { HomeStats } from "@/lib/homeStats";
 
 export const revalidate = 600;
@@ -12,7 +12,7 @@ const numberFrom = (value: unknown) => {
 };
 
 export async function GET() {
-  const supabase = await getServerSupabase();
+  const supabase = getPublicSupabase();
   const { data, error } = await supabase.rpc("get_home_stats");
 
   if (error) {
