@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { z } from "zod";
 
 import { getServerSupabase } from "@/lib/supabaseServer";
+import { autoTagProject } from "@/lib/ai/autoTag";
 
 const locationSchema = z.object({
   lat: z.number(),
@@ -172,6 +173,9 @@ export async function POST(req: Request) {
       feedPostWarning = "Project created successfully, but could not post to feed.";
     }
   }
+
+  // Standard tags from the shared list, chosen by the AI after the response is sent (no wait for the person).
+  after(() => autoTagProject(projectId, user.id));
 
   return NextResponse.json({
     ...submission[0],

@@ -16,10 +16,12 @@ type Props = {
   pointsQuery: string;
   /** The matching results (table), shown under the filters */
   results?: ReactNode;
+  /** shown above the filters (AI search) */
+  search?: ReactNode;
 };
 
 /** Find Projects: filters on the left, every matching project (community and imported) on the globe. */
-export default function ProjectsGlobeSplitView({ options, totalCount, pointsQuery, results }: Props) {
+export default function ProjectsGlobeSplitView({ options, totalCount, pointsQuery, results, search }: Props) {
   const projects = useMemo<MapProjectLayer>(
     () => ({
       url: `/api/projects/points${pointsQuery ? `?${pointsQuery}` : ""}`,
@@ -53,7 +55,12 @@ export default function ProjectsGlobeSplitView({ options, totalCount, pointsQuer
     <GlobeSplitView
       results={results}
       storageKey="find:projects:split"
-      filters={<ProjectsFilters options={options} showSorting={false} />}
+      filters={
+        <>
+          {search ? <div className="mb-6">{search}</div> : null}
+          <ProjectsFilters options={options} showSorting={false} />
+        </>
+      }
       markers={[]}
       projects={projects}
       legend={legend}
