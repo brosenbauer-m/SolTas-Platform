@@ -1314,6 +1314,36 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_usage: {
+        Row: {
+          created_at: string
+          feature: string
+          id: number
+          input_tokens: number
+          model: string
+          output_tokens: number
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          feature: string
+          id?: number
+          input_tokens?: number
+          model: string
+          output_tokens?: number
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          feature?: string
+          id?: number
+          input_tokens?: number
+          model?: string
+          output_tokens?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           id: boolean
