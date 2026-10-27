@@ -14,6 +14,7 @@ import {
 } from "@/lib/grants/findGrantsQuery";
 import { getServerSupabase } from "@/lib/supabaseServer";
 import Link from "next/link";
+import { plural } from "@/lib/plural";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -100,7 +101,7 @@ export default async function FindFundingPage({
         description={
           <>
             Grants and funding opportunities for environmental and humanitarian work.{" "}
-            <span className="whitespace-nowrap">{count.toLocaleString()} funding opportunities</span>
+            <span className="whitespace-nowrap">{plural(count, "funding opportunity", "funding opportunities")}</span>
           </>
         }
         actions={

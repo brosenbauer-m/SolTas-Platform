@@ -13,6 +13,7 @@ import {
   fetchOrganisationMarkers,
   type OrganisationListRow,
 } from "@/lib/organisations/findOrganisationsQuery";
+import { plural } from "@/lib/plural";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -62,7 +63,7 @@ export default async function FindOrganisationsPage({
         description={
           <>
             Verified organisations, where they work and what they need.{" "}
-            <span className="whitespace-nowrap">{count.toLocaleString()} organisations</span>
+            <span className="whitespace-nowrap">{plural(count, "organisation")}</span>
           </>
         }
         actions={

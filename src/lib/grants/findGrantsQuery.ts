@@ -1,6 +1,7 @@
 // src/lib/grants/findGrantsQuery.ts
 import type { Database } from "@/lib/database.types";
 import { getServerSupabase } from "@/lib/supabaseServer";
+import { ilikeAny } from "@/lib/postgrestSearch";
 
 export const PAGE_SIZE = 25;
 export const FILTER_OPTIONS_LIMIT = 2000;
@@ -195,10 +196,7 @@ export async function fetchFindGrants({
     .eq("is_published", true);
 
   if (params.q) {
-    const escaped = params.q.replace(/%/g, "\\%").replace(/_/g, "\\_");
-    query = query.or(
-      `title.ilike.%${escaped}%,summary.ilike.%${escaped}%,funder_name.ilike.%${escaped}%`,
-    );
+    query = query.or(ilikeAny(["title", "summary", "funder_name"], params.q));
   }
 
   if (params.project_type.length) query = query.in("project_type", params.project_type);
@@ -295,10 +293,7 @@ export async function fetchGrantMarkers({
     .eq("is_published", true);
 
   if (params.q) {
-    const escaped = params.q.replace(/%/g, "\\%").replace(/_/g, "\\_");
-    query = query.or(
-      `title.ilike.%${escaped}%,summary.ilike.%${escaped}%,funder_name.ilike.%${escaped}%`,
-    );
+    query = query.or(ilikeAny(["title", "summary", "funder_name"], params.q));
   }
 
   if (params.project_type.length) query = query.in("project_type", params.project_type);

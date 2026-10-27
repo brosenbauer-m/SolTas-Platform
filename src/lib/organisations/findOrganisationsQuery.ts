@@ -1,6 +1,7 @@
 import type { Database } from "@/lib/database.types";
 import { getServerSupabase } from "@/lib/supabaseServer";
 import { IATI_ORG_ID } from "@/lib/iati/systemOrg";
+import { ilikeAny } from "@/lib/postgrestSearch";
 
 export const PAGE_SIZE = 25;
 export const MARKER_LIMIT = 250;
@@ -176,8 +177,7 @@ export async function fetchFindOrganisations({
     .neq("id", IATI_ORG_ID);
 
   if (params.q) {
-    const escaped = params.q.replace(/%/g, "\\%").replace(/_/g, "\\_");
-    query = query.or(`name.ilike.%${escaped}%,description.ilike.%${escaped}%`);
+    query = query.or(ilikeAny(["name", "description"], params.q));
   }
 
   if (params.countries.length) {
@@ -317,8 +317,7 @@ export async function fetchOrganisationMarkers({
     .neq("id", IATI_ORG_ID);
 
   if (params.q) {
-    const escaped = params.q.replace(/%/g, "\\%").replace(/_/g, "\\_");
-    query = query.or(`name.ilike.%${escaped}%,description.ilike.%${escaped}%`);
+    query = query.or(ilikeAny(["name", "description"], params.q));
   }
 
   if (params.countries.length) {

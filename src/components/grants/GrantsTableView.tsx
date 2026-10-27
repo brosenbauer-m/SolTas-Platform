@@ -4,6 +4,7 @@ import GrantsPagination from "@/components/grants/GrantsPagination";
 import { Badge } from "@/components/ui/badge";
 import type { GrantListRow } from "@/lib/grants/findGrantsQuery";
 import { cn } from "@/lib/utils";
+import { plural } from "@/lib/plural";
 
 const formatDate = (value: string | null) => {
   if (!value) return "—";
@@ -70,7 +71,7 @@ export default function GrantsTableView({ rows, count, page, pageCount, searchPa
   return (
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-soltas-muted">Showing {rows.length} of {count} funding opportunities</p>
+        <p className="text-sm text-soltas-muted">Showing {rows.length} of {plural(count, "funding opportunity", "funding opportunities")}</p>
         <GrantsPagination page={page} pageCount={pageCount} searchParams={searchParams} basePath="/funding" />
       </div>
 

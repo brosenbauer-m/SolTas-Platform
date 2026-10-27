@@ -5,6 +5,7 @@ import ProjectsPagination from "@/components/projects/ProjectsPagination";
 import { Badge } from "@/components/ui/badge";
 import type { ProjectListRow } from "@/lib/projects/findProjectsQuery";
 import { cn } from "@/lib/utils";
+import { plural } from "@/lib/plural";
 
 const formatDate = (value: string | null) => {
   if (!value) return "—";
@@ -86,7 +87,7 @@ export default function ProjectsTableView({
   return (
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-soltas-muted">Showing {rows.length} of {count} projects</p>
+        <p className="text-sm text-soltas-muted">Showing {rows.length} of {plural(count, "project")}</p>
         <ProjectsPagination page={page} pageCount={pageCount} searchParams={searchParams} basePath="/projects" />
       </div>
 

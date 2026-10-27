@@ -1033,6 +1033,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
                     }
                   }}
                   placeholder="Add a new intervention"
+                  aria-label="New type of intervention"
                 />
                 <Button type="button" onClick={addIntervention} className="whitespace-nowrap">
                   <Plus className="mr-1 h-4 w-4" /> Add tag
@@ -1078,6 +1079,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
                     }
                   }}
                   placeholder="Add a thematic area"
+                  aria-label="New thematic area"
                 />
                 <Button type="button" onClick={addTheme} className="whitespace-nowrap">
                   <Plus className="mr-1 h-4 w-4" /> Add tag

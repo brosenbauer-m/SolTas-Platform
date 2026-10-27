@@ -1,5 +1,4 @@
 import UpdateCard from "./UpdateCard";
-import NewUpdateButton from "./NewUpdateButton";
 
 // TODO: Expected data shape for updates
 // type UpdateSummary = {
@@ -22,22 +21,19 @@ export type UpdateSummary = {
 
 type UpdatesSectionProps = {
   updates: UpdateSummary[];
-  isAuthenticated: boolean;
+  /** kept for callers; posting is only available on projects (UpdatesSectionWithSocial) */
+  isAuthenticated?: boolean;
   canPost?: boolean;
 };
 
-export default function UpdatesSection({
-  updates,
-  isAuthenticated,
-  canPost = false,
-}: UpdatesSectionProps) {
+export default function UpdatesSection({ updates }: UpdatesSectionProps) {
   return (
     <section className="card p-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-lg font-semibold tracking-tight text-soltas-text">
           Updates
         </h2>
-        {canPost ? <NewUpdateButton isAuthenticated={isAuthenticated} /> : null}
+        {/* Only project updates can be published so far (UpdatesSectionWithSocial); no placeholder here. */}
       </div>
 
       {updates.length > 0 ? (
