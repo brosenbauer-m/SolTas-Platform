@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { Database } from "@/lib/database.types";
 import FollowButton from "@/components/FollowButton";
 import IatiTag from "@/components/iati/IatiTag";
+import ProjectTags, { type ProjectTag, type TagOption } from "@/components/tags/ProjectTags";
 import { Badge } from "@/components/ui/badge";
 import { buttonClasses } from "@/components/ui/button";
 import ImportedProjectDetails, { publisherName, readSourceData } from "@/components/projects/ImportedProjectDetails";
@@ -130,6 +131,17 @@ export default async function ProjectDetailPage({
   // 4) Can the current viewer edit? (used only for buttons)
   const { data: canEdit } = await supabase.rpc("user_can_edit_project", { pid: project.id });
 
+  // Tags from the shared list (public.tags); editors also get the list to add from.
+  const [{ data: tagRows }, { data: vocabularyRows }] = await Promise.all([
+    supabase.from("project_tags").select("added_by,tags(id,slug,label)").eq("project_id", project.id),
+    canEdit ? supabase.from("tags").select("id,slug,label").order("label").limit(2000) : Promise.resolve({ data: [] }),
+  ]);
+  const projectTags = ((tagRows ?? []) as unknown as { added_by: string; tags: TagOption | null }[])
+    .filter((row) => row.tags)
+    .map((row) => ({ ...(row.tags as TagOption), added_by: row.added_by }) as ProjectTag)
+    .sort((a, b) => a.label.localeCompare(b.label));
+  const tagVocabulary = (vocabularyRows ?? []) as TagOption[];
+
   const { count: followerCount, error: followerCountError } = await supabase
     .from("follow_edges")
     .select("id", { count: "exact", head: true })
@@ -252,6 +264,12 @@ export default async function ProjectDetailPage({
               {locationLabel}
             </p>
           ) : null}
+          <ProjectTags
+            projectId={project.id}
+            initialTags={projectTags}
+            canEdit={Boolean(canEdit)}
+            vocabulary={tagVocabulary}
+          />
         </div>
 
         <div className="flex shrink-0 flex-col gap-2 sm:items-end">

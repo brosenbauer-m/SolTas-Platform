@@ -21,6 +21,7 @@ import { createHash } from "node:crypto";
 import postgres from "postgres";
 
 import { countryName } from "../../src/lib/geo/countries";
+import { iatiSectorTagLabel, tagSlug } from "../../src/lib/tags/iatiSectors";
 
 import { IATI_FIELDS, sectorShare, transformActivity, type IatiActivityRow, type IatiDoc } from "./transform";
 
@@ -377,10 +378,52 @@ async function upsertProjects(sql: Sql, rows: { row: IatiActivityRow; visibility
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- postgres.js helper typing
   const records: Record<string, any>[] = rows.map(({ row, visibility }) => toProjectRecord(sql, row, visibility));
   const columns = Object.keys(records[0]);
-  await sql`
+  const saved = await sql<{ id: string; iati_identifier: string }[]>`
     insert into public.projects ${sql(records, columns)}
     on conflict (iati_identifier) do update set
-    ${sql.unsafe(UPDATE_COLUMNS.map((column) => `"${column}" = excluded."${column}"`).join(", "))}`;
+    ${sql.unsafe(UPDATE_COLUMNS.map((column) => `"${column}" = excluded."${column}"`).join(", "))}
+    returning id, iati_identifier`;
+  await syncSectorTags(sql, rows.map(({ row }) => row), saved);
+}
+
+/**
+ * Tags from the published sector names (migration 20260324120015): creates missing tags, then replaces the
+ * import's own tags ('iati') on these projects. Tags people or the AI added stay.
+ */
+async function syncSectorTags(sql: Sql, rows: IatiActivityRow[], saved: { id: string; iati_identifier: string }[]) {
+  const idByIdentifier = new Map(saved.map((project) => [project.iati_identifier, project.id]));
+  const tags = new Map<string, { label: string; codes: Set<string> }>();
+  const links: { project_id: string; slug: string }[] = [];
+  for (const row of rows) {
+    const projectId = idByIdentifier.get(row.iati_identifier);
+    if (!projectId) continue;
+    for (const code of row.dac_sectors) {
+      const label = iatiSectorTagLabel(code);
+      if (!label) continue;
+      const slug = tagSlug(label);
+      const tag = tags.get(slug) ?? { label, codes: new Set<string>() };
+      tag.codes.add(code);
+      tags.set(slug, tag);
+      links.push({ project_id: projectId, slug });
+    }
+  }
+  if (tags.size) {
+    const tagRows = [...tags.entries()].map(([slug, tag]) => ({ slug, label: tag.label, origin: "iati", iati_codes: [...tag.codes] }));
+    await sql`
+      insert into public.tags ${sql(tagRows, "slug", "label", "origin", "iati_codes")}
+      on conflict (slug) do update set
+        iati_codes = array(select distinct code from unnest(public.tags.iati_codes || excluded.iati_codes) as code)`;
+  }
+  const projectIds = [...idByIdentifier.values()];
+  await sql`delete from public.project_tags where added_by = 'iati' and project_id = any(${projectIds})`;
+  if (links.length) {
+    await sql`
+      insert into public.project_tags (project_id, tag_id, added_by)
+      select l.project_id::uuid, t.id, 'iati'
+      from jsonb_to_recordset(${sql.json(links)}) as l(project_id text, slug text)
+      join public.tags t on t.slug = l.slug
+      on conflict do nothing`;
+  }
 }
 
 /**

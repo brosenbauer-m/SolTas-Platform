@@ -341,7 +341,7 @@ export const DAC_SECTORS: Record<string, string> = {
 
 export const DAC_SECTOR_CATEGORIES: Record<string, string> = {
   "110": "I.1. Education",
-  "111": "I.1.a. Education, level nnspecified",
+  "111": "I.1.a. Education, level unspecified",
   "112": "I.1.b. Basic education",
   "113": "I.1.c. Upper secondary education",
   "114": "I.1.d. Post-secondary education",

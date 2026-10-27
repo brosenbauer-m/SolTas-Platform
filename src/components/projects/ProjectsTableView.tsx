@@ -47,11 +47,16 @@ const getLocationLabel = (project: ProjectListRow) => {
   return "—";
 };
 
-const getTagPreview = (project: ProjectListRow) => {
-  const tags = project.thematic_area?.filter(Boolean) ?? [];
+/** Up to three tags from the shared list; older projects without tags show their themes instead. */
+const getTagPreview = (project: ProjectListRow): { label: string; slug?: string }[] => {
+  const tags = (project.tag_list ?? [])
+    .map((row) => row.tags)
+    .filter((tag): tag is { slug: string; label: string } => Boolean(tag))
+    .sort((a, b) => a.label.localeCompare(b.label));
   if (tags.length) return tags.slice(0, 3);
-  const interventions = project.type_of_intervention?.filter(Boolean) ?? [];
-  return interventions.slice(0, 3);
+  const themes = project.thematic_area?.filter(Boolean) ?? [];
+  if (themes.length) return themes.slice(0, 3).map((label) => ({ label }));
+  return (project.type_of_intervention?.filter(Boolean) ?? []).slice(0, 3).map((label) => ({ label }));
 };
 
 const getProjectSlug = (project: ProjectListRow) => project.slug ?? project.id;
@@ -139,11 +144,19 @@ export default function ProjectsTableView({
                   <td className="px-4 py-4">
                     <div className="flex flex-wrap gap-1">
                       {tags.length > 0 ? (
-                        tags.map(tag => (
-                          <Badge key={tag} variant="outline" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))
+                        tags.map(tag =>
+                          tag.slug ? (
+                            <Link key={tag.slug} href={`/projects?tag=${encodeURIComponent(tag.slug)}`}>
+                              <Badge variant="ocean" className="text-xs hover:underline">
+                                {tag.label}
+                              </Badge>
+                            </Link>
+                          ) : (
+                            <Badge key={tag.label} variant="outline" className="text-xs">
+                              {tag.label}
+                            </Badge>
+                          ),
+                        )
                       ) : (
                         <span className="text-xs text-soltas-muted">No tags</span>
                       )}

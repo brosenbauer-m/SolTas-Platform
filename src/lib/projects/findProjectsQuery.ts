@@ -25,7 +25,10 @@ export type ProjectListRow = Pick<
   | "type_of_intervention"
   | "partner_org_ids"
   | "target_demographic"
->;
+> & {
+  /** the project's tags (public.tags), for the table */
+  tag_list?: { tags: { slug: string; label: string } | null }[];
+};
 
 export type ProjectMarker = Pick<
   ProjectRow,
@@ -48,6 +51,8 @@ export type FindProjectsParams = {
   target_demographic: string[];
   partner_org_ids: string[];
   lifecycle_status: string[];
+  /** tag slugs (public.tags); a project matches if it has any of them */
+  tags: string[];
   /** community = added on the platform, iati = imported from IATI; undefined = both */
   source?: "community" | "iati";
   min_needed?: number;
@@ -147,6 +152,7 @@ export function parseFindProjectsSearchParams(searchParams: RawSearchParams): Fi
     target_demographic: parseStringList(searchParams.target_demographic),
     partner_org_ids: parseStringList(searchParams.partner_org_ids),
     lifecycle_status: parseStringList(searchParams.stage),
+    tags: parseStringList(searchParams.tag),
     source: parseSource(searchParams.source),
     min_needed: parseNumber(searchParams.min_needed),
     max_needed: parseNumber(searchParams.max_needed),
@@ -160,6 +166,14 @@ export function parseFindProjectsSearchParams(searchParams: RawSearchParams): Fi
     dir: parseDir(searchParams.dir),
     page: parsePage(searchParams.page),
   };
+}
+
+/**
+ * Extra select for the tag filter: an inner join, so only projects with one of the tags remain.
+ * Add it to the select of every query that goes through applyProjectFilters.
+ */
+function tagJoin(params: FindProjectsParams) {
+  return params.tags.length ? ",tag_filter:project_tags!inner(tags!inner(slug))" : "";
 }
 
 /**
@@ -216,6 +230,11 @@ function applyProjectFilters<Q extends Record<string, any>>(query: Q, params: Fi
     q = q.in("lifecycle_status", params.lifecycle_status);
   }
 
+  if (params.tags.length) {
+    // needs tagJoin(params) in the select
+    q = q.in("tag_filter.tags.slug", params.tags);
+  }
+
   if (typeof params.min_needed === "number") {
     q = q.gte("amount_needed", params.min_needed);
   }
@@ -270,7 +289,8 @@ export async function fetchFindProjects({
   let query = supabase
     .from("projects")
     .select(
-      "id,slug,name,category,source,place_name,region,country,start_date,end_date,donations_received,amount_needed,currency,thematic_area,type_of_intervention,partner_org_ids,target_demographic",
+      "id,slug,name,category,source,place_name,region,country,start_date,end_date,donations_received,amount_needed,currency,thematic_area,type_of_intervention,partner_org_ids,target_demographic,tag_list:project_tags(tags(slug,label))" +
+        tagJoin(params),
       { count: "exact" },
     );
 
@@ -294,7 +314,7 @@ export async function fetchFindProjects({
     throw error;
   }
 
-  const rows = (data ?? []) as ProjectListRow[];
+  const rows = (data ?? []) as unknown as ProjectListRow[];
   const totalCount = count ?? rows.length;
   const pageCount = totalCount ? Math.ceil(totalCount / PAGE_SIZE) : 0;
 
@@ -315,6 +335,15 @@ export type ProjectPoint = {
   approximate: boolean;
 };
 
+type PointRow = {
+  id: string;
+  slug: string | null;
+  lat: number | null;
+  lng: number | null;
+  category: string;
+  point_precision: string | null;
+};
+
 const POINT_PAGE = 1000; // PostgREST returns at most 1000 rows per request
 const MAX_POINTS = 150_000;
 const PARALLEL_PAGES = 10;
@@ -330,7 +359,7 @@ export async function fetchProjectPoints(searchParams: RawSearchParams): Promise
     applyProjectFilters(
       supabase
         .from("projects")
-        .select(columns, head ? { count: "exact", head: true } : undefined)
+        .select(`${columns}${tagJoin(params)}`, head ? { count: "exact", head: true } : undefined)
         .eq("visibility", "public")
         .eq("status", "approved")
         .not("lat", "is", null)
@@ -351,7 +380,7 @@ export async function fetchProjectPoints(searchParams: RawSearchParams): Promise
           .order("id")
           .range(from, from + POINT_PAGE - 1);
         if (error) throw error;
-        return data ?? [];
+        return (data ?? []) as unknown as PointRow[];
       }),
     );
     for (const row of pages.flat()) {
@@ -405,7 +434,8 @@ export async function fetchProjectsAt(
     getPublicSupabase()
       .from("projects")
       .select(
-        "id,slug,name,category,source,place_name,country,source_data,lead_org:organisations!projects_lead_org_id_fkey(name)",
+        "id,slug,name,category,source,place_name,country,source_data,lead_org:organisations!projects_lead_org_id_fkey(name)" +
+          tagJoin(params),
         { count: "exact" },
       )
       .eq("visibility", "public")
@@ -446,6 +476,7 @@ export type ProjectFilterOptions = {
   interventions: { value: string; label: string }[];
   demographics: { value: string; label: string }[];
   organisations: { value: string; label: string }[];
+  tags: { value: string; label: string }[];
 };
 
 const uniqueSorted = (values: Array<string | null | undefined>) => {
@@ -462,7 +493,7 @@ const uniqueSorted = (values: Array<string | null | undefined>) => {
 /** Values that actually occur on public projects, for the filter dropdowns. */
 export async function fetchProjectFilterOptions(): Promise<ProjectFilterOptions> {
   const supabase = await getServerSupabase();
-  const [{ data: rows }, { data: orgs }] = await Promise.all([
+  const [{ data: rows }, { data: orgs }, { data: tags }] = await Promise.all([
     supabase
       .from("projects")
       .select("country,region,thematic_area,type_of_intervention,target_demographic")
@@ -470,6 +501,7 @@ export async function fetchProjectFilterOptions(): Promise<ProjectFilterOptions>
       .eq("status", "approved")
       .limit(2000),
     supabase.from("organisations_directory_v1").select("id,name").order("name").limit(1000),
+    supabase.from("tags").select("slug,label").order("label").limit(2000),
   ]);
 
   const list = rows ?? [];
@@ -482,5 +514,6 @@ export async function fetchProjectFilterOptions(): Promise<ProjectFilterOptions>
     organisations: (orgs ?? [])
       .filter((o): o is { id: string; name: string } => Boolean(o.id && o.name))
       .map((o) => ({ value: o.id, label: o.name })),
+    tags: (tags ?? []).map((t) => ({ value: t.slug, label: t.label })),
   };
 }

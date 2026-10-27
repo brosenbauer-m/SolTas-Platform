@@ -76,9 +76,15 @@ export default function ProjectsFilters({ options, showSorting = true }: Project
       ),
     },
     {
+      key: "tag",
+      label: "Tags",
+      main: true,
+      params: ["tag"],
+      render: () => <ComboboxFilter param="tag" options={options.tags} placeholder="Any tag" />,
+    },
+    {
       key: "thematic_area",
       label: "Thematic areas",
-      main: true,
       params: ["thematic_area"],
       render: () => <ComboboxFilter param="thematic_area" options={options.thematic} placeholder="Any theme" />,
     },
