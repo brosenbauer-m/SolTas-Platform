@@ -1,6 +1,7 @@
 import type { Database } from "@/lib/database.types";
 import { getPublicSupabase } from "@/lib/supabasePublic";
 import { getServerSupabase } from "@/lib/supabaseServer";
+import { IATI_ORG_ID } from "@/lib/iati/systemOrg";
 
 export const PAGE_SIZE = 25;
 
@@ -500,7 +501,7 @@ export async function fetchProjectFilterOptions(): Promise<ProjectFilterOptions>
       .eq("visibility", "public")
       .eq("status", "approved")
       .limit(2000),
-    supabase.from("organisations_directory_v1").select("id,name").order("name").limit(1000),
+    supabase.from("organisations_directory_v1").select("id,name").neq("id", IATI_ORG_ID).order("name").limit(1000),
     supabase.from("tags").select("slug,label").order("label").limit(2000),
   ]);
 

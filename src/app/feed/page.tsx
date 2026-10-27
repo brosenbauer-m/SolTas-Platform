@@ -11,6 +11,7 @@ import { FeedPostCard } from "@/components/feed/FeedPostCard";
 import { NewPostComposer } from "@/components/feed/NewPostComposer";
 import { getServerSupabase } from "@/lib/supabaseServer";
 import type { Database } from "@/lib/database.types";
+import { IATI_ORG_ID } from "@/lib/iati/systemOrg";
 
 const PAGE_SIZE = 30;
 
@@ -330,6 +331,7 @@ export default async function FeedPage({
   const { data: discoverOrgs } = await supabase
     .from("organisations")
     .select("id,name")
+    .neq("id", IATI_ORG_ID)
     .order("created_at", { ascending: false })
     .limit(5);
 

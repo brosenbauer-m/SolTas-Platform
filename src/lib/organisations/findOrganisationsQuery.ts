@@ -1,5 +1,6 @@
 import type { Database } from "@/lib/database.types";
 import { getServerSupabase } from "@/lib/supabaseServer";
+import { IATI_ORG_ID } from "@/lib/iati/systemOrg";
 
 export const PAGE_SIZE = 25;
 export const MARKER_LIMIT = 250;
@@ -171,7 +172,8 @@ export async function fetchFindOrganisations({
     .select(
       "id,name,description,website,based_in_country,based_in_region,thematic_tags,intervention_tags,demographic_tags,funding_needed,founded_at,age_years,followers_count,projects_total_count,projects_ongoing_count",
       { count: "exact" },
-    );
+    )
+    .neq("id", IATI_ORG_ID);
 
   if (params.q) {
     const escaped = params.q.replace(/%/g, "\\%").replace(/_/g, "\\_");
@@ -311,7 +313,8 @@ export async function fetchOrganisationMarkers({
 
   let query = supabase
     .from("organisations_directory_v1")
-    .select("id,name,description,based_in_country,based_in_region,lat,lng,thematic_tags,intervention_tags,demographic_tags,age_years,projects_total_count,projects_ongoing_count,funding_needed");
+    .select("id,name,description,based_in_country,based_in_region,lat,lng,thematic_tags,intervention_tags,demographic_tags,age_years,projects_total_count,projects_ongoing_count,funding_needed")
+    .neq("id", IATI_ORG_ID);
 
   if (params.q) {
     const escaped = params.q.replace(/%/g, "\\%").replace(/_/g, "\\_");

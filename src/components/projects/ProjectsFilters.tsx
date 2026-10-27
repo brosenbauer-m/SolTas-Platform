@@ -44,22 +44,6 @@ export default function ProjectsFilters({ options, showSorting = true }: Project
       render: () => <SearchFilter param="q" placeholder="Project name or place" />,
     },
     {
-      key: "source",
-      wide: true,
-      label: "Source",
-      main: true,
-      params: ["source"],
-      render: () => (
-        <SegmentedFilter
-          param="source"
-          options={[
-            { value: "community", label: "Community" },
-            { value: "iati", label: "IATI" },
-          ]}
-        />
-      ),
-    },
-    {
       key: "category",
       wide: true,
       label: "Type",
