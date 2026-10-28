@@ -28,7 +28,7 @@ Update this file when a phase lands. Risk follows AGENT_RULES: DB/RLS/auth/payme
 | Issues | Report, review, list/globe/table, updates, follow, map on the issue page | Done | Fundraising, resolved steps, linking advocates and organisations |
 | Note Empathy | Media / writing / store | Not started | — |
 | Services | Overview + request | Partly | Request is an email link, no form |
-| Profiles | Name, nationality, organisation, bio, links | Partly | Portfolio, Watchdog label, following list |
+| Profiles | Name, nationality, organisation, bio, links, label (Independent / Watchdog / Organisation), portfolio (published projects and issues), following list | Done | Self-described roles and periods (owner decision 8) |
 | Notifications | In-app, email setting | Partly | Email digests for followed projects |
 | Membership fees | Individuals and organisations | Not started | Provider, prices |
 | Legal | Privacy, legal notice, processors | Done | Add the payment provider when chosen |
