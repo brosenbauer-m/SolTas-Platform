@@ -32,6 +32,7 @@ Update this file when a phase lands. Risk follows AGENT_RULES: DB/RLS/auth/payme
 | Notifications | In-app, email setting | Partly | Email digests for followed projects |
 | Membership fees | Individuals and organisations | Not started | Provider, prices |
 | Legal | Privacy, legal notice, processors | Done | Add the payment provider when chosen |
+| SEO / sharing | Page titles and descriptions, link previews, sitemap, robots, styled not-found and error pages | Done | Per-project preview images |
 | Quality | CI, RLS tests, admin review, scan fixes (#217), session middleware (#220), list timeouts fixed (#221) | Done | End-to-end tests, rate limits on posts/comments, typed Supabase clients |
 
 ## 2. Suggested order

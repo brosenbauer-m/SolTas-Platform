@@ -10,6 +10,9 @@ import { fetchFindProjects, fetchProjectFilterOptions, type ProjectListRow } fro
 import AiProjectSearch from "@/components/ai/AiProjectSearch";
 import { plural } from "@/lib/plural";
 import { getServerSupabase } from "@/lib/supabaseServer";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Find projects", description: "Humanitarian and environmental projects worldwide on one map, with filters by goal, country, tag and funding." };
 
 type SearchParams = Record<string, string | string[] | undefined>;
 

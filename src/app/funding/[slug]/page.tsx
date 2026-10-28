@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { grantMetadata } from "@/lib/pageMetadata";
 import { ArrowUpRight } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -59,6 +61,11 @@ const deadlineHint = (value: string | null) => {
 };
 
 const externalLink = { target: "_blank", rel: "noopener noreferrer" } as const;
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  return grantMetadata(slug);
+}
 
 export default async function GrantDetailPage({
   params,

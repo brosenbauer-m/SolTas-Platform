@@ -6,7 +6,7 @@ import SiteFooter from "@/components/SiteFooter";
 import { buttonClasses } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "About | Solarpunk Taskforce",
+  title: "About",
   description:
     "Who we are and what we do: a living map of humanitarian and environmental work, plus intelligence and storytelling services for the people doing it.",
 };

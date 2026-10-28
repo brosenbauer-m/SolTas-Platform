@@ -14,6 +14,7 @@
   glass-circle project layer + popups, used by Find Projects and the home globe), `find/` (split view: filters +
   results table + globe), `iati/` (`IatiTag` with its (i)), `tags/` (`ProjectTags`: shared tag list, editors remove/add, ask for new), `projects/`,
   `organisations/`, `grants/`, `watchdog/`, `feed/`, `social/` (likes, comments), `updates/`
+- SEO: root `layout.tsx` metadata (title template, Open Graph), `src/lib/pageMetadata.ts` (`generateMetadata` for detail pages, public client only), `src/app/sitemap.ts` + `robots.ts`, styled `not-found.tsx` / `error.tsx`
 - `src/lib/` data access: `supabaseServer.ts` (server client), `supabaseClient.ts` (browser client),
   `projects/`, `organisations/`, `grants/`, `watchdog/` query helpers, `email/`
 - Tags: `public.tags` (shared vocabulary, only admins/server add), `project_tags`, `tag_requests` (admin queue `/admin/tag-requests`); IATI sector names → tags in `scripts/iati/sync.ts` via `src/lib/tags/iatiSectors.ts`; Find Projects filter `?tag=<slug>`

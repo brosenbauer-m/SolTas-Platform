@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { LegalPage } from "@/components/legal/LegalPage";
 
-export const metadata: Metadata = { title: "Legal notice | Solarpunk Taskforce" };
+export const metadata: Metadata = { title: "Legal notice" };
 
 // Austria, run by a private person (no legal entity yet): information under § 5 ECG and
 // disclosure under § 25 MedienG. When an association or company is founded, add its name, register

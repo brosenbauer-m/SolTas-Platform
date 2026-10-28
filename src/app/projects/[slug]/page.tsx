@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { projectMetadata } from "@/lib/pageMetadata";
 
 import type { Database } from "@/lib/database.types";
 import FollowButton from "@/components/FollowButton";
@@ -71,6 +73,11 @@ function normalizeJsonLinks(value: ProjectRow["links"]) {
   }
 
   return out;
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  return projectMetadata(slug);
 }
 
 export default async function ProjectDetailPage({
