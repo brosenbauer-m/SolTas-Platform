@@ -112,7 +112,9 @@ export async function POST(
     .single();
 
   if (insertError) {
-    return NextResponse.json({ error: insertError.message }, { status: 400 });
+    // Database rate limit (migration 20260324120023)
+    const status = insertError.message.startsWith("Too many") ? 429 : 400;
+    return NextResponse.json({ error: insertError.message }, { status });
   }
 
   return NextResponse.json({ comment }, { status: 201 });

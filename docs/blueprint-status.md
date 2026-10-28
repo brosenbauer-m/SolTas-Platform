@@ -33,7 +33,7 @@ Update this file when a phase lands. Risk follows AGENT_RULES: DB/RLS/auth/payme
 | Membership fees | Individuals and organisations | Not started | Provider, prices |
 | Legal | Privacy, legal notice, processors | Done | Add the payment provider when chosen |
 | SEO / sharing | Page titles and descriptions, link previews, sitemap, robots, styled not-found and error pages | Done | Per-project preview images |
-| Quality | CI, RLS tests, admin review, scan fixes (#217), session middleware (#220), list timeouts fixed (#221) | Done | End-to-end tests, rate limits on posts/comments, typed Supabase clients |
+| Quality | CI, RLS tests, admin review, scan fixes (#217), session middleware (#220), list timeouts fixed (#221) | Done | End-to-end tests, typed Supabase clients |
 
 ## 2. Suggested order
 
@@ -42,7 +42,7 @@ Update this file when a phase lands. Risk follows AGENT_RULES: DB/RLS/auth/payme
 
 **B. Robustness (Medium/High)**: ~~Supabase session middleware~~ (done); typed Supabase clients and the
 errors they reveal (M); ~~project edit as one database function~~ (done);
-rate limits on posts, comments, uploads (M); ~~delete dead routes and pages~~ (done).
+~~rate limits on posts, comments, updates, issues~~ (done, database triggers); upload limits (M); ~~delete dead routes and pages~~ (done).
 
 **C. Membership and money (High)**: provider (e.g. Mollie, EU), plans for individuals and organisations, checkout,
 billing records (L); then AI search for members only; donations (L, needs the legal entity).

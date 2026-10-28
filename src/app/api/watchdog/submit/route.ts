@@ -83,7 +83,9 @@ export async function POST(request: Request) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    // Database rate limit (migration 20260324120023)
+    const status = error.message.startsWith("Too many") ? 429 : 400;
+    return NextResponse.json({ error: error.message }, { status });
   }
 
   // If user wants to post to feed, create a feed post
