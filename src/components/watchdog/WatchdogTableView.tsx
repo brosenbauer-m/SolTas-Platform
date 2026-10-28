@@ -22,6 +22,8 @@ const formatLocation = (issue: WatchdogIssueListRow) => {
 const formatUrgency = (value: number | null) => urgencyLabel(value) ?? "—";
 
 type WatchdogTableViewProps = {
+  /** the list query failed (timeout, outage): say so instead of "no results" */
+  loadFailed?: boolean;
   rows: WatchdogIssueListRow[];
   count: number;
   page: number;
@@ -30,6 +32,7 @@ type WatchdogTableViewProps = {
 };
 
 export default function WatchdogTableView({
+  loadFailed = false,
   rows,
   count,
   page,
@@ -39,7 +42,9 @@ export default function WatchdogTableView({
   return (
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-soltas-muted">Showing {rows.length} of {count} approved issues</p>
+        <p className="text-sm text-soltas-muted">
+          Showing {rows.length} of {count} approved issues
+        </p>
         <WatchdogPagination page={page} pageCount={pageCount} searchParams={searchParams} />
       </div>
 
@@ -56,7 +61,7 @@ export default function WatchdogTableView({
             </tr>
           </thead>
           <tbody className="divide-y divide-soltas-line">
-            {rows.map(issue => {
+            {rows.map((issue) => {
               const mapParams = new URLSearchParams();
               mapParams.set("view", "globe");
               mapParams.set("focus", issue.id);
@@ -84,17 +89,17 @@ export default function WatchdogTableView({
                   </td>
                   <td className="px-4 py-4">
                     <div className="flex flex-wrap gap-1">
-                      {sdgTags.slice(0, 3).map(tag => (
+                      {sdgTags.slice(0, 3).map((tag) => (
                         <Badge key={`sdg-${tag}`} variant="outline" className="text-xs">
                           SDG {tag}
                         </Badge>
                       ))}
-                      {challengeTags.slice(0, 2).map(tag => (
+                      {challengeTags.slice(0, 2).map((tag) => (
                         <Badge key={`challenge-${tag}`} variant="outline" className="text-xs">
                           {tag}
                         </Badge>
                       ))}
-                      {demographicTags.slice(0, 2).map(tag => (
+                      {demographicTags.slice(0, 2).map((tag) => (
                         <Badge key={`demo-${tag}`} variant="outline" className="text-xs">
                           {tag}
                         </Badge>
@@ -120,8 +125,13 @@ export default function WatchdogTableView({
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-soltas-line p-8 text-center text-sm text-soltas-muted">
-          No approved watchdog issues match the selected filters.
+        <div
+          role={loadFailed ? "alert" : undefined}
+          className="rounded-lg border border-dashed border-soltas-line p-8 text-center text-sm text-soltas-muted"
+        >
+          {loadFailed
+            ? "We couldn’t load the issues right now. Please try again in a moment."
+            : "No approved watchdog issues match the selected filters."}
         </div>
       ) : null}
 

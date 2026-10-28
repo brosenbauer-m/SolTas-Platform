@@ -37,6 +37,7 @@ export default async function FindProjectsPage({
   let count = 0;
   let page = 1;
   let pageCount = 1;
+  let loadFailed = false;
 
   try {
     const result = await fetchFindProjects({ searchParams: params });
@@ -46,6 +47,7 @@ export default async function FindProjectsPage({
     pageCount = result.pageCount;
   } catch (error) {
     console.error("Find projects: list query failed", error);
+    loadFailed = true;
   }
 
   const projectOptions = await fetchProjectFilterOptions().catch((error) => {
@@ -88,7 +90,7 @@ export default async function FindProjectsPage({
             pointsQuery={toQueryString(params, ["view", "focus", "page", "sort", "dir", "ai"])}
             search={aiSearch}
             results={
-              <ProjectsTableView rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />
+              <ProjectsTableView loadFailed={loadFailed} rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />
             }
           />
         </div>
@@ -98,7 +100,7 @@ export default async function FindProjectsPage({
             <div className="mb-6">{aiSearch}</div>
             <ProjectsFilters options={filterOptions} />
           </div>
-          <ProjectsTableView rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />
+          <ProjectsTableView loadFailed={loadFailed} rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />
         </>
       )}
     </main>
