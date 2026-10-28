@@ -3535,6 +3535,35 @@ export type Database = {
         Returns: string
       }
       slugify_project_name: { Args: { project_name: string }; Returns: string }
+      update_project_submission: {
+        Args: {
+          p_amount_needed: number
+          p_category: string
+          p_currency: string
+          p_description: string
+          p_donations_received: number
+          p_end_date: string
+          p_id: string
+          p_ifrc_ids: number[]
+          p_lat: number
+          p_lead_org_id: string
+          p_links: Json
+          p_lives_improved: number
+          p_lng: number
+          p_name: string
+          p_partner_org_ids: string[]
+          p_place_name: string
+          p_sdg_ids: number[]
+          p_start_date: string
+          p_target_demographic: string
+          p_thematic_area: string[]
+          p_type_of_intervention: string[]
+        }
+        Returns: {
+          id: string
+          slug: string
+        }[]
+      }
       user_can_edit_project: { Args: { pid: string }; Returns: boolean }
       user_can_view_project: { Args: { pid: string }; Returns: boolean }
       user_can_view_project_private: { Args: { pid: string }; Returns: boolean }
