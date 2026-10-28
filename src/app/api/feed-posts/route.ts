@@ -48,6 +48,10 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (insertError) {
+      // Database rate limit (migration 20260324120023): tell the person to wait, not that it failed
+      if (insertError.message.startsWith("Too many")) {
+        return NextResponse.json({ error: insertError.message }, { status: 429 });
+      }
       console.error("Insert error:", insertError);
       // Handle RLS errors more gracefully
       if (insertError.code === "42501" || insertError.message.includes("policy")) {
