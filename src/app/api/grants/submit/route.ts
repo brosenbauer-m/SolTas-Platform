@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { isApplicantType } from "@/lib/grants/applicantTypes";
+
 import { getServerSupabase } from "@/lib/supabaseServer";
 
 const payloadSchema = z
@@ -22,6 +24,7 @@ const payloadSchema = z
     decision_date: z.string().optional().nullable(),
     start_date: z.string().optional().nullable(),
     eligible_countries: z.array(z.string()).optional().nullable(),
+    applicant_types: z.array(z.string()).optional().nullable(),
     remote_ok: z.boolean().optional().nullable(),
     location_name: z.string().trim().optional().nullable(),
     latitude: z.number().optional().nullable(),
@@ -108,6 +111,7 @@ export async function POST(req: Request) {
       decision_date: data.decision_date ?? null,
       start_date: data.start_date ?? null,
       eligible_countries: data.eligible_countries ?? [],
+      applicant_types: (data.applicant_types ?? []).filter(isApplicantType),
       remote_ok: data.remote_ok ?? true,
       location_name: data.location_name ?? null,
       latitude: data.latitude ?? null,
