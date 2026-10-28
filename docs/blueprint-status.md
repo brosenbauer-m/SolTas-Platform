@@ -29,7 +29,7 @@ Update this file when a phase lands. Risk follows AGENT_RULES: DB/RLS/auth/payme
 | Note Empathy | Media / writing / store | Not started | — |
 | Services | Overview + request form (emailed to the team, nothing stored) | Done | Request tracking, if volume grows |
 | Profiles | Name, nationality, organisation, bio, links, label (Independent / Watchdog / Organisation), portfolio (published projects and issues), following list | Done | Self-described roles and periods (owner decision 8) |
-| Notifications | In-app, email setting | Partly | Email digests for followed projects |
+| Notifications | In-app: project updates, organisation updates, new projects of followed organisations, "your project is published"; email setting | Partly | Email digests |
 | Membership fees | Individuals and organisations | Not started | Provider, prices |
 | Legal | Privacy, legal notice, processors | Done | Add the payment provider when chosen |
 | SEO / sharing | Page titles and descriptions, link previews, sitemap, robots, styled not-found and error pages | Done | Per-project preview images |
