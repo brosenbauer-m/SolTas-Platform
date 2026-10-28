@@ -8,6 +8,7 @@ import ProjectTags, { type ProjectTag, type TagOption } from "@/components/tags/
 import { Badge } from "@/components/ui/badge";
 import { buttonClasses } from "@/components/ui/button";
 import ImportedProjectDetails, { publisherName, readSourceData } from "@/components/projects/ImportedProjectDetails";
+import ProjectGoals from "@/components/projects/ProjectGoals";
 import { SupportCard } from "@/components/projects/SupportCard";
 import UpdatesSectionWithSocial, { type UpdateSummary } from "@/components/updates/UpdatesSectionWithSocial";
 import { getServerSupabase } from "@/lib/supabaseServer";
@@ -128,6 +129,23 @@ export default async function ProjectDetailPage({
     .eq("project_id", project.id)
     .order("created_at", { ascending: false });
 
+  // Partner organisations (the form writes project_partners; partner_org_ids is legacy)
+  const { data: partnerRows } = await supabase
+    .from("project_partners")
+    .select("organisations(id,name)")
+    .eq("project_id", project.id);
+  const partners = ((partnerRows ?? []) as unknown as { organisations: { id: string; name: string } | null }[])
+    .map((row) => row.organisations)
+    .filter((org): org is { id: string; name: string } => Boolean(org?.id && org?.name))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  // Media files live in the private "project-media" bucket: links are signed for an hour.
+  const mediaPaths = (projectMedia ?? []).map((item) => item.path);
+  const { data: signed } = mediaPaths.length
+    ? await supabase.storage.from("project-media").createSignedUrls(mediaPaths, 60 * 60)
+    : { data: [] };
+  const mediaUrl = new Map((signed ?? []).map((item) => [item.path ?? "", item.signedUrl]));
+
   // 4) Can the current viewer edit? (used only for buttons)
   const { data: canEdit } = await supabase.rpc("user_can_edit_project", { pid: project.id });
 
@@ -207,6 +225,18 @@ export default async function ProjectDetailPage({
   const start = formatDate(project.start_date);
   const end = formatDate(project.end_date);
 
+  // Freshness: visitors and funders look for when the information was last touched.
+  const latestUpdate = (projectUpdates ?? [])[0]?.published_at ?? null;
+  const lastUpdated = formatDate(
+    imported
+      ? project.source_updated_at
+      : [latestUpdate, project.approved_at, project.created_at]
+          .filter((v): v is string => Boolean(v))
+          .sort()
+          .at(-1) ?? null,
+  );
+  const added = formatDate(project.created_at);
+
   const donations = formatMoney(project.donations_received, project.currency);
   const needed = formatMoney(project.amount_needed, project.currency);
   const raised = typeof project.donations_received === "number" ? project.donations_received : null;
@@ -264,6 +294,29 @@ export default async function ProjectDetailPage({
               {locationLabel}
             </p>
           ) : null}
+          {partners.length ? (
+            <p className="mt-1 text-[15px] text-soltas-muted">
+              with{" "}
+              {partners.map((org, index) => (
+                <span key={org.id}>
+                  {index > 0 ? (index === partners.length - 1 ? " and " : ", ") : null}
+                  <Link className="font-medium text-soltas-ocean hover:underline" href={`/organisations/${org.id}`}>
+                    {org.name}
+                  </Link>
+                </span>
+              ))}
+            </p>
+          ) : null}
+          <p className="mt-2 text-xs text-soltas-muted">
+            {imported ? (
+              <>Imported from IATI{lastUpdated ? <> · publisher data as of {lastUpdated}</> : null}</>
+            ) : (
+              <>
+                Added on Solarpunk Taskforce{added ? <> on {added}</> : null}
+                {lastUpdated && lastUpdated !== added ? <> · last updated {lastUpdated}</> : null}
+              </>
+            )}
+          </p>
           <ProjectTags
             projectId={project.id}
             initialTags={projectTags}
@@ -350,6 +403,8 @@ export default async function ProjectDetailPage({
           <p className="mt-3 whitespace-pre-wrap text-[15px] leading-7 text-soltas-text">{project.description}</p>
         </section>
       ) : null}
+
+      <ProjectGoals sdgs={project.sdgs} ifrc={project.ifrc_global_challenges} />
 
       {imported && project.iati_identifier ? (
         <ImportedProjectDetails data={sourceData} iatiIdentifier={project.iati_identifier} updatedAt={project.source_updated_at} />
@@ -468,14 +523,18 @@ export default async function ProjectDetailPage({
                   </div>
                   <div className="text-xs text-soltas-muted">{item.mime_type || "Unknown type"}</div>
                 </div>
-                <Link
-                  href={item.path}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-sm font-medium text-soltas-ocean hover:underline"
-                >
-                  View
-                </Link>
+                {mediaUrl.get(item.path) ? (
+                  <a
+                    href={mediaUrl.get(item.path)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm font-medium text-soltas-ocean hover:underline"
+                  >
+                    View
+                  </a>
+                ) : (
+                  <span className="text-xs text-soltas-muted">Not available</span>
+                )}
               </li>
             ))}
           </ul>

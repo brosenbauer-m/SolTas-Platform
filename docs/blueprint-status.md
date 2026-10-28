@@ -14,9 +14,9 @@ Update this file when a phase lands. Risk follows AGENT_RULES: DB/RLS/auth/payme
 | Find Projects | Globe + filters + results table, sorting | Done | End date / status sorts |
 | Find Projects | Standard tags (shared list, requests, admin queue) | Done (#216) | Tags for organisations and funding |
 | Find Projects | AI search (Mistral) | Built (#218), off until keys are set | Limit to paying members once fees exist |
-| Find Projects | SDG + IFRC filters | Not started | Data is collected, not filterable |
+| Find Projects | SDG + IFRC filters, end-date sort | Done | — |
 | Find Projects | Timeline slider / history | Not started | No history stored |
-| Project page | Core profile, updates, likes, comments, follow, tags | Done | Partners and SDGs/IFRC not shown |
+| Project page | Core profile, updates, likes, comments, follow, tags, partners, goals (SDG/IFRC), provenance and last-updated line | Done | Documents, contact person |
 | Project page | AI tags on create | Built (#218) | — |
 | Project page | Impact metrics, update reminders | Not started | — |
 | Project page | Donations | Placeholder | Payment provider, legal entity |
@@ -32,14 +32,14 @@ Update this file when a phase lands. Risk follows AGENT_RULES: DB/RLS/auth/payme
 | Notifications | In-app, email setting | Partly | Email digests for followed projects |
 | Membership fees | Individuals and organisations | Not started | Provider, prices |
 | Legal | Privacy, legal notice, processors | Done | Add the payment provider when chosen |
-| Quality | CI, RLS tests, admin review, scan fixes (#217) | Done | End-to-end tests, session middleware, rate limits on posts/comments, typed Supabase clients |
+| Quality | CI, RLS tests, admin review, scan fixes (#217), session middleware (#220), list timeouts fixed (#221) | Done | End-to-end tests, rate limits on posts/comments, typed Supabase clients |
 
 ## 2. Suggested order
 
-**A. Quick wins (Low/Medium)**: partners and SDGs/IFRC on the project page (S); SDG/IFRC filters and sorts (S–M);
+**A. Quick wins (Low/Medium)**: ~~partners and SDGs/IFRC on the project page; SDG/IFRC filters and sorts~~ (done);
 organisation page counts, partners, project search (M); feed share button (S); services request form (S–M).
 
-**B. Robustness (Medium/High)**: Supabase session middleware (M, High: auth); typed Supabase clients and the
+**B. Robustness (Medium/High)**: ~~Supabase session middleware~~ (done); typed Supabase clients and the
 errors they reveal (M); project edit as one database function so a failed save can't lose links/partners (M, High);
 rate limits on posts, comments, uploads (M); delete dead routes and pages (S).
 

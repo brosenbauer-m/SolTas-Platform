@@ -37,7 +37,7 @@ export type ProjectMarker = Pick<
   "id" | "slug" | "name" | "category" | "lat" | "lng" | "place_name" | "description"
 >;
 
-type SortColumn = "created_at" | "name" | "amount_needed" | "donations_received" | "start_date";
+type SortColumn = "created_at" | "name" | "amount_needed" | "donations_received" | "start_date" | "end_date";
 
 type SortDirection = "asc" | "desc";
 
@@ -55,6 +55,9 @@ export type FindProjectsParams = {
   lifecycle_status: string[];
   /** tag slugs (public.tags); a project matches if it has any of them */
   tags: string[];
+  /** SDG numbers ("1".."17") and IFRC challenge codes; a project matches if it has any of them */
+  sdgs: string[];
+  ifrc: string[];
   /** community = added on the platform, iati = imported from IATI; undefined = both */
   source?: "community" | "iati";
   min_needed?: number;
@@ -78,6 +81,7 @@ const SORT_COLUMNS: readonly SortColumn[] = [
   "amount_needed",
   "donations_received",
   "start_date",
+  "end_date",
 ];
 
 const SORT_DIRECTIONS: readonly SortDirection[] = ["asc", "desc"];
@@ -155,6 +159,8 @@ export function parseFindProjectsSearchParams(searchParams: RawSearchParams): Fi
     partner_org_ids: parseStringList(searchParams.partner_org_ids),
     lifecycle_status: parseStringList(searchParams.stage),
     tags: parseStringList(searchParams.tag),
+    sdgs: parseStringList(searchParams.sdg),
+    ifrc: parseStringList(searchParams.ifrc),
     source: parseSource(searchParams.source),
     min_needed: parseNumber(searchParams.min_needed),
     max_needed: parseNumber(searchParams.max_needed),
@@ -175,7 +181,10 @@ export function parseFindProjectsSearchParams(searchParams: RawSearchParams): Fi
  * Add it to the select of every query that goes through applyProjectFilters.
  */
 function tagJoin(params: FindProjectsParams) {
-  return params.tags.length ? ",tag_filter:project_tags!inner(tags!inner(slug))" : "";
+  return (
+    (params.tags.length ? ",tag_filter:project_tags!inner(tags!inner(slug))" : "") +
+    (params.partner_org_ids.length ? ",partner_filter:project_partners!inner(organisation_id)" : "")
+  );
 }
 
 /**
@@ -224,7 +233,16 @@ function applyProjectFilters<Q extends Record<string, any>>(query: Q, params: Fi
   }
 
   if (params.partner_org_ids.length) {
-    q = q.overlaps("partner_org_ids", params.partner_org_ids);
+    // needs tagJoin(params) in the select; the form writes partners to project_partners
+    q = q.in("partner_filter.organisation_id", params.partner_org_ids);
+  }
+
+  if (params.sdgs.length) {
+    q = q.overlaps("sdgs", params.sdgs);
+  }
+
+  if (params.ifrc.length) {
+    q = q.overlaps("ifrc_global_challenges", params.ifrc);
   }
 
   if (params.lifecycle_status.length) {
