@@ -8,9 +8,31 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import FollowButton from "@/components/FollowButton";
 import { buttonClasses } from "@/components/ui/button";
 import { SocialLinks } from "@/components/profiles/SocialLinks";
+import OrganisationUpdateForm from "@/components/organisations/OrganisationUpdateForm";
 import UpdatesSection, { type UpdateSummary } from "@/components/updates/UpdatesSection";
+import { plural } from "@/lib/plural";
 import { getServerSupabase } from "@/lib/supabaseServer";
 import { IATI_ORG_ID } from "@/lib/iati/systemOrg";
+import type { Database } from "@/lib/database.types";
+
+type OrganisationRow = Database["public"]["Tables"]["organisations"]["Row"];
+
+/** Columns added in migration 20260324120019 (typed here until the generated types catch up). */
+type TrustFields = {
+  legal_form: string | null;
+  registration_number: string | null;
+  registration_country: string | null;
+  founded_year: number | null;
+  annual_report_url: string | null;
+  contact_email: string | null;
+  looking_for: string[] | null;
+};
+
+const LOOKING_FOR_LABELS: Record<string, string> = {
+  funding: "Funding",
+  partners: "Partner organisations",
+  volunteers: "Volunteers",
+};
 
 function formatDate(value: string | null) {
   if (!value) return "—";
@@ -35,39 +57,56 @@ export default async function OrganisationPage({
 
   const supabase = await getServerSupabase();
 
-  const { data: organisation, error } = await supabase
+  const { data: organisationRow, error } = await supabase
     .from("organisations")
     .select(
-      "id,name,country_based,what_we_do,existing_since,website,social_links,logo_url,created_at,created_by,verification_status",
+      "id,name,country_based,what_we_do,existing_since,website,social_links,logo_url,created_at,created_by,verification_status," +
+        "legal_form,registration_number,registration_country,founded_year,annual_report_url,contact_email,looking_for",
     )
     .eq("id", id)
     .single();
 
-  if (!organisation) {
+  if (!organisationRow) {
     notFound();
   }
 
   if (error) {
     throw new Error("Unable to load organisation.");
   }
+  const organisation = organisationRow as unknown as Pick<
+    OrganisationRow,
+    | "id"
+    | "name"
+    | "country_based"
+    | "what_we_do"
+    | "existing_since"
+    | "website"
+    | "social_links"
+    | "logo_url"
+    | "created_at"
+    | "created_by"
+    | "verification_status"
+  > &
+    TrustFields;
 
   const { data: auth } = await supabase.auth.getUser();
   const user = auth?.user ?? null;
 
   const { data: isAdmin } = await supabase.rpc("is_admin");
-  const canEdit = Boolean(user && (organisation.created_by === user.id || isAdmin));
 
-  // Check if user is an org admin/owner
+  // The viewer's membership: owners and admins edit; they and members with posting rights publish updates.
   const { data: userMembership } = user
     ? await supabase
         .from("organisation_members")
-        .select("role")
+        .select("role,can_post_feed")
         .eq("organisation_id", organisation.id)
         .eq("user_id", user.id)
-        .single()
+        .maybeSingle()
     : { data: null };
 
   const isOrgAdmin = userMembership?.role === "admin" || userMembership?.role === "owner";
+  const canEdit = Boolean(user && (organisation.created_by === user.id || isOrgAdmin || isAdmin));
+  const canPost = Boolean(user && (isOrgAdmin || userMembership?.can_post_feed));
 
   const { count: followerCount, error: followerCountError } = await supabase
     .from("follow_edges")
@@ -90,19 +129,37 @@ export default async function OrganisationPage({
     .select("user_id", { count: "exact", head: true })
     .eq("organisation_id", organisation.id);
 
-  // Public, approved projects this organisation leads or owns.
-  const { data: orgProjects, error: projectError } = await supabase
-    .from("projects")
-    .select("id,slug,name,category,place_name,country,description")
-    .or(`lead_org_id.eq.${organisation.id},and(owner_type.eq.organisation,owner_id.eq.${organisation.id})`)
-    .eq("status", "approved")
-    .eq("visibility", "public")
-    .order("created_at", { ascending: false })
-    .limit(12);
-  const projectCount = orgProjects?.length ?? 0;
+  // Public, approved projects this organisation leads or owns, newest first, plus the counts (the list is capped).
+  const ownOrLead = `lead_org_id.eq.${organisation.id},and(owner_type.eq.organisation,owner_id.eq.${organisation.id})`;
+  const listedProjects = () =>
+    supabase.from("projects").select("id", { count: "exact", head: true }).or(ownOrLead).eq("status", "approved").eq("visibility", "public");
+  const today = new Date().toISOString().slice(0, 10);
+  const [{ data: orgProjects, error: projectError }, { count: projectCount }, { count: ongoingCount }, { data: partnerRows }] =
+    await Promise.all([
+      supabase
+        .from("projects")
+        .select("id,slug,name,category,place_name,country,description,end_date")
+        .or(ownOrLead)
+        .eq("status", "approved")
+        .eq("visibility", "public")
+        .order("created_at", { ascending: false })
+        .limit(12),
+      listedProjects(),
+      listedProjects().or(`end_date.is.null,end_date.gte.${today}`),
+      // Projects where this organisation is a partner (RLS shows only what the viewer may see)
+      supabase.from("project_partners").select("projects(id,slug,name,category,status,visibility)").eq("organisation_id", organisation.id).limit(12),
+    ]);
+  const partnerProjects = ((partnerRows ?? []) as unknown as {
+    projects: { id: string; slug: string | null; name: string; category: string; status: string; visibility: string | null } | null;
+  }[])
+    .map((row) => row.projects)
+    .filter((p): p is NonNullable<typeof p> => Boolean(p && p.status === "approved" && (p.visibility ?? "public") === "public"));
 
   const resolvedMemberCount = memberError ? null : memberCount ?? 0;
   const resolvedProjectCount = projectError ? null : projectCount ?? 0;
+  const finishedCount = Math.max(0, (projectCount ?? 0) - (ongoingCount ?? 0));
+  const lookingFor = (organisation.looking_for ?? []).map((key) => LOOKING_FOR_LABELS[key]).filter(Boolean);
+  const founded = organisation.founded_year ?? organisation.existing_since;
   const resolvedFollowerCount = followerCountError ? null : followerCount ?? 0;
   const isFollowing = Boolean(followEdge && !followEdgeError);
   const isVerified = organisation.verification_status === "verified";
@@ -210,16 +267,13 @@ export default async function OrganisationPage({
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 sm:items-end">
+        <div className="flex shrink-0 flex-col gap-2 sm:items-end">
           {canEdit ? (
-            <>
-              <Link
-                href={`/organisations/${organisation.id}/edit`}
-                className={buttonClasses({ size: "sm" })}
-              >
+            <div className="flex flex-wrap gap-2">
+              <Link href={`/organisations/${organisation.id}/edit`} className={buttonClasses({ size: "sm" })}>
                 Edit
               </Link>
-              {isOrgAdmin ? (
+              {isOrgAdmin || isAdmin ? (
                 <Link
                   href={`/organisations/${organisation.id}/members`}
                   className={buttonClasses({ variant: "outline", size: "sm" })}
@@ -227,48 +281,123 @@ export default async function OrganisationPage({
                   Members
                 </Link>
               ) : null}
-            </>
-          ) : (
-            <FollowButton
-              targetType="org"
-              targetId={organisation.id}
-              initialIsFollowing={isFollowing}
-              initialFollowerCount={resolvedFollowerCount}
-              isAuthenticated={Boolean(user)}
-            />
-          )}
+            </div>
+          ) : null}
+          <FollowButton
+            targetType="org"
+            targetId={organisation.id}
+            initialIsFollowing={isFollowing}
+            initialFollowerCount={resolvedFollowerCount}
+            isAuthenticated={Boolean(user)}
+          />
         </div>
       </header>
 
+      {/* Key figures: what funders and partners look at first */}
+      <section aria-label="Key figures" className="grid gap-3 sm:grid-cols-3">
+        <div className="card p-5">
+          <p className="text-xs font-medium text-soltas-muted">Ongoing projects</p>
+          <p className="mt-1 text-2xl font-semibold tracking-tight text-soltas-text">{(ongoingCount ?? 0).toLocaleString()}</p>
+        </div>
+        <div className="card p-5">
+          <p className="text-xs font-medium text-soltas-muted">Finished projects</p>
+          <p className="mt-1 text-2xl font-semibold tracking-tight text-soltas-text">{finishedCount.toLocaleString()}</p>
+        </div>
+        <div className="card p-5">
+          <p className="text-xs font-medium text-soltas-muted">Followers</p>
+          <p className="mt-1 text-2xl font-semibold tracking-tight text-soltas-text">{(resolvedFollowerCount ?? 0).toLocaleString()}</p>
+        </div>
+      </section>
+
       <section className="card p-6">
-        <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Overview</h2>
+        <h2 className="text-lg font-semibold tracking-tight text-soltas-text">What we do</h2>
+        {organisation.what_we_do ? (
+          <p className="mt-3 whitespace-pre-wrap text-[15px] leading-7 text-soltas-text">{organisation.what_we_do}</p>
+        ) : (
+          <p className="mt-3 text-sm text-soltas-muted">
+            {canEdit ? "Not written yet. Tell visitors what you do and where; it is the first thing they read." : "Not reported yet."}
+          </p>
+        )}
+        {lookingFor.length ? (
+          <div className="mt-5">
+            <p className="text-xs font-medium text-soltas-muted">Looking for</p>
+            <ul className="mt-2 flex flex-wrap gap-2">
+              {lookingFor.map((label) => (
+                <li key={label} className="rounded-full bg-soltas-ocean/10 px-3 py-1 text-xs font-medium text-soltas-ocean">
+                  {label}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+      </section>
+
+      <section className="card p-6">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Organisation details</h2>
+          <p className="text-xs text-soltas-muted">Self-reported{isVerified ? ", identity verified by Solarpunk Taskforce" : ""}</p>
+        </div>
         <dl className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div className="sm:col-span-2">
-            <dt className="text-xs font-medium text-soltas-muted">
-              What we do
-            </dt>
+          <div>
+            <dt className="text-xs font-medium text-soltas-muted">Legal form</dt>
             <dd className="mt-1 text-sm text-soltas-text">
-              {organisation.what_we_do ? (
-                organisation.what_we_do
+              {organisation.legal_form || <span className="text-soltas-muted">Not reported yet</span>}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium text-soltas-muted">Registration number</dt>
+            <dd className="mt-1 text-sm text-soltas-text">
+              {organisation.registration_number ? (
+                <>
+                  {organisation.registration_number}
+                  {organisation.registration_country ? (
+                    <span className="text-soltas-muted"> · {organisation.registration_country}</span>
+                  ) : null}
+                </>
               ) : (
-                <span className="italic text-soltas-muted">No description provided</span>
+                <span className="text-soltas-muted">Not reported yet</span>
               )}
             </dd>
           </div>
           <div>
-            <dt className="text-xs font-medium text-soltas-muted">
-              Country
-            </dt>
+            <dt className="text-xs font-medium text-soltas-muted">Based in</dt>
             <dd className="mt-1 text-sm text-soltas-text">
-              {organisation.country_based || <span className="text-soltas-muted">—</span>}
+              {organisation.country_based || <span className="text-soltas-muted">Not reported yet</span>}
             </dd>
           </div>
           <div>
-            <dt className="text-xs font-medium text-soltas-muted">
-              Established
-            </dt>
+            <dt className="text-xs font-medium text-soltas-muted">Founded</dt>
             <dd className="mt-1 text-sm text-soltas-text">
-              {organisation.existing_since || <span className="text-soltas-muted">—</span>}
+              {founded || <span className="text-soltas-muted">Not reported yet</span>}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium text-soltas-muted">Annual report</dt>
+            <dd className="mt-1 text-sm text-soltas-text">
+              {organisation.annual_report_url ? (
+                <a
+                  href={organisation.annual_report_url}
+                  className="font-medium text-soltas-ocean hover:underline"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open the latest report ↗
+                </a>
+              ) : (
+                <span className="text-soltas-muted">Not published yet</span>
+              )}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium text-soltas-muted">Contact</dt>
+            <dd className="mt-1 text-sm text-soltas-text">
+              {organisation.contact_email ? (
+                <a href={`mailto:${organisation.contact_email}`} className="font-medium text-soltas-ocean hover:underline">
+                  {organisation.contact_email}
+                </a>
+              ) : (
+                <span className="text-soltas-muted">Not reported yet</span>
+              )}
             </dd>
           </div>
           <div>
@@ -304,8 +433,8 @@ export default async function OrganisationPage({
           <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Projects</h2>
           <p className="text-sm text-soltas-muted">
             {[
-              resolvedProjectCount ? `${resolvedProjectCount} ${resolvedProjectCount === 1 ? "project" : "projects"}` : null,
-              resolvedMemberCount ? `${resolvedMemberCount} ${resolvedMemberCount === 1 ? "member" : "members"}` : null,
+              resolvedProjectCount != null ? plural(resolvedProjectCount, "project") : null,
+              resolvedMemberCount ? plural(resolvedMemberCount, "member") : null,
             ]
               .filter(Boolean)
               .join(" · ")}
@@ -338,15 +467,50 @@ export default async function OrganisationPage({
             ))}
           </ul>
         ) : (
-          <p className="mt-3 text-sm text-soltas-muted">No public projects yet.</p>
+          <p className="mt-3 text-sm text-soltas-muted">
+            {canEdit ? (
+              <>
+                No public projects yet.{" "}
+                <Link href="/projects/new" className="font-medium text-soltas-ocean hover:underline">
+                  Add your first project
+                </Link>
+                .
+              </>
+            ) : (
+              "No public projects yet."
+            )}
+          </p>
         )}
+        {(resolvedProjectCount ?? 0) > (orgProjects?.length ?? 0) ? (
+          <p className="mt-4 text-sm text-soltas-muted">Showing the {orgProjects?.length ?? 0} newest.</p>
+        ) : null}
       </section>
 
-      <UpdatesSection
-        updates={updates}
-        isAuthenticated={Boolean(user)}
-        canPost={canEdit}
-      />
+      {partnerProjects.length ? (
+        <section className="card p-6">
+          <h2 className="text-lg font-semibold tracking-tight text-soltas-text">Projects as a partner</h2>
+          <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+            {partnerProjects.map((project) => (
+              <li key={project.id}>
+                <Link
+                  href={`/projects/${project.slug ?? project.id}`}
+                  className="flex h-full flex-col rounded-2xl border border-soltas-line p-4 transition-colors hover:bg-soltas-off-white"
+                >
+                  <Badge variant={project.category === "humanitarian" ? "ocean" : "green"} className="w-fit capitalize">
+                    {project.category}
+                  </Badge>
+                  <span className="mt-2 font-medium text-soltas-text">{project.name}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      <section className="space-y-4">
+        {canPost ? <OrganisationUpdateForm organisationId={organisation.id} /> : null}
+        <UpdatesSection updates={updates} isAuthenticated={Boolean(user)} canPost={canPost} />
+      </section>
     </main>
   );
 }
