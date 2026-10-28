@@ -3,6 +3,8 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { z } from "zod"
+import { Checkbox } from "@/components/ui/checkbox"
+import { APPLICANT_TYPES, isApplicantType } from "@/lib/grants/applicantTypes"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 
@@ -96,6 +98,7 @@ const formSchema = z.object({
   start_date: z.string().optional().default(""),
 
   eligible_countries: z.string().optional().default(""),
+  applicant_types: z.array(z.string()).default([]),
 
   remote_ok: z.boolean().default(false),
 
@@ -242,6 +245,7 @@ export default function GrantForm({ grant, mode = "create" }: GrantFormProps) {
         decision_date: "",
         start_date: "",
         eligible_countries: "",
+        applicant_types: [],
         remote_ok: false,
         location_name: "",
         latitude: "",
@@ -274,6 +278,9 @@ export default function GrantForm({ grant, mode = "create" }: GrantFormProps) {
       eligible_countries: Array.isArray(grant.eligible_countries)
         ? grant.eligible_countries.join(", ")
         : (grant.eligible_countries as unknown as string) ?? "",
+      applicant_types: Array.isArray((grant as { applicant_types?: string[] }).applicant_types)
+        ? ((grant as { applicant_types?: string[] }).applicant_types as string[])
+        : [],
       remote_ok: Boolean(grant.remote_ok),
       location_name: grant.location_name ?? "",
       latitude: grant.latitude != null ? String(grant.latitude) : "",
@@ -341,6 +348,7 @@ export default function GrantForm({ grant, mode = "create" }: GrantFormProps) {
         start_date: parseDateOrNull(values.start_date),
 
         eligible_countries: eligibleCountries,
+        applicant_types: values.applicant_types.filter(isApplicantType),
         remote_ok: values.remote_ok,
 
         location_name: values.location_name.trim() ? values.location_name.trim() : null,
@@ -373,7 +381,7 @@ export default function GrantForm({ grant, mode = "create" }: GrantFormProps) {
         if (!user) throw new Error("You must be signed in to create funding.")
 
         const payload: GrantInsert = {
-          ...(payloadBase as Omit<GrantInsert, "created_by" | "slug">),
+          ...(payloadBase as unknown as Omit<GrantInsert, "created_by" | "slug">),
           created_by: user.id,
           slug: slugify(values.title) || `grant-${Date.now()}`,
         }
@@ -686,6 +694,37 @@ export default function GrantForm({ grant, mode = "create" }: GrantFormProps) {
                   <Input placeholder="e.g. Global, EU, USA, Kenya" {...field} />
                 </FormControl>
                 <FormDescription>Free text is ok (e.g. “Global” or “EU + UK”).</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="applicant_types"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Who can apply</FormLabel>
+                <FormDescription>Tick every type of applicant the funder accepts.</FormDescription>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {APPLICANT_TYPES.map((type) => {
+                    const checked = field.value.includes(type.value);
+                    return (
+                      <label key={type.value} className="flex min-h-11 items-center gap-3 rounded-xl border border-soltas-line px-3 text-sm text-soltas-text">
+                        <Checkbox
+                          checked={checked}
+                          onCheckedChange={(next) =>
+                            field.onChange(
+                              next ? [...field.value, type.value] : field.value.filter((v: string) => v !== type.value),
+                            )
+                          }
+                          aria-label={type.label}
+                        />
+                        {type.label}
+                      </label>
+                    );
+                  })}
+                </div>
                 <FormMessage />
               </FormItem>
             )}

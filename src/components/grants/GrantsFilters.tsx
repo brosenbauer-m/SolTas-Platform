@@ -12,6 +12,7 @@ import {
   type FilterDef,
   type Option,
 } from "@/components/find/filters";
+import { APPLICANT_TYPE_OPTIONS } from "@/lib/grants/applicantTypes";
 import type { GrantFilterOptions } from "@/lib/grants/findGrantsQuery";
 
 const FUNDING_TYPE_OPTIONS: Option[] = [
@@ -81,6 +82,13 @@ export default function GrantsFilters({ options, showSorting = true }: GrantsFil
       main: true,
       params: ["eligible_countries"],
       render: () => <ComboboxFilter param="eligible_countries" options={options.countries} placeholder="Anywhere" />,
+    },
+    {
+      key: "applicant_types",
+      label: "Who can apply",
+      main: true,
+      params: ["applicant_types"],
+      render: () => <ComboboxFilter param="applicant_types" options={APPLICANT_TYPE_OPTIONS} placeholder="Anyone" />,
     },
     {
       key: "funding_type",

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { grantMetadata } from "@/lib/pageMetadata";
+import { applicantTypeLabel } from "@/lib/grants/applicantTypes";
 import { ArrowUpRight } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -49,6 +50,13 @@ const FUNDING_TYPE_LABELS: Record<string, string> = {
 };
 
 /** "in 12 days", "today", or "closed" relative to now. */
+/** True when the deadline is within the next `days` days (sector convention: "closing soon" ≈ two weeks). */
+const closesWithin = (value: string | null, days: number) => {
+  if (!value) return false;
+  const left = Math.ceil((new Date(value).getTime() - Date.now()) / 86_400_000);
+  return Number.isFinite(left) && left >= 0 && left <= days;
+};
+
 const deadlineHint = (value: string | null) => {
   if (!value) return null;
   const date = new Date(value);
@@ -81,7 +89,7 @@ export default async function GrantDetailPage({
   const { data: grant, error } = await supabase
     .from("grants")
     .select(
-      "id,slug,title,summary,description,funder_name,funder_website,application_url,contact_email,funding_type,project_type,currency,amount_min,amount_max,open_date,deadline,decision_date,start_date,eligible_countries,remote_ok,location_name,themes,sdgs,status",
+      "id,slug,title,summary,description,funder_name,funder_website,application_url,contact_email,funding_type,project_type,currency,amount_min,amount_max,open_date,deadline,decision_date,start_date,eligible_countries,applicant_types,remote_ok,location_name,themes,sdgs,status",
     )
     .eq("slug", slug)
     .single();
@@ -100,6 +108,8 @@ export default async function GrantDetailPage({
   const hint = grant.status === "closed" ? "Closed" : deadlineHint(grant.deadline);
   const isClosed = hint === "Closed";
   const where = grant.eligible_countries?.length ? grant.eligible_countries.join(", ") : null;
+  const applicants = (((grant as unknown as { applicant_types?: string[] }).applicant_types ?? []) as string[]).map(applicantTypeLabel);
+  const closingSoon = !isClosed && closesWithin(grant.deadline, 14);
   const otherDates = [
     openDate ? { label: "Opens", value: openDate } : null,
     decisionDate ? { label: "Decision", value: decisionDate } : null,
@@ -116,7 +126,15 @@ export default async function GrantDetailPage({
               {grant.project_type}
             </Badge>
           ) : null}
-          {isClosed ? <Badge variant="rose">Closed</Badge> : grant.status === "rolling" ? <Badge>Rolling</Badge> : null}
+          {isClosed ? (
+            <Badge variant="rose">Closed</Badge>
+          ) : grant.status === "rolling" ? (
+            <Badge>Rolling</Badge>
+          ) : closingSoon ? (
+            <Badge variant="amber">Closing soon</Badge>
+          ) : (
+            <Badge variant="green">Open</Badge>
+          )}
         </div>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-soltas-text sm:text-4xl">{grant.title}</h1>
         {grant.funder_name ? <p className="mt-2 text-[15px] text-soltas-muted">by {grant.funder_name}</p> : null}
@@ -151,7 +169,18 @@ export default async function GrantDetailPage({
         </div>
         <div className="card p-5">
           <p className="text-xs font-medium text-soltas-muted">Who can apply</p>
-          <p className="mt-1 text-[15px] font-medium leading-6 text-soltas-text">{where ?? "Not specified"}</p>
+          {applicants.length ? (
+            <ul className="mt-1.5 flex flex-wrap gap-1.5">
+              {applicants.map((label) => (
+                <li key={label} className="rounded-full bg-soltas-ocean/10 px-2.5 py-0.5 text-xs font-medium text-soltas-ocean">
+                  {label}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <p className={`${applicants.length ? "mt-2" : "mt-1"} text-[15px] font-medium leading-6 text-soltas-text`}>
+            {where ? `From ${where}` : applicants.length ? "From anywhere" : "Not specified"}
+          </p>
           {grant.remote_ok ? <p className="mt-1 text-xs text-soltas-muted">Remote participation possible</p> : null}
         </div>
       </section>

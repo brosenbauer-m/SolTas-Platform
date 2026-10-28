@@ -52,6 +52,7 @@ export type FindGrantsParams = {
   status: string[];
   closing_within?: number;
   eligible_countries: string[];
+  applicant_types: string[];
   themes: string[];
   sdgs: number[];
   remote_only?: boolean;
@@ -148,6 +149,7 @@ export function parseFindGrantsSearchParams(searchParams: RawSearchParams): Find
     status: parseStringList(searchParams.status),
     closing_within: parseNumber(searchParams.closing_within),
     eligible_countries: parseStringList(searchParams.eligible_countries),
+    applicant_types: parseStringList(searchParams.applicant_types),
     themes: parseStringList(searchParams.themes),
     sdgs: parseNumberList(searchParams.sdgs),
 
@@ -190,7 +192,7 @@ export async function fetchFindGrants({
   let query = supabase
     .from("grants")
     .select(
-      "id,slug,title,summary,funder_name,funding_type,project_type,currency,amount_min,amount_max,deadline,open_date,eligible_countries,location_name,latitude,longitude,status,created_at",
+      "id,slug,title,summary,funder_name,funding_type,project_type,currency,amount_min,amount_max,deadline,open_date,eligible_countries,applicant_types,location_name,latitude,longitude,status,created_at",
       { count: "exact" },
     )
     .eq("is_published", true);
@@ -215,6 +217,9 @@ export async function fetchFindGrants({
 
   if (params.eligible_countries.length) {
     query = query.overlaps("eligible_countries", params.eligible_countries);
+  }
+  if (params.applicant_types.length) {
+    query = query.overlaps("applicant_types", params.applicant_types);
   }
 
   if (params.themes.length) {
@@ -312,6 +317,9 @@ export async function fetchGrantMarkers({
 
   if (params.eligible_countries.length) {
     query = query.overlaps("eligible_countries", params.eligible_countries);
+  }
+  if (params.applicant_types.length) {
+    query = query.overlaps("applicant_types", params.applicant_types);
   }
 
   if (params.themes.length) {
