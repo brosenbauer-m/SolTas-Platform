@@ -8,7 +8,7 @@ import { Check, Plus } from "lucide-react";
 import { buttonClasses } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
-export type FollowTargetType = "person" | "org" | "project";
+export type FollowTargetType = "person" | "org" | "project" | "issue";
 
 type FollowButtonProps = {
   targetType: FollowTargetType;
