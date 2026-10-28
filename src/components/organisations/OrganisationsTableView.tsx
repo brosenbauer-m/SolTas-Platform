@@ -31,6 +31,8 @@ const formatAge = (value: number | null) => {
 };
 
 type Props = {
+  /** the list query failed (timeout, outage): say so instead of "no results" */
+  loadFailed?: boolean;
   rows: OrganisationListRow[];
   count: number;
   page: number;
@@ -39,7 +41,14 @@ type Props = {
 };
 
 /** Find Organisations results: a table with pagination (table view, and under the filters in the globe view). */
-export default function OrganisationsTableView({ rows, count, page, pageCount, searchParams: params }: Props) {
+export default function OrganisationsTableView({
+  loadFailed = false,
+  rows,
+  count,
+  page,
+  pageCount,
+  searchParams: params,
+}: Props) {
   return (
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -99,8 +108,13 @@ export default function OrganisationsTableView({ rows, count, page, pageCount, s
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-soltas-line p-8 text-center text-sm text-soltas-muted">
-          No organisations match the selected filters.
+        <div
+          role={loadFailed ? "alert" : undefined}
+          className="rounded-lg border border-dashed border-soltas-line p-8 text-center text-sm text-soltas-muted"
+        >
+          {loadFailed
+            ? "We couldn’t load the organisations right now. Please try again in a moment."
+            : "No organisations match the selected filters."}
         </div>
       ) : null}
 

@@ -37,6 +37,7 @@ export default async function FindOrganisationsPage({
   let count = 0;
   let page = 1;
   let pageCount = 1;
+  let loadFailed = false;
 
   try {
     const result = await fetchFindOrganisations({ searchParams: params });
@@ -46,6 +47,7 @@ export default async function FindOrganisationsPage({
     pageCount = result.pageCount;
   } catch (e) {
     console.error("Find organisations: list query failed", e);
+    loadFailed = true;
   }
 
   let markers: Awaited<ReturnType<typeof fetchOrganisationMarkers>> = [];
@@ -88,7 +90,7 @@ export default async function FindOrganisationsPage({
             totalCount={count}
             focusSlug={focus}
             results={
-              <OrganisationsTableView rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />
+              <OrganisationsTableView loadFailed={loadFailed} rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />
             }
           />
         </div>
@@ -98,7 +100,7 @@ export default async function FindOrganisationsPage({
             <OrganisationsFilters options={filterOptions} showSorting />
           </div>
 
-          <OrganisationsTableView rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />
+          <OrganisationsTableView loadFailed={loadFailed} rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />
         </>
       )}
     </main>

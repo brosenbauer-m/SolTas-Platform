@@ -76,6 +76,7 @@ export default async function FindFundingPage({
   let count = 0;
   let page = 1;
   let pageCount = 1;
+  let loadFailed = false;
 
   try {
     const result = await fetchFindGrants({ searchParams: params });
@@ -85,6 +86,7 @@ export default async function FindFundingPage({
     pageCount = result.pageCount;
   } catch (error) {
     console.error("Find funding: list query failed", error);
+    loadFailed = true;
   }
 
   let markers: Awaited<ReturnType<typeof fetchGrantMarkers>> = [];
@@ -124,7 +126,7 @@ export default async function FindFundingPage({
             markers={markers}
             totalCount={count}
             focusSlug={focus}
-            results={<GrantsTableView rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />}
+            results={<GrantsTableView loadFailed={loadFailed} rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />}
           />
         </div>
       ) : (
@@ -132,7 +134,7 @@ export default async function FindFundingPage({
           <div className="card p-5 lg:p-6">
             <GrantsFilters options={filterOptions} />
           </div>
-          <GrantsTableView rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />
+          <GrantsTableView loadFailed={loadFailed} rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />
         </>
       )}
     </main>

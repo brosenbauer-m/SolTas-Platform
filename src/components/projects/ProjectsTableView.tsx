@@ -75,6 +75,8 @@ const buttonVariants = {
 } as const;
 
 type ProjectsTableViewProps = {
+  /** the list query failed (timeout, outage): say so instead of "no results" */
+  loadFailed?: boolean;
   rows: ProjectListRow[];
   count: number;
   page: number;
@@ -83,6 +85,7 @@ type ProjectsTableViewProps = {
 };
 
 export default function ProjectsTableView({
+  loadFailed = false,
   rows,
   count,
   page,
@@ -92,7 +95,9 @@ export default function ProjectsTableView({
   return (
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-soltas-muted">Showing {rows.length} of {plural(count, "project")}</p>
+        <p className="text-sm text-soltas-muted">
+          Showing {rows.length} of {plural(count, "project")}
+        </p>
         <ProjectsPagination page={page} pageCount={pageCount} searchParams={searchParams} basePath="/projects" />
       </div>
 
@@ -110,7 +115,7 @@ export default function ProjectsTableView({
             </tr>
           </thead>
           <tbody className="divide-y divide-soltas-line">
-            {rows.map(project => {
+            {rows.map((project) => {
               const slugForPath = getProjectSlug(project);
               const tags = getTagPreview(project);
               const mapParams = new URLSearchParams();
@@ -145,7 +150,7 @@ export default function ProjectsTableView({
                   <td className="px-4 py-4">
                     <div className="flex flex-wrap gap-1">
                       {tags.length > 0 ? (
-                        tags.map(tag =>
+                        tags.map((tag) =>
                           tag.slug ? (
                             <Link key={tag.slug} href={`/projects?tag=${encodeURIComponent(tag.slug)}`}>
                               <Badge variant="ocean" className="text-xs hover:underline">
@@ -184,8 +189,13 @@ export default function ProjectsTableView({
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-soltas-line p-8 text-center text-sm text-soltas-muted">
-          No projects match the selected filters.
+        <div
+          role={loadFailed ? "alert" : undefined}
+          className="rounded-lg border border-dashed border-soltas-line p-8 text-center text-sm text-soltas-muted"
+        >
+          {loadFailed
+            ? "We couldn’t load the projects right now. Please try again in a moment."
+            : "No projects match the selected filters."}
         </div>
       ) : null}
 

@@ -60,6 +60,8 @@ const buttonVariants = {
 } as const;
 
 type GrantsTableViewProps = {
+  /** the list query failed (timeout, outage): say so instead of "no results" */
+  loadFailed?: boolean;
   rows: GrantListRow[];
   count: number;
   page: number;
@@ -67,11 +69,20 @@ type GrantsTableViewProps = {
   searchParams: Record<string, string | string[] | undefined>;
 };
 
-export default function GrantsTableView({ rows, count, page, pageCount, searchParams }: GrantsTableViewProps) {
+export default function GrantsTableView({
+  loadFailed = false,
+  rows,
+  count,
+  page,
+  pageCount,
+  searchParams,
+}: GrantsTableViewProps) {
   return (
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-soltas-muted">Showing {rows.length} of {plural(count, "funding opportunity", "funding opportunities")}</p>
+        <p className="text-sm text-soltas-muted">
+          Showing {rows.length} of {plural(count, "funding opportunity", "funding opportunities")}
+        </p>
         <GrantsPagination page={page} pageCount={pageCount} searchParams={searchParams} basePath="/funding" />
       </div>
 
@@ -89,7 +100,7 @@ export default function GrantsTableView({ rows, count, page, pageCount, searchPa
             </tr>
           </thead>
           <tbody className="divide-y divide-soltas-line">
-            {rows.map(grant => {
+            {rows.map((grant) => {
               const slugForPath = getGrantSlug(grant);
               const focusSlug = grant.slug ?? null;
               const mapParams = new URLSearchParams();
@@ -111,7 +122,9 @@ export default function GrantsTableView({ rows, count, page, pageCount, searchPa
                     <p className="mt-1 truncate text-xs text-soltas-muted">
                       {grant.funder_name ? `Funder: ${grant.funder_name}` : "Funder not listed"}
                     </p>
-                    {grant.summary ? <p className="mt-2 line-clamp-2 text-xs text-soltas-muted">{grant.summary}</p> : null}
+                    {grant.summary ? (
+                      <p className="mt-2 line-clamp-2 text-xs text-soltas-muted">{grant.summary}</p>
+                    ) : null}
                   </td>
                   <td className="px-4 py-4 text-soltas-muted">
                     <div className="capitalize">{grant.funding_type}</div>
@@ -149,8 +162,13 @@ export default function GrantsTableView({ rows, count, page, pageCount, searchPa
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-soltas-line p-8 text-center text-sm text-soltas-muted">
-          No funding opportunities match the selected filters.
+        <div
+          role={loadFailed ? "alert" : undefined}
+          className="rounded-lg border border-dashed border-soltas-line p-8 text-center text-sm text-soltas-muted"
+        >
+          {loadFailed
+            ? "We couldn’t load the funding opportunities right now. Please try again in a moment."
+            : "No funding opportunities match the selected filters."}
         </div>
       ) : null}
 

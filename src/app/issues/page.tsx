@@ -41,6 +41,7 @@ export default async function WatchdogPage({
   let count = 0;
   let page = 1;
   let pageCount = 1;
+  let loadFailed = false;
 
   try {
     const result = await fetchWatchdogIssues({ searchParams: params });
@@ -50,6 +51,7 @@ export default async function WatchdogPage({
     pageCount = result.pageCount;
   } catch (error) {
     console.error("Issues: list query failed", error);
+    loadFailed = true;
   }
 
   let markers: Awaited<ReturnType<typeof fetchWatchdogMarkers>> = [];
@@ -89,7 +91,7 @@ export default async function WatchdogPage({
             totalCount={count}
             focusId={focus}
             options={filterOptions}
-            results={<WatchdogTableView rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />}
+            results={<WatchdogTableView loadFailed={loadFailed} rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />}
           />
         </div>
       ) : (
@@ -97,7 +99,7 @@ export default async function WatchdogPage({
           <div className="card p-5 lg:p-6">
             <WatchdogFilters options={filterOptions} />
           </div>
-          <WatchdogTableView rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />
+          <WatchdogTableView loadFailed={loadFailed} rows={rows} count={count} page={page} pageCount={pageCount} searchParams={params} />
         </>
       )}
     </main>
