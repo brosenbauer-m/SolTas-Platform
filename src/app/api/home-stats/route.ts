@@ -19,7 +19,11 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const row = Array.isArray(data) ? data[0] : data;
+  // Columns added in migration 20260324120024 are typed here until the generated types catch up.
+  const row = (Array.isArray(data) ? data[0] : data) as
+    | ((typeof data extends (infer R)[] ? R : typeof data) & { projects_changemakers?: unknown; projects_lives_improved?: unknown })
+    | null
+    | undefined;
 
   const response: HomeStats = {
     updated_at: row?.updated_at ?? new Date().toISOString(),
@@ -27,6 +31,8 @@ export async function GET() {
       projects_approved: numberFrom(row?.projects_projects_approved),
       projects_ongoing: numberFrom(row?.projects_projects_ongoing),
       organisations_registered: numberFrom(row?.projects_organisations_registered),
+      changemakers: numberFrom(row?.projects_changemakers),
+      lives_improved: numberFrom(row?.projects_lives_improved),
       donations_received_eur: numberFrom(row?.projects_donations_received_eur),
     },
     funding: {
