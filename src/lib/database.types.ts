@@ -1663,6 +1663,7 @@ export type Database = {
         Row: {
           amount_max: number | null
           amount_min: number | null
+          applicant_types: string[]
           application_url: string
           approved_at: string | null
           approved_by: string | null
@@ -1707,6 +1708,7 @@ export type Database = {
         Insert: {
           amount_max?: number | null
           amount_min?: number | null
+          applicant_types?: string[]
           application_url: string
           approved_at?: string | null
           approved_by?: string | null
@@ -1751,6 +1753,7 @@ export type Database = {
         Update: {
           amount_max?: number | null
           amount_min?: number | null
+          applicant_types?: string[]
           application_url?: string
           approved_at?: string | null
           approved_by?: string | null
