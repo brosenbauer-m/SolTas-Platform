@@ -637,6 +637,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
           </div>
 
           <div className="mt-6 space-y-6">
+            {mode === "create" ? (
             <FormField
               control={control}
               name="owner_type"
@@ -692,6 +693,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
                 </FormItem>
               )}
             />
+            ) : null}
 
             <FormField
               control={control}
@@ -1263,6 +1265,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
           </div>
         </section>
 
+        {mode === "create" ? (
         <section className="rounded-2xl border border-soltas-line bg-white p-6">
           <h2 className="text-xl font-semibold text-soltas-text">Share to feed</h2>
           <p className="mt-1 text-sm text-soltas-muted">Optionally announce this project to the community feed.</p>
@@ -1304,6 +1307,7 @@ export default function ProjectForm({ mode = "create", projectId, initialValues 
             )}
           </div>
         </section>
+        ) : null}
 
         {submitWarning && <div className="rounded-3xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">{submitWarning}</div>}
 

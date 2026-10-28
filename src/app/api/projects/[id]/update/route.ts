@@ -73,75 +73,43 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
   const data = parsed.data;
 
-  // Update main project row
-  const { data: updated, error: updateError } = await supabase
-    .from("projects")
-    .update({
-      category: data.category,
-      name: data.name,
-      description: data.description ?? null,
-      lead_org_id: data.lead_org_id ?? null,
-      lat: data.location.lat,
-      lng: data.location.lng,
-      place_name: data.location.place_name,
-      type_of_intervention: data.type_of_intervention ?? [],
-      target_demographic: data.target_demographic ?? null,
-      lives_improved: data.lives_improved ?? null,
-      start_date: data.start_date ?? null,
-      end_date: data.end_date ?? null,
-      thematic_area: data.thematic_area ?? [],
-      donations_received: data.donations_received ?? null,
-      amount_needed: data.amount_needed ?? null,
-      currency: (data.currency ?? "USD").toUpperCase(),
-    })
-    .eq("id", id)
-    .select("id, slug")
-    .single();
-
-  if (updateError || !updated) {
-    return NextResponse.json({ error: updateError?.message ?? "Update failed" }, { status: 400 });
+  if (data.start_date && data.end_date && data.end_date < data.start_date) {
+    return NextResponse.json({ error: "The end date is before the start date." }, { status: 400 });
   }
 
-  // Replace links (simple + consistent)
-  const links =
-    data.links
-      ?.filter(l => l.url && l.url.trim().length > 0)
-      .map(l => ({ project_id: id, url: l.url.trim(), label: l.label ?? null })) ?? [];
+  // One database function saves the row and replaces links, partners and goals in a single transaction,
+  // so a failed step can't leave the project without them (migration 20260324120020).
+  const { data: saved, error: saveError } = await supabase.rpc("update_project_submission", {
+    p_id: id,
+    p_category: data.category,
+    p_name: data.name,
+    p_description: data.description ?? null,
+    p_lead_org_id: data.lead_org_id ?? null,
+    p_lat: data.location.lat,
+    p_lng: data.location.lng,
+    p_place_name: data.location.place_name,
+    p_type_of_intervention: data.type_of_intervention ?? [],
+    p_target_demographic: data.target_demographic ?? null,
+    p_lives_improved: data.lives_improved ?? null,
+    p_start_date: data.start_date ?? null,
+    p_end_date: data.end_date ?? null,
+    p_thematic_area: data.thematic_area ?? [],
+    p_donations_received: data.donations_received ?? null,
+    p_amount_needed: data.amount_needed ?? null,
+    p_currency: data.currency ?? "USD",
+    p_links: (data.links ?? []).filter(l => l.url.trim().length > 0).map(l => ({ url: l.url.trim(), label: l.label ?? null })),
+    p_partner_org_ids: data.partner_org_ids ?? [],
+    p_sdg_ids: data.sdg_ids ?? [],
+    p_ifrc_ids: data.ifrc_ids ?? [],
+  } as never);
 
-  // Clear + reinsert child rows (keeps logic simple; RLS still enforced)
-  const ops = [
-    supabase.from("project_links").delete().eq("project_id", id),
-    supabase.from("project_partners").delete().eq("project_id", id),
-    supabase.from("project_sdgs").delete().eq("project_id", id),
-    supabase.from("project_ifrc_challenges").delete().eq("project_id", id),
-  ];
-
-  for (const op of ops) {
-    const { error } = await op;
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if (saveError) {
+    const status = saveError.code === "42501" ? 403 : 400;
+    return NextResponse.json({ error: saveError.message }, { status });
   }
-
-  if (links.length) {
-    const { error } = await supabase.from("project_links").insert(links);
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-  }
-
-  const partnerRows = (data.partner_org_ids ?? []).map(orgId => ({ project_id: id, organisation_id: orgId }));
-  if (partnerRows.length) {
-    const { error } = await supabase.from("project_partners").insert(partnerRows);
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-  }
-
-  const sdgRows = (data.sdg_ids ?? []).map(sdgId => ({ project_id: id, sdg_id: sdgId }));
-  if (sdgRows.length) {
-    const { error } = await supabase.from("project_sdgs").insert(sdgRows);
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-  }
-
-  const ifrcRows = (data.ifrc_ids ?? []).map(challengeId => ({ project_id: id, challenge_id: challengeId }));
-  if (ifrcRows.length) {
-    const { error } = await supabase.from("project_ifrc_challenges").insert(ifrcRows);
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  const updated = (Array.isArray(saved) ? saved[0] : saved) as { id: string; slug: string | null } | undefined;
+  if (!updated) {
+    return NextResponse.json({ error: "Update failed" }, { status: 400 });
   }
 
   // Projects saved before tagging existed get AI tags once; projects that have tags keep them as they are.
