@@ -24,7 +24,7 @@ Update this file when a phase lands. Risk follows AGENT_RULES: DB/RLS/auth/payme
 | Organisations | Globe + table + filters, sorting | Done | — |
 | Org page | Name, description, followers, ongoing/finished counts, projects led and as partner, trust details (legal form, registration, founded, annual report, contact, looking for), members post updates | Done | Lives improved, impact, gallery, publications |
 | Funding | List, filters, table, globe, who can apply (filter + chips), Open / Closing soon / Closed chips | Done | Duration, deadline reminders |
-| Feed | Popular / Following / Issues, posts, likes, comments | Done | Share button, donate shortcut |
+| Feed | Popular / Following / Issues, posts, likes, comments; Share on project, organisation and issue pages | Done | Share on feed posts, donate shortcut |
 | Issues | Report, review, list/globe/table, updates, follow, map on the issue page | Done | Fundraising, resolved steps, linking advocates and organisations |
 | Note Empathy | Media / writing / store | Not started | — |
 | Services | Overview + request form (emailed to the team, nothing stored) | Done | Request tracking, if volume grows |

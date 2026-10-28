@@ -8,6 +8,7 @@ import { organisationMetadata } from "@/lib/pageMetadata";
 
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import FollowButton from "@/components/FollowButton";
+import ShareButton from "@/components/ShareButton";
 import { buttonClasses } from "@/components/ui/button";
 import { SocialLinks } from "@/components/profiles/SocialLinks";
 import OrganisationUpdateForm from "@/components/organisations/OrganisationUpdateForm";
@@ -306,13 +307,16 @@ export default async function OrganisationPage({
               ) : null}
             </div>
           ) : null}
-          <FollowButton
-            targetType="org"
-            targetId={organisation.id}
-            initialIsFollowing={isFollowing}
-            initialFollowerCount={resolvedFollowerCount}
-            isAuthenticated={Boolean(user)}
-          />
+          <div className="flex flex-wrap gap-2 sm:justify-end">
+            <FollowButton
+              targetType="org"
+              targetId={organisation.id}
+              initialIsFollowing={isFollowing}
+              initialFollowerCount={resolvedFollowerCount}
+              isAuthenticated={Boolean(user)}
+            />
+            <ShareButton title={organisation.name} path={`/organisations/${organisation.id}`} />
+          </div>
         </div>
       </header>
 
