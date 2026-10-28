@@ -2121,8 +2121,10 @@ export type Database = {
       }
       organisations: {
         Row: {
+          annual_report_url: string | null
           based_in_country: string | null
           based_in_region: string | null
+          contact_email: string | null
           country: string | null
           country_based: string | null
           created_at: string | null
@@ -2131,13 +2133,18 @@ export type Database = {
           description: string | null
           existing_since: string | null
           founded_at: string | null
+          founded_year: number | null
           funding_needed: number | null
           id: string
           intervention_tags: string[] | null
           lat: number | null
+          legal_form: string | null
           lng: number | null
           logo_url: string | null
+          looking_for: string[]
           name: string
+          registration_country: string | null
+          registration_number: string | null
           rejected_at: string | null
           rejected_by: string | null
           rejection_reason: string | null
@@ -2150,8 +2157,10 @@ export type Database = {
           what_we_do: string | null
         }
         Insert: {
+          annual_report_url?: string | null
           based_in_country?: string | null
           based_in_region?: string | null
+          contact_email?: string | null
           country?: string | null
           country_based?: string | null
           created_at?: string | null
@@ -2160,13 +2169,18 @@ export type Database = {
           description?: string | null
           existing_since?: string | null
           founded_at?: string | null
+          founded_year?: number | null
           funding_needed?: number | null
           id?: string
           intervention_tags?: string[] | null
           lat?: number | null
+          legal_form?: string | null
           lng?: number | null
           logo_url?: string | null
+          looking_for?: string[]
           name: string
+          registration_country?: string | null
+          registration_number?: string | null
           rejected_at?: string | null
           rejected_by?: string | null
           rejection_reason?: string | null
@@ -2179,8 +2193,10 @@ export type Database = {
           what_we_do?: string | null
         }
         Update: {
+          annual_report_url?: string | null
           based_in_country?: string | null
           based_in_region?: string | null
+          contact_email?: string | null
           country?: string | null
           country_based?: string | null
           created_at?: string | null
@@ -2189,13 +2205,18 @@ export type Database = {
           description?: string | null
           existing_since?: string | null
           founded_at?: string | null
+          founded_year?: number | null
           funding_needed?: number | null
           id?: string
           intervention_tags?: string[] | null
           lat?: number | null
+          legal_form?: string | null
           lng?: number | null
           logo_url?: string | null
+          looking_for?: string[]
           name?: string
+          registration_country?: string | null
+          registration_number?: string | null
           rejected_at?: string | null
           rejected_by?: string | null
           rejection_reason?: string | null
