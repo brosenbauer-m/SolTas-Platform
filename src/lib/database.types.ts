@@ -3549,7 +3549,9 @@ export type Database = {
           funding_opportunities_total: number
           issues_issues_open: number
           issues_issues_total: number
+          projects_changemakers: number
           projects_donations_received_eur: number
+          projects_lives_improved: number
           projects_organisations_registered: number
           projects_projects_approved: number
           projects_projects_ongoing: number
