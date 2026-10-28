@@ -22,7 +22,7 @@ Update this file when a phase lands. Risk follows AGENT_RULES: DB/RLS/auth/payme
 | Project page | Donations | Placeholder | Payment provider, legal entity |
 | Project form | Step-by-step form in the new design | Partly | Works, one long form |
 | Organisations | Globe + table + filters, sorting | Done | — |
-| Org page | Name, description, followers, projects | Partly | Ongoing/finished, lives improved, partners, impact, gallery, publications |
+| Org page | Name, description, followers, ongoing/finished counts, projects led and as partner, trust details (legal form, registration, founded, annual report, contact, looking for), members post updates | Done | Lives improved, impact, gallery, publications |
 | Funding | List, filters, table, globe | Done | Who can apply, duration, deadline reminders |
 | Feed | Popular / Following / Issues, posts, likes, comments | Done | Share button, donate shortcut |
 | Issues | Report, review, list/globe/table, updates | Done | Fundraising, resolved steps, linking advocates and organisations |
@@ -37,7 +37,7 @@ Update this file when a phase lands. Risk follows AGENT_RULES: DB/RLS/auth/payme
 ## 2. Suggested order
 
 **A. Quick wins (Low/Medium)**: ~~partners and SDGs/IFRC on the project page; SDG/IFRC filters and sorts~~ (done);
-organisation page counts, partners, project search (M); feed share button (S); services request form (S–M).
+~~organisation page counts, partners~~ (done); organisation project search (M); feed share button (S); services request form (S–M).
 
 **B. Robustness (Medium/High)**: ~~Supabase session middleware~~ (done); typed Supabase clients and the
 errors they reveal (M); project edit as one database function so a failed save can't lose links/partners (M, High);
