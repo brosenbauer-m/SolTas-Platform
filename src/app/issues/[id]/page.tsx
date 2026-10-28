@@ -5,6 +5,7 @@ import { issueMetadata } from "@/lib/pageMetadata";
 import { ExternalLink } from "lucide-react";
 
 import FollowButton from "@/components/FollowButton";
+import ShareButton from "@/components/ShareButton";
 import Map from "@/components/Map";
 import UpdatesSection, { type UpdateSummary } from "@/components/updates/UpdatesSection";
 import { Badge } from "@/components/ui/badge";
@@ -145,7 +146,7 @@ export default async function WatchdogIssuePage({
         </p>
         </div>
         {issue.status === "approved" ? (
-          <div className="shrink-0">
+          <div className="flex shrink-0 flex-wrap gap-2 sm:justify-end">
             <FollowButton
               targetType="issue"
               targetId={issue.id}
@@ -153,6 +154,7 @@ export default async function WatchdogIssuePage({
               initialFollowerCount={followerCount ?? 0}
               isAuthenticated={Boolean(user)}
             />
+            <ShareButton title={issue.title} path={`/issues/${issue.id}`} />
           </div>
         ) : null}
       </header>

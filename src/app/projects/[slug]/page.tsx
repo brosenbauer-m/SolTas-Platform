@@ -5,6 +5,7 @@ import { projectMetadata } from "@/lib/pageMetadata";
 
 import type { Database } from "@/lib/database.types";
 import FollowButton from "@/components/FollowButton";
+import ShareButton from "@/components/ShareButton";
 import IatiTag from "@/components/iati/IatiTag";
 import ProjectTags, { type ProjectTag, type TagOption } from "@/components/tags/ProjectTags";
 import { Badge } from "@/components/ui/badge";
@@ -350,17 +351,20 @@ export default async function ProjectDetailPage({
                 Edit
               </Link>
               <Link href={`/projects/${slug}/edit#sharing`} className={buttonClasses({ variant: "outline", size: "sm" })}>
-                Share
+                Collaborators
               </Link>
             </div>
           ) : null}
-          <FollowButton
-            targetType="project"
-            targetId={project.id}
-            initialIsFollowing={isFollowing}
-            initialFollowerCount={resolvedFollowerCount}
-            isAuthenticated={Boolean(user)}
-          />
+          <div className="flex flex-wrap gap-2 sm:justify-end">
+            <FollowButton
+              targetType="project"
+              targetId={project.id}
+              initialIsFollowing={isFollowing}
+              initialFollowerCount={resolvedFollowerCount}
+              isAuthenticated={Boolean(user)}
+            />
+            <ShareButton title={project.name} path={`/projects/${encodeURIComponent(slug)}`} />
+          </div>
         </div>
       </header>
 
