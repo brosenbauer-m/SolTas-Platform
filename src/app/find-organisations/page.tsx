@@ -14,6 +14,9 @@ import {
   type OrganisationListRow,
 } from "@/lib/organisations/findOrganisationsQuery";
 import { plural } from "@/lib/plural";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Find organisations", description: "The organisations behind humanitarian and environmental work: what they do, where, and who they partner with." };
 
 type SearchParams = Record<string, string | string[] | undefined>;
 

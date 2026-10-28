@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { LegalPage } from "@/components/legal/LegalPage";
 
-export const metadata: Metadata = { title: "Privacy policy | Solarpunk Taskforce" };
+export const metadata: Metadata = { title: "Privacy policy" };
 
 // DRAFT: fill in every highlighted [placeholder] and have the text reviewed before relying on it.
 // Keep the "Services we use" list in sync whenever a new provider is added (see AGENT_RULES.md).

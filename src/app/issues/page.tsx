@@ -12,6 +12,9 @@ import {
   type WatchdogIssueListRow,
 } from "@/lib/watchdog/findWatchdogIssuesQuery";
 import { plural } from "@/lib/plural";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Issues", description: "Local humanitarian and environmental issues raised by the people who live them." };
 
 type SearchParams = Record<string, string | string[] | undefined>;
 

@@ -12,6 +12,9 @@ import { NewPostComposer } from "@/components/feed/NewPostComposer";
 import { getServerSupabase } from "@/lib/supabaseServer";
 import type { Database } from "@/lib/database.types";
 import { IATI_ORG_ID } from "@/lib/iati/systemOrg";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Feed", description: "Updates and posts from projects and organisations across the Solarpunk Taskforce community." };
 
 const PAGE_SIZE = 30;
 

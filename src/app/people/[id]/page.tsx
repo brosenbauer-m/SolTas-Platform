@@ -2,6 +2,8 @@ import { buttonClasses } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { personMetadata } from "@/lib/pageMetadata";
 
 import FollowButton from "@/components/FollowButton";
 import { SocialLinks } from "@/components/profiles/SocialLinks";
@@ -12,6 +14,11 @@ function formatDate(value: string | null) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  return personMetadata(id);
 }
 
 export default async function ProfilePage({

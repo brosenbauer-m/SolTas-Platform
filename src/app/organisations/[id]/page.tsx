@@ -3,6 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { organisationMetadata } from "@/lib/pageMetadata";
 
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import FollowButton from "@/components/FollowButton";
@@ -17,6 +19,11 @@ function formatDate(value: string | null) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  return organisationMetadata(id);
 }
 
 export default async function OrganisationPage({

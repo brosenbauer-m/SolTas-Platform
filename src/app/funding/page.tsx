@@ -15,6 +15,9 @@ import {
 import { getServerSupabase } from "@/lib/supabaseServer";
 import Link from "next/link";
 import { plural } from "@/lib/plural";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Find funding", description: "Open and upcoming grants for humanitarian and environmental projects, with deadlines, amounts and eligibility." };
 
 type SearchParams = Record<string, string | string[] | undefined>;
 

@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { issueMetadata } from "@/lib/pageMetadata";
 import { ExternalLink } from "lucide-react";
 
 import UpdatesSection, { type UpdateSummary } from "@/components/updates/UpdatesSection";
@@ -20,6 +22,11 @@ function formatDate(value: string | null) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  return issueMetadata(id);
 }
 
 export default async function WatchdogIssuePage({
