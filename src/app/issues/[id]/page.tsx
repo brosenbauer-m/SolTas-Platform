@@ -4,6 +4,8 @@ import type { Metadata } from "next";
 import { issueMetadata } from "@/lib/pageMetadata";
 import { ExternalLink } from "lucide-react";
 
+import FollowButton from "@/components/FollowButton";
+import Map from "@/components/Map";
 import UpdatesSection, { type UpdateSummary } from "@/components/updates/UpdatesSection";
 import { Badge } from "@/components/ui/badge";
 import { getServerSupabase } from "@/lib/supabaseServer";
@@ -59,6 +61,20 @@ export default async function WatchdogIssuePage({
 
   const { data: isAdmin } = await supabase.rpc("is_admin");
 
+  const [{ count: followerCount }, { data: followEdge }] = await Promise.all([
+    supabase.from("follow_edges").select("id", { count: "exact", head: true }).eq("target_type", "issue").eq("target_issue_id", issue.id),
+    user
+      ? supabase
+          .from("follow_edges")
+          .select("id")
+          .eq("target_type", "issue")
+          .eq("target_issue_id", issue.id)
+          .eq("follower_user_id", user.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
+  const hasPoint = typeof issue.latitude === "number" && typeof issue.longitude === "number";
+
   // Only allow viewing if:
   // 1. Issue is approved (public), OR
   // 2. User is the creator, OR
@@ -111,7 +127,8 @@ export default async function WatchdogIssuePage({
         <span>Issue</span>
       </nav>
 
-      <header className="min-w-0">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           {urgency ? <Badge variant={urgencyTone(issue.urgency)}>{urgency} urgency</Badge> : null}
           {issue.status !== "approved" ? (
@@ -126,7 +143,39 @@ export default async function WatchdogIssuePage({
           Reported {formatDate(issue.created_at)}
           {issue.date_observed ? <> · Observed {formatDate(issue.date_observed)}</> : null}
         </p>
+        </div>
+        {issue.status === "approved" ? (
+          <div className="shrink-0">
+            <FollowButton
+              targetType="issue"
+              targetId={issue.id}
+              initialIsFollowing={Boolean(followEdge)}
+              initialFollowerCount={followerCount ?? 0}
+              isAuthenticated={Boolean(user)}
+            />
+          </div>
+        ) : null}
       </header>
+
+      {hasPoint ? (
+        <section className="card overflow-hidden" aria-label="Where">
+          <div className="h-64 sm:h-80">
+            <Map
+              markers={[
+                {
+                  id: issue.id,
+                  slug: issue.id,
+                  lng: issue.longitude as number,
+                  lat: issue.latitude as number,
+                  title: issue.title,
+                  placeName: locationLabel,
+                },
+              ]}
+              focusSlug={issue.id}
+            />
+          </div>
+        </section>
+      ) : null}
 
       {issue.description ? (
         <section className="card p-6">

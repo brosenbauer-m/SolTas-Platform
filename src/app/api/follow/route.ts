@@ -4,11 +4,13 @@ import { z } from "zod";
 import { getServerSupabase } from "@/lib/supabaseServer";
 
 const followPayloadSchema = z.object({
-  targetType: z.enum(["person", "org", "project"]),
+  targetType: z.enum(["person", "org", "project", "issue"]),
   targetId: z.string().uuid(),
 });
 
-function buildTargetColumn(targetType: "person" | "org" | "project") {
+type TargetType = "person" | "org" | "project" | "issue";
+
+function buildTargetColumn(targetType: TargetType) {
   switch (targetType) {
     case "person":
       return "target_person_id";
@@ -16,18 +18,13 @@ function buildTargetColumn(targetType: "person" | "org" | "project") {
       return "target_org_id";
     case "project":
       return "target_project_id";
+    case "issue":
+      return "target_issue_id";
   }
 }
 
-function buildOnConflict(targetType: "person" | "org" | "project") {
-  switch (targetType) {
-    case "person":
-      return "follower_user_id,target_type,target_person_id";
-    case "org":
-      return "follower_user_id,target_type,target_org_id";
-    case "project":
-      return "follower_user_id,target_type,target_project_id";
-  }
+function buildOnConflict(targetType: TargetType) {
+  return `follower_user_id,target_type,${buildTargetColumn(targetType)}`;
 }
 
 export async function POST(req: Request) {

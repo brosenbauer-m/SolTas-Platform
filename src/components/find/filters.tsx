@@ -171,16 +171,19 @@ function FilterField({
   onRemove?: () => void;
   wide?: boolean;
 }) {
+  const labelId = useId();
   return (
-    <div className={cn("min-w-0 space-y-1.5", wide && "@lg:col-span-2")}>
+    <div role="group" aria-labelledby={labelId} className={cn("min-w-0 space-y-1.5", wide && "@lg:col-span-2")}>
       <div className="flex min-h-5 items-center justify-between gap-2">
-        <span className="text-sm font-medium text-soltas-text">{label}</span>
+        <span id={labelId} className="text-sm font-medium text-soltas-text">
+          {label}
+        </span>
         {onRemove ? (
           <button
             type="button"
             onClick={onRemove}
             aria-label={`Remove ${label} filter`}
-            className="grid h-6 w-6 place-items-center rounded-full text-soltas-muted hover:bg-soltas-light hover:text-soltas-text"
+            className="-m-2 grid h-10 w-10 place-items-center rounded-full text-soltas-muted hover:bg-soltas-light hover:text-soltas-text"
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -280,6 +283,7 @@ export function SelectFilter({ param, options, placeholder = "Any" }: { param: s
     <div className="relative">
       <select
         value={value}
+        aria-label={placeholder}
         onChange={(event) => set({ [param]: event.target.value })}
         className={cn("h-11 appearance-none", fieldClasses, "pr-10", !value && "text-soltas-muted")}
       >
@@ -376,6 +380,7 @@ export function ComboboxFilter({
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder={searchPlaceholder}
+          aria-label={searchPlaceholder}
           aria-controls={listId}
           className={cn("mb-1.5 h-10", fieldClasses)}
         />

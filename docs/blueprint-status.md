@@ -25,7 +25,7 @@ Update this file when a phase lands. Risk follows AGENT_RULES: DB/RLS/auth/payme
 | Org page | Name, description, followers, ongoing/finished counts, projects led and as partner, trust details (legal form, registration, founded, annual report, contact, looking for), members post updates | Done | Lives improved, impact, gallery, publications |
 | Funding | List, filters, table, globe | Done | Who can apply, duration, deadline reminders |
 | Feed | Popular / Following / Issues, posts, likes, comments | Done | Share button, donate shortcut |
-| Issues | Report, review, list/globe/table, updates | Done | Fundraising, resolved steps, linking advocates and organisations |
+| Issues | Report, review, list/globe/table, updates, follow, map on the issue page | Done | Fundraising, resolved steps, linking advocates and organisations |
 | Note Empathy | Media / writing / store | Not started | — |
 | Services | Overview + request | Partly | Request is an email link, no form |
 | Profiles | Name, nationality, organisation, bio, links | Partly | Portfolio, Watchdog label, following list |
@@ -42,7 +42,7 @@ Update this file when a phase lands. Risk follows AGENT_RULES: DB/RLS/auth/payme
 
 **B. Robustness (Medium/High)**: ~~Supabase session middleware~~ (done); typed Supabase clients and the
 errors they reveal (M); ~~project edit as one database function~~ (done);
-rate limits on posts, comments, uploads (M); delete dead routes and pages (S).
+rate limits on posts, comments, uploads (M); ~~delete dead routes and pages~~ (done).
 
 **C. Membership and money (High)**: provider (e.g. Mollie, EU), plans for individuals and organisations, checkout,
 billing records (L); then AI search for members only; donations (L, needs the legal entity).
