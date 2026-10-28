@@ -13,6 +13,7 @@ import { SocialLinks } from "@/components/profiles/SocialLinks";
 import OrganisationUpdateForm from "@/components/organisations/OrganisationUpdateForm";
 import UpdatesSection, { type UpdateSummary } from "@/components/updates/UpdatesSection";
 import { plural } from "@/lib/plural";
+import { formatMetricValue, unitLabel } from "@/lib/metrics";
 import { getServerSupabase } from "@/lib/supabaseServer";
 import { IATI_ORG_ID } from "@/lib/iati/systemOrg";
 import type { Database } from "@/lib/database.types";
@@ -161,6 +162,21 @@ export default async function OrganisationPage({
   }[])
     .map((row) => row.projects)
     .filter((p): p is NonNullable<typeof p> => Boolean(p && p.status === "approved" && (p.visibility ?? "public") === "public"));
+
+  // Impact across the organisation's listed projects: same-unit figures add up ("other" is left out)
+  const { data: metricRows } = await supabase
+    .from("project_metrics")
+    .select("unit,value,projects!inner(lead_org_id,owner_type,owner_id,status,visibility)")
+    .or(ownOrLead, { referencedTable: "projects" })
+    .eq("projects.status", "approved")
+    .eq("projects.visibility", "public")
+    .neq("unit", "other")
+    .limit(2000);
+  const impactTotals = new Map<string, number>();
+  for (const row of (metricRows ?? []) as unknown as { unit: string; value: number }[]) {
+    impactTotals.set(row.unit, (impactTotals.get(row.unit) ?? 0) + Number(row.value));
+  }
+  const impact = [...impactTotals.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6);
 
   const resolvedMemberCount = memberError ? null : memberCount ?? 0;
   const resolvedProjectCount = projectError ? null : projectCount ?? 0;
@@ -492,6 +508,23 @@ export default async function OrganisationPage({
           <p className="mt-4 text-sm text-soltas-muted">Showing the {orgProjects?.length ?? 0} newest.</p>
         ) : null}
       </section>
+
+      {impact.length ? (
+        <section className="card p-6" aria-labelledby="org-impact">
+          <h2 id="org-impact" className="text-lg font-semibold tracking-tight text-soltas-text">
+            Impact across projects
+          </h2>
+          <p className="mt-1 text-sm text-soltas-muted">Figures reported by the organisation&apos;s projects, added up by unit.</p>
+          <ul className="mt-4 grid gap-3 sm:grid-cols-3">
+            {impact.map(([unit, total]) => (
+              <li key={unit} className="rounded-2xl border border-soltas-line bg-soltas-off-white p-4">
+                <p className="text-2xl font-semibold tracking-tight text-soltas-text">{formatMetricValue(total)}</p>
+                <p className="mt-1 text-sm font-medium text-soltas-text">{unitLabel(unit)}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {partnerProjects.length ? (
         <section className="card p-6">

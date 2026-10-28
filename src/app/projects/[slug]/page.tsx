@@ -11,6 +11,8 @@ import { Badge } from "@/components/ui/badge";
 import { buttonClasses } from "@/components/ui/button";
 import ImportedProjectDetails, { publisherName, readSourceData } from "@/components/projects/ImportedProjectDetails";
 import ProjectGoals from "@/components/projects/ProjectGoals";
+import ProjectImpact from "@/components/projects/ProjectImpact";
+import type { ProjectMetric } from "@/lib/metrics";
 import { SupportCard } from "@/components/projects/SupportCard";
 import UpdatesSectionWithSocial, { type UpdateSummary } from "@/components/updates/UpdatesSectionWithSocial";
 import { getServerSupabase } from "@/lib/supabaseServer";
@@ -152,6 +154,15 @@ export default async function ProjectDetailPage({
     ? await supabase.storage.from("project-media").createSignedUrls(mediaPaths, 60 * 60)
     : { data: [] };
   const mediaUrl = new Map((signed ?? []).map((item) => [item.path ?? "", item.signedUrl]));
+
+  // Impact metrics (self-defined figures, see src/lib/metrics.ts)
+  const { data: metricRows } = await supabase
+    .from("project_metrics")
+    .select("id,project_id,label,unit,kind,value,as_of,note")
+    .eq("project_id", project.id)
+    .order("kind")
+    .order("created_at");
+  const metrics = (metricRows ?? []) as unknown as ProjectMetric[];
 
   // 4) Can the current viewer edit? (used only for buttons)
   const { data: canEdit } = await supabase.rpc("user_can_edit_project", { pid: project.id });
@@ -412,6 +423,10 @@ export default async function ProjectDetailPage({
       ) : null}
 
       <ProjectGoals sdgs={project.sdgs} ifrc={project.ifrc_global_challenges} />
+
+      {!imported ? (
+        <ProjectImpact projectId={project.id} initialMetrics={metrics} canEdit={Boolean(canEdit)} userId={user?.id ?? null} />
+      ) : null}
 
       {imported && project.iati_identifier ? (
         <ImportedProjectDetails data={sourceData} iatiIdentifier={project.iati_identifier} updatedAt={project.source_updated_at} />

@@ -18,7 +18,7 @@ Update this file when a phase lands. Risk follows AGENT_RULES: DB/RLS/auth/payme
 | Find Projects | Timeline slider / history | Not started | No history stored |
 | Project page | Core profile, updates, likes, comments, follow, tags, partners, goals (SDG/IFRC), provenance and last-updated line | Done | Documents, contact person |
 | Project page | AI tags on create | Built (#218) | — |
-| Project page | Impact metrics, update reminders | Not started | — |
+| Project page | Impact metrics (self-defined, fixed units, outputs/outcomes, dated), summed per unit on the organisation page | Done | AI-suggested metrics, update reminders |
 | Project page | Donations | Placeholder | Payment provider, legal entity |
 | Project form | Step-by-step form in the new design | Partly | Works, one long form; saving an edit is one transaction now |
 | Organisations | Globe + table + filters, sorting | Done | — |
@@ -47,7 +47,7 @@ rate limits on posts, comments, uploads (M); delete dead routes and pages (S).
 **C. Membership and money (High)**: provider (e.g. Mollie, EU), plans for individuals and organisations, checkout,
 billing records (L); then AI search for members only; donations (L, needs the legal entity).
 
-**D. Engagement (Medium–High)**: impact metrics (M, new tables), Following/Featured on the home globe (M), email
+**D. Engagement (Medium–High)**: ~~impact metrics~~ (done); Following/Featured on the home globe (M), email
 digests and update reminders (M), profile portfolio (M), issue status steps and fundraising (M–L), more key figures (S).
 
 **E. Content and depth**: Note Empathy page (M), timeline/history (L, maybe drop), funding details and reminders (M),
