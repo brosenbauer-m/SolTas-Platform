@@ -12,6 +12,7 @@ import {
   SortSelect,
   type FilterDef,
 } from "@/components/find/filters";
+import { IFRC_OPTIONS, SDG_OPTIONS } from "@/lib/goals";
 import type { ProjectFilterOptions } from "@/lib/projects/findProjectsQuery";
 
 const SORT_OPTIONS = [
@@ -21,6 +22,7 @@ const SORT_OPTIONS = [
   { value: "amount_needed:desc", label: "Most funding needed" },
   { value: "donations_received:desc", label: "Most raised" },
   { value: "start_date:asc", label: "Starting soonest" },
+  { value: "end_date:asc", label: "Ending soonest" },
 ];
 
 const STAGE_OPTIONS = [
@@ -65,6 +67,19 @@ export default function ProjectsFilters({ options, showSorting = true }: Project
       main: true,
       params: ["tag"],
       render: () => <ComboboxFilter param="tag" options={options.tags} placeholder="Any tag" />,
+    },
+    {
+      key: "sdg",
+      label: "Sustainable Development Goals",
+      main: true,
+      params: ["sdg"],
+      render: () => <ComboboxFilter param="sdg" options={SDG_OPTIONS} placeholder="Any goal" searchPlaceholder="Goal number or name" />,
+    },
+    {
+      key: "ifrc",
+      label: "IFRC Global Challenges",
+      params: ["ifrc"],
+      render: () => <ComboboxFilter param="ifrc" options={IFRC_OPTIONS} placeholder="Any challenge" />,
     },
     {
       key: "thematic_area",
