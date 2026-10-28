@@ -131,16 +131,35 @@ export default function HomeGlobeSection({
 
   const [mode, setMode] = useState<HomeGlobeMode>(DEFAULT_MODE);
 
+  // "Following" view (blueprint): signed-in people can limit the globe to the projects they follow and the
+  // projects of organisations they follow. null = not signed in (or not loaded): the switch stays hidden.
+  const [followingCount, setFollowingCount] = useState<number | null>(null);
+  const [showFollowing, setShowFollowing] = useState(false);
+  useEffect(() => {
+    let active = true;
+    fetch("/api/projects/following")
+      .then((res) => (res.ok ? (res.json() as Promise<{ total?: number }>) : null))
+      .then((data) => {
+        if (active && data) setFollowingCount(data.total ?? 0);
+      })
+      .catch(() => {
+        // visitors and failures: no switch
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   // Every project (community and imported) as one clustered layer in Projects mode, like Find Projects.
   const projectLayer = useMemo<HomeGlobeProjectLayer>(
     () => ({
       mode: "projects",
-      url: "/api/projects/points",
+      url: showFollowing ? "/api/projects/following?following=1" : "/api/projects/points",
       color: MARKER_COLORS.project,
       ctaLabel: MODE_CONFIG.projects.ctaLabel,
       summaryUrl: (id) => `/api/projects/summary?slug=${encodeURIComponent(id)}`,
     }),
-    [],
+    [showFollowing],
   );
   const buttonRowRef = useRef<HTMLDivElement | null>(null);
 
@@ -299,6 +318,37 @@ export default function HomeGlobeSection({
                 );
               })}
             </div>
+
+            {followingCount != null && mode === "projects" ? (
+              <div
+                className="mt-3 inline-flex rounded-full border border-white/25 bg-white/10 p-1 backdrop-blur-md"
+                role="group"
+                aria-label="Which projects to show"
+              >
+                {[
+                  { value: false, label: "All projects" },
+                  { value: true, label: followingCount ? `Following (${numberFormatter.format(followingCount)})` : "Following" },
+                ].map((option) => (
+                  <button
+                    key={String(option.value)}
+                    type="button"
+                    onClick={() => setShowFollowing(option.value)}
+                    aria-pressed={showFollowing === option.value}
+                    className={cn(
+                      "h-9 rounded-full px-4 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-white",
+                      showFollowing === option.value ? "bg-white text-soltas-text" : "text-white/90 hover:bg-white/10",
+                    )}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+            {showFollowing && followingCount === 0 && mode === "projects" ? (
+              <p className="mt-2 text-sm text-white/80">
+                You don’t follow anything yet. Follow a project or an organisation to see it here.
+              </p>
+            ) : null}
 
             <div className="mt-4 flex flex-col gap-3 md:hidden">
               <div
