@@ -1,4 +1,4 @@
-# Blueprint status (checked against the code, 2026-10-27)
+# Blueprint status (checked against the code, 2026-10-28)
 
 Every item of `docs/blueprint.md` checked in the code (routes, components, migrations), not in the roadmap.
 Update this file when a phase lands. Risk follows AGENT_RULES: DB/RLS/auth/payments/AI prompts = High.
@@ -47,11 +47,11 @@ errors they reveal (M); ~~project edit as one database function~~ (done);
 **C. Membership and money (High)**: provider (e.g. Mollie, EU), plans for individuals and organisations, checkout,
 billing records (L); then AI search for members only; donations (L, needs the legal entity).
 
-**D. Engagement (Medium–High)**: ~~impact metrics~~ (done); Following/Featured on the home globe (M), email
-digests and update reminders (M), profile portfolio (M), issue status steps and fundraising (M–L), ~~more key figures~~ (done).
+**D. Engagement (Medium–High)**: ~~impact metrics~~ (done); ~~Following~~ (done) / Featured on the home globe (M); email
+digests and update reminders (M; in-app notifications for organisation followers done); ~~profile portfolio~~ (done); issue status steps and fundraising (M–L); ~~more key figures~~ (done).
 
-**E. Content and depth**: Note Empathy page (M), timeline/history (L, maybe drop), funding details and reminders (M),
-step-by-step project form, accessibility/mobile pass, SEO, end-to-end tests (M each).
+**E. Content and depth**: Note Empathy page (M), timeline/history (L, maybe drop), funding duration and deadline reminders (M),
+step-by-step project form, accessibility/mobile pass, ~~SEO basics~~ (done), end-to-end tests (M each).
 
 ## 3. Decisions for the owner
 
@@ -63,3 +63,16 @@ step-by-step project form, accessibility/mobile pass, SEO, end-to-end tests (M e
 6. Note Empathy: owner of the content, launch date, store in scope?
 7. Timeline/history: still wanted (costly)?
 8. Portfolio roles: self-claimed or confirmed by the project owner?
+
+## 4. Shipped on 2026-10-28 (one PR each, all merged)
+
+#221 list timeouts fixed · #222 goals (SDG/IFRC) + partners on projects, filters · #223 titles, previews, sitemap, robots, 404/error pages ·
+#224 organisation profile (trust details, counts, partner projects, members post updates) · #225 project edit in one transaction ·
+#226 impact metrics · #227 Following view on the home globe · #228 issue follow + map, accessible filters, dead pages removed ·
+#229 funding "who can apply" + status chips · #230 profile label, portfolio, following · #231 spam limits · #232 services request form ·
+#233 home key figures (changemakers, lives improved) · #234 notifications for organisation followers and approved projects ·
+#235 Share button · #236 Find pages: 8 s for visitors, honest "couldn't load" state.
+
+Still open from the research (see `docs/research/` and the table): documents and a contact person on projects, "Open to funding /
+partners / volunteers" flags as a filter, saved searches and alerts, staleness banners ("not updated since …") and an archived state,
+email digests, Featured projects, step-by-step project form, end-to-end tests.
