@@ -422,7 +422,7 @@ export default async function ProjectEditPage({
         ? project.project_links
             .filter(l => typeof l.url === "string" && l.url.length > 0)
             .map(l => ({ url: l.url as string, label: l.label ?? undefined }))
-        : [{ url: "", label: undefined }],
+        : [],
     partner_org_ids:
       project.project_partners
         ?.map(p => p.organisation_id)

@@ -20,7 +20,7 @@ Update this file when a phase lands. Risk follows AGENT_RULES: DB/RLS/auth/payme
 | Project page | AI tags on create | Built (#218) | — |
 | Project page | Impact metrics, update reminders | Not started | — |
 | Project page | Donations | Placeholder | Payment provider, legal entity |
-| Project form | Step-by-step form in the new design | Partly | Works, one long form |
+| Project form | Step-by-step form in the new design | Partly | Works, one long form; saving an edit is one transaction now |
 | Organisations | Globe + table + filters, sorting | Done | — |
 | Org page | Name, description, followers, ongoing/finished counts, projects led and as partner, trust details (legal form, registration, founded, annual report, contact, looking for), members post updates | Done | Lives improved, impact, gallery, publications |
 | Funding | List, filters, table, globe | Done | Who can apply, duration, deadline reminders |
@@ -41,7 +41,7 @@ Update this file when a phase lands. Risk follows AGENT_RULES: DB/RLS/auth/payme
 ~~organisation page counts, partners~~ (done); organisation project search (M); feed share button (S); services request form (S–M).
 
 **B. Robustness (Medium/High)**: ~~Supabase session middleware~~ (done); typed Supabase clients and the
-errors they reveal (M); project edit as one database function so a failed save can't lose links/partners (M, High);
+errors they reveal (M); ~~project edit as one database function~~ (done);
 rate limits on posts, comments, uploads (M); delete dead routes and pages (S).
 
 **C. Membership and money (High)**: provider (e.g. Mollie, EU), plans for individuals and organisations, checkout,
