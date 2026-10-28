@@ -3231,44 +3231,6 @@ export type Database = {
           thematic_tags: string[] | null
           website: string | null
         }
-        Insert: {
-          age_years?: never
-          based_in_country?: never
-          based_in_region?: string | null
-          demographic_tags?: string[] | null
-          description?: never
-          followers_count?: never
-          founded_at?: never
-          funding_needed?: number | null
-          id?: string | null
-          intervention_tags?: string[] | null
-          lat?: number | null
-          lng?: number | null
-          name?: string | null
-          projects_ongoing_count?: never
-          projects_total_count?: never
-          thematic_tags?: string[] | null
-          website?: string | null
-        }
-        Update: {
-          age_years?: never
-          based_in_country?: never
-          based_in_region?: string | null
-          demographic_tags?: string[] | null
-          description?: never
-          followers_count?: never
-          founded_at?: never
-          funding_needed?: number | null
-          id?: string | null
-          intervention_tags?: string[] | null
-          lat?: number | null
-          lng?: number | null
-          name?: string | null
-          projects_ongoing_count?: never
-          projects_total_count?: never
-          thematic_tags?: string[] | null
-          website?: string | null
-        }
         Relationships: []
       }
       rejected_projects: {
@@ -3538,6 +3500,13 @@ export type Database = {
       is_org_member: { Args: { _org_id: string }; Returns: boolean }
       is_superadmin: { Args: never; Returns: boolean }
       is_superadmin_email: { Args: { e: string }; Returns: boolean }
+      listed_project_counts: {
+        Args: { org_id: string }
+        Returns: {
+          ongoing: number
+          total: number
+        }[]
+      }
       mark_all_notifications_read: { Args: never; Returns: undefined }
       mark_notification_read: { Args: { nid: string }; Returns: undefined }
       remove_project_collaborator: {
