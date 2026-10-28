@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, BarChart3, Check, Megaphone } from "lucide-react";
 
 import SiteFooter from "@/components/SiteFooter";
+import ServiceRequestForm from "@/components/services/ServiceRequestForm";
 import { buttonClasses } from "@/components/ui/button";
 
 export const metadata: Metadata = {
@@ -260,17 +261,22 @@ export default function AboutPage() {
               ))}
             </ol>
 
-            <div className="mt-10 rounded-3xl bg-soltas-abyssal px-7 py-12 text-center text-white sm:px-12 sm:py-16">
-              <p className="text-3xl font-semibold tracking-tight sm:text-4xl">Let&apos;s talk about your work.</p>
-              <p className="mx-auto mt-3 max-w-xl text-[15px] leading-7 text-white/75">
-                Services are available to organisations and projects registered on the platform. Registration is free.
+            <div id="request" className="mt-10 scroll-mt-24 rounded-3xl bg-soltas-abyssal px-7 py-12 text-white sm:px-12 sm:py-16">
+              <div className="text-center">
+                <p className="text-3xl font-semibold tracking-tight sm:text-4xl">Let&apos;s talk about your work.</p>
+                <p className="mx-auto mt-3 max-w-xl text-[15px] leading-7 text-white/75">
+                  Services are available to organisations and projects registered on the platform. Registration is free.
+                </p>
+              </div>
+              <div className="mx-auto mt-8 max-w-3xl rounded-3xl bg-white p-6 text-soltas-text sm:p-8">
+                <ServiceRequestForm />
+              </div>
+              <p className="mt-6 text-center text-sm text-white/70">
+                Prefer email?{" "}
+                <a href={CONSULTATION_HREF} className="font-medium text-white underline">
+                  {CONTACT_EMAIL}
+                </a>
               </p>
-              <a
-                href={CONSULTATION_HREF}
-                className={buttonClasses({ size: "lg", className: "mt-8 bg-white text-soltas-abyssal hover:bg-white/90" })}
-              >
-                Email {CONTACT_EMAIL}
-              </a>
             </div>
           </div>
         </section>
