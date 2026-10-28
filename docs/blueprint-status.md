@@ -27,7 +27,7 @@ Update this file when a phase lands. Risk follows AGENT_RULES: DB/RLS/auth/payme
 | Feed | Popular / Following / Issues, posts, likes, comments | Done | Share button, donate shortcut |
 | Issues | Report, review, list/globe/table, updates, follow, map on the issue page | Done | Fundraising, resolved steps, linking advocates and organisations |
 | Note Empathy | Media / writing / store | Not started | — |
-| Services | Overview + request | Partly | Request is an email link, no form |
+| Services | Overview + request form (emailed to the team, nothing stored) | Done | Request tracking, if volume grows |
 | Profiles | Name, nationality, organisation, bio, links, label (Independent / Watchdog / Organisation), portfolio (published projects and issues), following list | Done | Self-described roles and periods (owner decision 8) |
 | Notifications | In-app, email setting | Partly | Email digests for followed projects |
 | Membership fees | Individuals and organisations | Not started | Provider, prices |
@@ -38,7 +38,7 @@ Update this file when a phase lands. Risk follows AGENT_RULES: DB/RLS/auth/payme
 ## 2. Suggested order
 
 **A. Quick wins (Low/Medium)**: ~~partners and SDGs/IFRC on the project page; SDG/IFRC filters and sorts~~ (done);
-~~organisation page counts, partners~~ (done); organisation project search (M); feed share button (S); services request form (S–M).
+~~organisation page counts, partners~~ (done); organisation project search (M); feed share button (S); ~~services request form~~ (done).
 
 **B. Robustness (Medium/High)**: ~~Supabase session middleware~~ (done); typed Supabase clients and the
 errors they reveal (M); ~~project edit as one database function~~ (done);
