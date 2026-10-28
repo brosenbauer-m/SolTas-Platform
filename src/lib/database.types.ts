@@ -2484,6 +2484,63 @@ export type Database = {
           },
         ]
       }
+      project_metrics: {
+        Row: {
+          as_of: string
+          created_at: string
+          created_by: string | null
+          id: string
+          kind: string
+          label: string
+          note: string | null
+          project_id: string
+          unit: string
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          as_of?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          label: string
+          note?: string | null
+          project_id: string
+          unit: string
+          updated_at?: string
+          value: number
+        }
+        Update: {
+          as_of?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          label?: string
+          note?: string | null
+          project_id?: string
+          unit?: string
+          updated_at?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_metrics_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_metrics_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "rejected_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_partners: {
         Row: {
           organisation_id: string
