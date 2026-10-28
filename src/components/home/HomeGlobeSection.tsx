@@ -230,10 +230,11 @@ export default function HomeGlobeSection({
         ],
         right: [
           { label: "Verified organisations", value: homeStatsState?.projects.organisations_registered, format: "number" },
-          { label: "Donations received", value: homeStatsState?.projects.donations_received_eur, format: "currency" },
+          { label: "Changemakers", value: homeStatsState?.projects.changemakers, format: "number" },
         ],
-        footnote:
-          "Totals include projects added here and projects imported from IATI (the International Aid Transparency Initiative).",
+        footnote: homeStatsState?.projects.lives_improved
+          ? `Project totals include projects imported from IATI. Community projects report ${numberFormatter.format(homeStatsState.projects.lives_improved)} lives improved (self-reported).`
+          : "Project totals include projects added here and projects imported from IATI (the International Aid Transparency Initiative). Changemakers are people behind a published project, issue or verified organisation.",
       },
       funding: {
         leftTitle: "Funding flow",

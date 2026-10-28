@@ -5,6 +5,10 @@ export type HomeStats = {
     projects_approved?: number;
     projects_ongoing?: number;
     organisations_registered?: number;
+    /** people who own or created a published project or issue, or belong to a verified organisation */
+    changemakers?: number;
+    /** self-reported "lives improved" of published community projects */
+    lives_improved?: number;
     donations_received_eur?: number;
   };
   funding: {

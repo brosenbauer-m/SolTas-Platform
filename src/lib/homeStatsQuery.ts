@@ -27,6 +27,8 @@ const validateHomeStats = (stats: HomeStats) => {
     isOptionalNumber(stats.projects.projects_approved) &&
     isOptionalNumber(stats.projects.projects_ongoing) &&
     isOptionalNumber(stats.projects.organisations_registered) &&
+    isOptionalNumber(stats.projects.changemakers) &&
+    isOptionalNumber(stats.projects.lives_improved) &&
     isOptionalNumber(stats.projects.donations_received_eur) &&
     isOptionalNumber(stats.funding.opportunities_total) &&
     isOptionalNumber(stats.funding.funders_registered) &&

@@ -8,7 +8,7 @@ Update this file when a phase lands. Risk follows AGENT_RULES: DB/RLS/auth/payme
 | Area | Feature | Status | What's missing |
 |---|---|---|---|
 | Home | Globe turning slowly, glass circles with correct counts | Done | — |
-| Home | Key figures | Partly | Changemakers, lives improved, issues resolved |
+| Home | Key figures | Done | Issues resolved (needs issue status steps); donations once a donation flow exists |
 | Home | Views All / Following / Featured | Partly | Projects / Funding / Issues, plus All projects / Following for signed-in people. No gold pulse for new updates, no curated Featured |
 | Data | IATI import (~25k, nightly), IATI tag with (i), sector names as tags | Done | Organisations claiming their IATI projects |
 | Find Projects | Globe + filters + results table, sorting | Done | End date / status sorts |
@@ -48,7 +48,7 @@ errors they reveal (M); ~~project edit as one database function~~ (done);
 billing records (L); then AI search for members only; donations (L, needs the legal entity).
 
 **D. Engagement (Medium–High)**: ~~impact metrics~~ (done); Following/Featured on the home globe (M), email
-digests and update reminders (M), profile portfolio (M), issue status steps and fundraising (M–L), more key figures (S).
+digests and update reminders (M), profile portfolio (M), issue status steps and fundraising (M–L), ~~more key figures~~ (done).
 
 **E. Content and depth**: Note Empathy page (M), timeline/history (L, maybe drop), funding details and reminders (M),
 step-by-step project form, accessibility/mobile pass, SEO, end-to-end tests (M each).
