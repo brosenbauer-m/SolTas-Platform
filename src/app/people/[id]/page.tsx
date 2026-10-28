@@ -7,7 +7,10 @@ import { personMetadata } from "@/lib/pageMetadata";
 
 import FollowButton from "@/components/FollowButton";
 import { SocialLinks } from "@/components/profiles/SocialLinks";
+import { Badge } from "@/components/ui/badge";
 import { getServerSupabase } from "@/lib/supabaseServer";
+import { plural } from "@/lib/plural";
+import { urgencyLabel } from "@/lib/watchdog/urgency";
 
 function formatDate(value: string | null) {
   if (!value) return "—";
@@ -82,6 +85,44 @@ export default async function ProfilePage({
 
   const name = [profile.first_name, profile.last_name].filter(Boolean).join(" ");
 
+  // Portfolio (blueprint): derived from what the person has done here, not self-claimed.
+  const [{ data: ownProjects }, { data: ownIssues }, { data: followEdges }] = await Promise.all([
+    supabase
+      .from("projects")
+      .select("id,slug,name,category,place_name,country")
+      .or(`and(owner_type.eq.user,owner_id.eq.${profile.id}),created_by.eq.${profile.id}`)
+      .eq("status", "approved")
+      .eq("visibility", "public")
+      .order("created_at", { ascending: false })
+      .limit(12),
+    supabase
+      .from("watchdog_issues")
+      .select("id,title,city,country,urgency,created_at")
+      .eq("created_by", profile.id)
+      .eq("status", "approved")
+      .order("created_at", { ascending: false })
+      .limit(12),
+    supabase
+      .from("follow_edges")
+      .select("target_type,target_project_id,target_org_id")
+      .eq("follower_user_id", profile.id)
+      .in("target_type", ["project", "org"])
+      .order("created_at", { ascending: false })
+      .limit(200),
+  ]);
+  const followedProjectIds = (followEdges ?? []).map((e) => e.target_project_id).filter((v): v is string => Boolean(v));
+  const followedOrgIds = (followEdges ?? []).map((e) => e.target_org_id).filter((v): v is string => Boolean(v));
+  const [{ data: followedProjects }, { data: followedOrgs }] = await Promise.all([
+    followedProjectIds.length
+      ? supabase.from("projects").select("id,slug,name").in("id", followedProjectIds.slice(0, 12))
+      : Promise.resolve({ data: [] as { id: string; slug: string | null; name: string }[] }),
+    followedOrgIds.length
+      ? supabase.from("organisations").select("id,name").in("id", followedOrgIds.slice(0, 12))
+      : Promise.resolve({ data: [] as { id: string; name: string }[] }),
+  ]);
+  // Blueprint label: Organisation member, Watchdog (has raised a published issue), otherwise Independent.
+  const label = organisation ? "Organisation" : (ownIssues?.length ?? 0) > 0 ? "Watchdog" : "Independent";
+
   return (
     <main className="mx-auto w-full max-w-6xl space-y-8 px-4 py-10">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -108,9 +149,12 @@ export default async function ProfilePage({
             </div>
           )}
           <div className="min-w-0">
-            <h1 className="text-3xl font-semibold tracking-tight text-soltas-text sm:text-4xl">
-              {name || "Unnamed profile"}
-            </h1>
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-3xl font-semibold tracking-tight text-soltas-text sm:text-4xl">
+                {name || "Unnamed profile"}
+              </h1>
+              <Badge variant={label === "Watchdog" ? "amber" : label === "Organisation" ? "ocean" : "outline"}>{label}</Badge>
+            </div>
             <p className="mt-1 text-sm text-soltas-muted">
               On Solarpunk Taskforce since {formatDate(profile.created_at)}
             </p>
@@ -124,9 +168,7 @@ export default async function ProfilePage({
                   {organisation.name}
                 </Link>
               </p>
-            ) : (
-              <p className="mt-1 text-sm text-soltas-muted">Independent</p>
-            )}
+            ) : null}
           </div>
         </div>
 
@@ -198,6 +240,113 @@ export default async function ProfilePage({
           </div>
         </dl>
       </section>
+
+      <section className="card p-6" aria-labelledby="portfolio-heading">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 id="portfolio-heading" className="text-lg font-semibold tracking-tight text-soltas-text">
+            Portfolio
+          </h2>
+          <p className="text-sm text-soltas-muted">
+            {[plural(ownProjects?.length ?? 0, "project"), plural(ownIssues?.length ?? 0, "issue raised", "issues raised")].join(" · ")}
+          </p>
+        </div>
+
+        {(ownProjects?.length ?? 0) > 0 ? (
+          <div className="mt-4">
+            <p className="text-xs font-medium text-soltas-muted">Projects</p>
+            <ul className="mt-2 grid gap-3 sm:grid-cols-2">
+              {(ownProjects ?? []).map((project) => (
+                <li key={project.id}>
+                  <Link
+                    href={`/projects/${project.slug ?? project.id}`}
+                    className="flex h-full flex-col rounded-2xl border border-soltas-line p-4 transition-colors hover:bg-soltas-off-white"
+                  >
+                    <Badge variant={project.category === "humanitarian" ? "ocean" : "green"} className="w-fit capitalize">
+                      {project.category}
+                    </Badge>
+                    <span className="mt-2 font-medium text-soltas-text">{project.name}</span>
+                    {project.place_name || project.country ? (
+                      <span className="mt-0.5 text-xs text-soltas-muted">
+                        {[project.place_name, project.country].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i).join(", ")}
+                      </span>
+                    ) : null}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
+        {(ownIssues?.length ?? 0) > 0 ? (
+          <div className="mt-5">
+            <p className="text-xs font-medium text-soltas-muted">Issues raised</p>
+            <ul className="mt-2 divide-y divide-soltas-line">
+              {(ownIssues ?? []).map((issue) => (
+                <li key={issue.id}>
+                  <Link href={`/issues/${issue.id}`} className="flex min-h-11 items-center justify-between gap-3 py-2 hover:underline">
+                    <span className="font-medium text-soltas-text">{issue.title}</span>
+                    <span className="shrink-0 text-xs text-soltas-muted">
+                      {[issue.city ?? issue.country, urgencyLabel(issue.urgency) ? `${urgencyLabel(issue.urgency)} urgency` : null]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
+        {!(ownProjects?.length ?? 0) && !(ownIssues?.length ?? 0) ? (
+          <p className="mt-3 text-sm text-soltas-muted">
+            {isOwner ? (
+              <>
+                Nothing here yet. Projects you add and issues you raise appear here once they are published.{" "}
+                <Link href="/projects/new" className="font-medium text-soltas-ocean hover:underline">
+                  Add a project
+                </Link>
+                .
+              </>
+            ) : (
+              "No published projects or issues yet."
+            )}
+          </p>
+        ) : null}
+      </section>
+
+      {(followedProjects?.length ?? 0) + (followedOrgs?.length ?? 0) > 0 ? (
+        <section className="card p-6" aria-labelledby="following-heading">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 id="following-heading" className="text-lg font-semibold tracking-tight text-soltas-text">
+              Following
+            </h2>
+            <p className="text-sm text-soltas-muted">
+              {[
+                followedProjectIds.length ? plural(followedProjectIds.length, "project") : null,
+                followedOrgIds.length ? plural(followedOrgIds.length, "organisation") : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+          </div>
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {(followedOrgs ?? []).map((org) => (
+              <li key={org.id}>
+                <Link href={`/organisations/${org.id}`} className="inline-flex min-h-9 items-center rounded-full bg-soltas-ocean/10 px-3 text-sm font-medium text-soltas-ocean hover:underline">
+                  {org.name}
+                </Link>
+              </li>
+            ))}
+            {(followedProjects ?? []).map((project) => (
+              <li key={project.id}>
+                <Link href={`/projects/${project.slug ?? project.id}`} className="inline-flex min-h-9 items-center rounded-full border border-soltas-line bg-white px-3 text-sm font-medium text-soltas-text hover:bg-soltas-off-white">
+                  {project.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </main>
   );
 }
